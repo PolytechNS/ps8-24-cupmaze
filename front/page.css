@@ -1,0 +1,117 @@
+#grid.quoridor-board {
+    display: grid;
+    grid-template-columns: repeat(8, 40px 5px) 40px;
+    grid-template-rows: repeat(18, 40px 5px) 40px;
+    /* gap: 2px; le retirer pour le collé*/
+    justify-content: center;
+    margin: 50px auto;
+}
+
+body {
+    background-image: url('imageResources/cupheadInGame2.jpg');
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    opacity: 0.7;
+}
+
+.cell {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    border: 0.1px solid;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+
+    position: relative;
+}
+
+.wall-vertical {
+    background-color: white;
+    width: 5px;
+    height: 40px;
+    /*border: 0.1px solid;*/
+}
+
+.wall-horizontal {
+    width: 40px;
+    height: 5px;
+    /*border: 0.5px solid;  si on retire la border on doit mettre 40px a la width */
+    background-color: white;
+}
+
+.wall-hovered {
+    background-color: green;
+}
+
+.wall-laid{
+    background-color: black;
+}
+
+.laidBy1{
+    background-color: red;
+}
+
+.laidBy2{
+    background-color: blue;
+}
+
+.space {
+    width: 5px;
+    height: 5px;
+    /*border: 0.5px solid;*/
+    justify-content: center;
+}
+
+.space-hovered {
+    background-color: green;
+}
+
+.player1-circle {
+    background-color: #ff0000;
+    border-radius: 50%;
+    box-sizing: border-box;
+    width: 25px;
+    height: 25px;
+}
+.player2-circle {
+    background-color: #0000ff;
+    border-radius: 50%;
+    box-sizing: border-box;
+    width: 25px;
+    height: 25px;
+}
+
+#popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 999;
+    color: white;
+    font-size: 24px;
+}
+
+#popup-content {
+    padding: 20px;
+    background: black;
+    border-radius: 10px;
+}
+
+.fog {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Assure que l'image couvre toute la zone */
+}
