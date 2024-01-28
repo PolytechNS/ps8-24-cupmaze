@@ -266,25 +266,29 @@ function wallLaid(event) {
     /**
      * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
      */
-    if(actionsToDo>0 && ((currentPlayer===1 && nbWallsPlayer1>0) || (currentPlayer===2 && nbWallsPlayer2>0))){
+    if(actionsToDo>0 && ((currentPlayer===1 && nbWallsPlayer1>0) || (currentPlayer===2 && nbWallsPlayer2>0))) {
         secondWallToColor.classList.add("wall-laid");
-        secondWallToColor.classList.add("laidBy"+currentPlayer);
+        secondWallToColor.classList.add("laidBy" + currentPlayer);
         spaceToColor.classList.add("wall-laid");
-        spaceToColor.classList.add("laidBy"+currentPlayer);
+        spaceToColor.classList.add("laidBy" + currentPlayer);
         firstWallToColor.classList.add("wall-laid");
         firstWallToColor.classList.add("firstWall");
-        firstWallToColor.classList.add("laidBy"+currentPlayer);
+        firstWallToColor.classList.add("laidBy" + currentPlayer);
 
-        if(currentPlayer===1) nbWallsPlayer1--;
+        if (currentPlayer === 1) nbWallsPlayer1--;
         else nbWallsPlayer2--;
+
+        actionsToDo--;
+        document.getElementById("button-validate-action").style.display = "flex";
+        document.getElementById("button-undo-action").style.display = "flex";
+        updateNumberAction(0);
+        //On sauvegarde la dernière action
+        lastActionType = "wall " + firstWallToColor.id + " " + spaceToColor.id + " " + secondWallToColor.id;
+        updateNumberWallsDisplay();
     }
-    actionsToDo--;
-    document.getElementById("button-validate-action").style.display = "flex";
-    document.getElementById("button-undo-action").style.display = "flex";
-    updateNumberAction(0);
-    //On sauvegarde la dernière action
-    lastActionType = "wall "+firstWallToColor.id+" "+spaceToColor.id+" "+secondWallToColor.id;
-    updateNumberWallsDisplay();
+    else{
+        alert("Insufficent number of actions and/or walls");
+    }
 }
 
 function updateNumberWallsDisplay(){
