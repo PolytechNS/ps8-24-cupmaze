@@ -266,31 +266,17 @@ function wallLaid(event) {
     /**
      * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
      */
-    if(currentPlayer===1){
-        if(nbWallsPlayer1>0 && actionsToDo===1){
-            //On colore les murs en noirs pour indiquer qu'ils sont posés
-            secondWallToColor.classList.add("wall-laid");
-            secondWallToColor.classList.add("laidBy"+currentPlayer);
-            spaceToColor.classList.add("wall-laid");
-            spaceToColor.classList.add("laidBy"+currentPlayer);
-            firstWallToColor.classList.add("wall-laid");
-            firstWallToColor.classList.add("firstWall");
-            firstWallToColor.classList.add("laidBy"+currentPlayer);
-            nbWallsPlayer1--;
+    if(actionsToDo>0 && ((currentPlayer===1 && nbWallsPlayer1>0) || (currentPlayer===2 && nbWallsPlayer2>0))){
+        secondWallToColor.classList.add("wall-laid");
+        secondWallToColor.classList.add("laidBy"+currentPlayer);
+        spaceToColor.classList.add("wall-laid");
+        spaceToColor.classList.add("laidBy"+currentPlayer);
+        firstWallToColor.classList.add("wall-laid");
+        firstWallToColor.classList.add("firstWall");
+        firstWallToColor.classList.add("laidBy"+currentPlayer);
 
-        }
-    }else{
-        if(nbWallsPlayer2>0 && actionsToDo===1){
-            //On colore les murs en noirs pour indiquer qu'ils sont posés
-            secondWallToColor.classList.add("wall-laid");
-            secondWallToColor.classList.add("laidBy"+currentPlayer);
-            spaceToColor.classList.add("wall-laid");
-            spaceToColor.classList.add("laidBy"+currentPlayer);
-            firstWallToColor.classList.add("wall-laid");
-            firstWallToColor.classList.add("firstWall");
-            firstWallToColor.classList.add("laidBy"+currentPlayer);
-            nbWallsPlayer2--;
-        }
+        if(currentPlayer===1) nbWallsPlayer1--;
+        else nbWallsPlayer2--;
     }
     actionsToDo--;
     document.getElementById("button-validate-action").style.display = "flex";
@@ -311,14 +297,12 @@ function updateNumberWallsDisplay(){
  * Event listener que l'on ajoute au bouton sur l'écran anti triche
  * Quand l'utilisateur veut jouer son tour, on va enlever l'écran anti triche, affiche la grille et le texte au dessus
  */
-function startNewRound(event){
+function startNewRound(){
     const popup = document.getElementById('popup');
     popup.style.display = 'none';
     document.getElementById("grid").style.display = 'grid';
     document.getElementById("display-current-player").style.display = "flex";
     document.getElementById("display-current-walls").style.display = "flex";
-    //document.getElementById("button-validate-action").style.display = "flex"
-    //document.getElementById("button-undo-action").style.display = "flex";
     document.getElementById("display-number-actions").style.display = "flex";
     document.getElementById("display-number-tour").style.display = "flex";
 }
@@ -349,7 +333,7 @@ function setUpNewRound(){
  * Cette fonction est appelée à chaque fois qu'un utilisateur va valider un round
  * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
  */
-function validateRound(event) {
+function validateRound() {
 
     if(isGameOver()){
         document.getElementById("popup-ready-message").innerHTML = victoryAnswer;
@@ -388,7 +372,7 @@ function validateRound(event) {
  * Si la dernière action est la pose d'un mur, alors la variable ressemble à ceci : lastActionType = "wall "+firstWallToColor.id+" "+spaceToColor.id+" "+secondWallToColor.id;
  * Si la dernière action est la mouvement d'un pion, alors on va regarder dans les données sauvegardées au début du tour pour replacer le pion correctement
  */
-function undoAction(event){
+function undoAction(){
     //On remet le nombre d'actions à 1
     actionsToDo=1;
     updateNumberAction(1);
