@@ -385,14 +385,17 @@ function undoAction(){
     //On remet le nombre d'actions à 1
     actionsToDo=1;
     updateNumberAction(1);
+
+    //On re-cache les boutons
+    document.getElementById("button-validate-action").style.display = "none";
+    document.getElementById("button-undo-action").style.display = "none";
+
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
+        document.getElementById(playerPositions["player"+currentPlayer]).innerHTML = "";
+
         if(lastPlayerPositions["player"+currentPlayer] === null){ //Cette condition est vraie si et seulement si on est dans le premier tour
-            document.getElementById(playerPositions["player"+currentPlayer]).innerHTML = "";
             document.getElementById(playerPositions["player"+currentPlayer]).classList.remove("occupied");
-            playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
-            document.getElementById("button-validate-action").style.display = "none";
-            document.getElementById("button-undo-action").style.display = "none";
 
             const cells = document.querySelectorAll(".cell");
             cells.forEach(cell => {
@@ -408,11 +411,8 @@ function undoAction(){
 
         }else{ //Si on est pas dans le premier tour
             addPlayerCircle(document.getElementById(lastPlayerPositions["player"+currentPlayer]),currentPlayer);
-            document.getElementById(playerPositions["player"+currentPlayer]).innerHTML = "";
-            playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
-            document.getElementById("button-validate-action").style.display = "none";
-            document.getElementById("button-undo-action").style.display = "none";
         }
+        playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
     }else{ //Si la dernière action la placement d'un mur
         if(currentPlayer === 1) nbWallsPlayer1++;
         else nbWallsPlayer2++;
@@ -437,8 +437,6 @@ function undoAction(){
 
         //On update la phrase affichée sur le site
         updateNumberWallsDisplay();
-        document.getElementById("button-validate-action").style.display = "none";
-        document.getElementById("button-undo-action").style.display = "none";
     }
 }
 
