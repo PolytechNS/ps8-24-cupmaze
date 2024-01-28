@@ -392,9 +392,9 @@ function undoAction(){
             })
 
         }else{ //Si on est pas dans le premier tour
-            addPlayerCircle(document.getElementById(lastPlayerPositions["player1"]),1);
-            document.getElementById(playerPositions["player1"]).innerHTML = "";
-            playerPositions["player1"] = lastPlayerPositions["player1"];
+            addPlayerCircle(document.getElementById(lastPlayerPositions["player"+currentPlayer]),currentPlayer);
+            document.getElementById(playerPositions["player"+currentPlayer]).innerHTML = "";
+            playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
             document.getElementById("button-validate-action").style.display = "none";
             document.getElementById("button-undo-action").style.display = "none";
         }
