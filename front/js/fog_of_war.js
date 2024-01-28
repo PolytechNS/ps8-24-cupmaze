@@ -155,19 +155,21 @@ function setVisionForPlayer(currentPlayer,playerPositions){
 
             if((parseInt(cell.visibility)>0 && currentPlayer === 1) || (currentPlayer === 2 && parseInt(cell.visibility)<0)){
                 cell.style.backgroundColor="lime";
-                let fogImage =document.createElement("img");
-                fogImage.id="fog~"+cell.id.split("~")[0];
-                fogImage.src = "imageResources/fog.png";
-                fogImage.alt = "brouillard de guerre";
-                fogImage.classList.add("fog");
-                cell.appendChild(fogImage);
+                if(!document.getElementById("fog~"+cell.id.split("~")[0])){
+                    let fogImage = document.createElement("img");
+                    fogImage.id = "fog~" + cell.id.split("~")[0];
+                    fogImage.src = "imageResources/fog.png";
+                    fogImage.alt = "brouillard de guerre";
+                    fogImage.classList.add("fog");
+                    cell.appendChild(fogImage);
 
-                //hide player if on cell
-                if(currentPlayer === 1 && playerPositions.player2 === cell.id) {
-                    player2circle.style.display='none';
-                }
-                if(currentPlayer === 2 && playerPositions.player1 === cell.id) {
-                    player1circle.style.display='none';
+                    //hide player if on cell
+                    if (currentPlayer === 1 && playerPositions.player2 === cell.id) {
+                        player2circle.style.display = 'none';
+                    }
+                    if (currentPlayer === 2 && playerPositions.player1 === cell.id) {
+                        player1circle.style.display = 'none';
+                    }
                 }
             }
             if((parseInt(cell.visibility)<=0 && currentPlayer === 1) || (currentPlayer === 2 && parseInt(cell.visibility)>=0)){
@@ -176,7 +178,7 @@ function setVisionForPlayer(currentPlayer,playerPositions){
                 if(fogImage) {
                     cell.removeChild(fogImage)
                     console.log(fogImage.id + "removed");
-                };
+                }
 
                 //show player if on cell
                 if(currentPlayer === 1 && playerPositions.player2 === cell.id) {
