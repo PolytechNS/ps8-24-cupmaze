@@ -247,7 +247,7 @@ function wallLaid(event) {
     const spaceToColor = findAdjacentSpace(wallPosition);
 
     //ancien to do: Vérifier si un mur n'est pas déjà posé ?
-    if((firstWallToColor.classList.contains("wall-laid") || (secondWallToColor.classList.contains("wall-laid") || (spaceToColor.classList.contains("wall-laid")){
+    if((firstWallToColor.classList.contains("wall-laid")) || (secondWallToColor.classList.contains("wall-laid")) || (spaceToColor.classList.contains("wall-laid"))){
         alert("Unexpected Error : wall shouldn't be clickable");
         return;
     }
