@@ -269,11 +269,16 @@ function wallLaid(event) {
     if(actionsToDo>0 && ((currentPlayer===1 && nbWallsPlayer1>0) || (currentPlayer===2 && nbWallsPlayer2>0))) {
         secondWallToColor.classList.add("wall-laid");
         secondWallToColor.classList.add("laidBy" + currentPlayer);
+        secondWallToColor.removeEventListener("mouseenter",wallListener);
+        secondWallToColor.removeEventListener("click",wallLaid);
+
         spaceToColor.classList.add("wall-laid");
         spaceToColor.classList.add("laidBy" + currentPlayer);
+
         firstWallToColor.classList.add("wall-laid");
-        firstWallToColor.classList.add("firstWall");
         firstWallToColor.classList.add("laidBy" + currentPlayer);
+        firstWallToColor.removeEventListener("mouseenter",wallListener);
+        firstWallToColor.removeEventListener("click",wallLaid);
 
         if (currentPlayer === 1) nbWallsPlayer1--;
         else nbWallsPlayer2--;
@@ -442,13 +447,23 @@ function undoAction(){
         else nbWallsPlayer2++;
         //On parle la string pour récupérer les id des 3 murs que l'on va devoir remettre en "normal"
         let parse = lastActionType.split(" ");
-        document.getElementById(parse[1]).classList.remove("wall-laid");
-        document.getElementById(parse[2]).classList.remove("wall-laid");
-        document.getElementById(parse[3]).classList.remove("wall-laid");
+        let firstWall=document.getElementById(parse[1]);
+        let space=document.getElementById(parse[2]);
+        let secondWall=document.getElementById(parse[3]);
 
-        document.getElementById(parse[1]).classList.remove("laidBy"+currentPlayer);
-        document.getElementById(parse[2]).classList.remove("laidBy"+currentPlayer);
-        document.getElementById(parse[3]).classList.remove("laidBy"+currentPlayer);
+        firstWall.classList.remove("wall-laid");
+        firstWall.classList.remove("laidBy"+currentPlayer);
+        firstWall.addEventListener("mouseenter",wallListener);
+        firstWall.addEventListener("click",wallLaid);
+
+        space.classList.remove("wall-laid");
+        space.classList.remove("laidBy"+currentPlayer);
+
+        secondWall.classList.remove("wall-laid");
+        secondWall.classList.remove("laidBy"+currentPlayer);
+        secondWall.addEventListener("mouseenter",wallListener);
+        secondWall.addEventListener("click",wallLaid);
+
         //On update la phrase affichée sur le site
         updateNumberWallsDisplay();
         document.getElementById("button-validate-action").style.display = "none";
