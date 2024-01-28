@@ -285,6 +285,8 @@ function wallLaid(event) {
         firstWallToColor.removeEventListener("mouseenter",wallListener);
         firstWallToColor.removeEventListener("click",wallLaid);
 
+        //TODO enlever l'event listener pour le mur juste avant
+
         if (currentPlayer === 1) nbWallsPlayer1--;
         else nbWallsPlayer2--;
 
