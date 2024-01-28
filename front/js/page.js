@@ -386,6 +386,19 @@ function undoAction(event){
                 playerPositions["player1"] = lastPlayerPositions["player1"];
                 document.getElementById("button-validate-action").style.display = "none";
                 document.getElementById("button-undo-action").style.display = "none";
+
+                const cells = document.querySelectorAll(".cell");
+                cells.forEach(cell => {
+                    cell.removeEventListener("click", movePlayer);
+                    cell.addEventListener("click", choosePositionToBegin);
+                });
+
+                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+                walls.forEach(wall=>{
+                    wall.removeEventListener("mouseenter",wallListener);
+                    wall.removeEventListener("click",wallLaid);
+                })
+
             }else{ //Si on est pas dans le premier tour
                 addPlayerCircle(document.getElementById(lastPlayerPositions["player1"]),1);
                 document.getElementById(playerPositions["player1"]).innerHTML = "";
@@ -400,6 +413,18 @@ function undoAction(event){
                 playerPositions["player2"] = lastPlayerPositions["player2"];
                 document.getElementById("button-validate-action").style.display = "none";
                 document.getElementById("button-undo-action").style.display = "none";
+
+                const cells = document.querySelectorAll(".cell");
+                cells.forEach(cell => {
+                    cell.removeEventListener("click", movePlayer);
+                    cell.addEventListener("click", choosePositionToBegin);
+                });
+
+                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+                walls.forEach(wall=>{
+                    wall.removeEventListener("mouseenter",wallListener);
+                    wall.removeEventListener("click",wallLaid);
+                })
 
             }else{//Si on est pas dans le premier tour
                 addPlayerCircle(document.getElementById(lastPlayerPositions["player2"]), 2);
