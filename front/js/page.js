@@ -372,60 +372,31 @@ function undoAction(){
     updateNumberAction(1);
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
-        if(currentPlayer === 1){
-            if(lastPlayerPositions["player1"] === null){ //Cette condition est vraie si et seulement si on est dans le premier tour
-                document.getElementById(playerPositions["player1"]).innerHTML = "";
-                document.getElementById(playerPositions["player1"]).classList.remove("occupied");
-                playerPositions["player1"] = lastPlayerPositions["player1"];
-                document.getElementById("button-validate-action").style.display = "none";
-                document.getElementById("button-undo-action").style.display = "none";
+        if(lastPlayerPositions["player"+currentPlayer] === null){ //Cette condition est vraie si et seulement si on est dans le premier tour
+            document.getElementById(playerPositions["player"+currentPlayer]).innerHTML = "";
+            document.getElementById(playerPositions["player"+currentPlayer]).classList.remove("occupied");
+            playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
+            document.getElementById("button-validate-action").style.display = "none";
+            document.getElementById("button-undo-action").style.display = "none";
 
-                const cells = document.querySelectorAll(".cell");
-                cells.forEach(cell => {
-                    cell.removeEventListener("click", movePlayer);
-                    cell.addEventListener("click", choosePositionToBegin);
-                });
+            const cells = document.querySelectorAll(".cell");
+            cells.forEach(cell => {
+                cell.removeEventListener("click", movePlayer);
+                cell.addEventListener("click", choosePositionToBegin);
+            });
 
-                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-                walls.forEach(wall=>{
-                    wall.removeEventListener("mouseenter",wallListener);
-                    wall.removeEventListener("click",wallLaid);
-                })
+            const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+            walls.forEach(wall=>{
+                wall.removeEventListener("mouseenter",wallListener);
+                wall.removeEventListener("click",wallLaid);
+            })
 
-            }else{ //Si on est pas dans le premier tour
-                addPlayerCircle(document.getElementById(lastPlayerPositions["player1"]),1);
-                document.getElementById(playerPositions["player1"]).innerHTML = "";
-                playerPositions["player1"] = lastPlayerPositions["player1"];
-                document.getElementById("button-validate-action").style.display = "none";
-                document.getElementById("button-undo-action").style.display = "none";
-            }
-        }else{
-            if(lastPlayerPositions["player2"] === null){ //Cette condition est vraie si et seulement si on est dans le premier tour
-                document.getElementById(playerPositions["player2"]).innerHTML = "";
-                document.getElementById(playerPositions["player2"]).classList.remove("occupied");
-                playerPositions["player2"] = lastPlayerPositions["player2"];
-                document.getElementById("button-validate-action").style.display = "none";
-                document.getElementById("button-undo-action").style.display = "none";
-
-                const cells = document.querySelectorAll(".cell");
-                cells.forEach(cell => {
-                    cell.removeEventListener("click", movePlayer);
-                    cell.addEventListener("click", choosePositionToBegin);
-                });
-
-                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-                walls.forEach(wall=>{
-                    wall.removeEventListener("mouseenter",wallListener);
-                    wall.removeEventListener("click",wallLaid);
-                })
-
-            }else{//Si on est pas dans le premier tour
-                addPlayerCircle(document.getElementById(lastPlayerPositions["player2"]), 2);
-                document.getElementById(playerPositions["player2"]).innerHTML = "";
-                playerPositions["player2"] = lastPlayerPositions["player2"];
-                document.getElementById("button-validate-action").style.display = "none";
-                document.getElementById("button-undo-action").style.display = "none";
-            }
+        }else{ //Si on est pas dans le premier tour
+            addPlayerCircle(document.getElementById(lastPlayerPositions["player1"]),1);
+            document.getElementById(playerPositions["player1"]).innerHTML = "";
+            playerPositions["player1"] = lastPlayerPositions["player1"];
+            document.getElementById("button-validate-action").style.display = "none";
+            document.getElementById("button-undo-action").style.display = "none";
         }
     }else{ //Si la dernière action la placement d'un mur
         if(currentPlayer === 1) nbWallsPlayer1++;
