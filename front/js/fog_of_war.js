@@ -18,10 +18,7 @@ function calculateVisibility(playerPositions) {
 
     const cells = document.querySelectorAll(".cell");
     const wallsByOne = document.querySelectorAll(".laidBy1");
-    console.log(wallsByOne.length);
     const wallsByTwo = document.querySelectorAll(".laidBy2");
-    console.log(wallsByTwo.length);
-
 
     cells.forEach(function(cell)
         {
@@ -51,7 +48,6 @@ function calculateVisibility(playerPositions) {
                 newVisibility++;
 
             cell.visibility=""+newVisibility;
-            console.log("cell "+cell.id+" visibility : "+cell.visibility);
         }
     )
 
@@ -81,9 +77,7 @@ function wallVision(wall,visionSign){
             let cellBelow = document.getElementById((wallLine + 1) + "-" + wallColumn + "~cell");
 
             if (cellAbove) cellAbove.visibility = "" + (parseInt(cellAbove.visibility) + 2*visionSign);
-            console.log(cellAbove.id + " above visibility : " + cellAbove.visibility);
             if (cellBelow) cellBelow.visibility = "" + (parseInt(cellBelow.visibility) + 2*visionSign);
-            console.log(cellBelow.id + " below visibility : " + cellBelow.visibility);
 
             if(wall.classList.contains("firstWall")){
                 let cellLeftAbove = document.getElementById(""+wallLine+"-"+(wallColumn-1)+"~cell");
@@ -112,11 +106,8 @@ function wallVision(wall,visionSign){
             let cellLeft = document.getElementById(""+wallLine+"-"+wallColumn+"~cell");
             let cellRight = document.getElementById(""+wallLine+"-"+(wallColumn+1)+"~cell");
 
-            console.log(cellLeft.id+" PRE left visibility : "+cellLeft.visibility);
             if(cellLeft) cellLeft.visibility =""+(parseInt(cellLeft.visibility)+2*visionSign);
-            console.log(cellLeft.id+" left visibility : "+cellLeft.visibility);
             if(cellRight) cellRight.visibility =""+(parseInt(cellRight.visibility)+2*visionSign);
-            console.log(cellRight.id+" right visibility : "+cellRight.visibility);
 
             if(wall.classList.contains("firstWall")){
                 let cellAboveLeft = document.getElementById(""+(wallLine-1)+"-"+wallColumn+"~cell");
@@ -148,8 +139,6 @@ function setVisionForPlayer(currentPlayer,playerPositions){
     console.log(" ########### ROUND BREAK ###########")
     cells.forEach(function(cell)
         {
-            console.log("cell "+cell.id+" visibility : "+cell.visibility);
-
             let player1circle = document.getElementById("player" + 1 + "-circle");
             let player2circle = document.getElementById("player" + 2 + "-circle");
 
@@ -177,7 +166,6 @@ function setVisionForPlayer(currentPlayer,playerPositions){
                 let fogImage =document.getElementById("fog~"+cell.id.split("~")[0]);
                 if(fogImage) {
                     cell.removeChild(fogImage)
-                    console.log(fogImage.id + "removed");
                 }
 
                 //show player if on cell
