@@ -65,71 +65,40 @@ function calculateVisibility(playerPositions) {
 }
 
 function wallVision(wall,visionSign){
-    const hORv = wall.id.split("~")[0]
-    const wallLine = parseInt(wall.id.match(/\d+/g)[0]);
-    const wallColumn = parseInt(wall.id.match(/\d+/g)[1]);
+    /*
+            |  AAL  |  AAR  |
+    |  ALL  |  AL   |   AR  |  ARR  |
+    |  BLL  |  BL   |   BR  |  BRR  |
+            |  BBL  |  BBR  |
+     */
+    if(wall.id.includes("space")){
+        const wallLine = parseInt(wall.id.match(/\d+/g)[0]);
+        const wallColumn = parseInt(wall.id.match(/\d+/g)[1]);
 
+        let cellAL = document.getElementById(wallLine + "-" + wallColumn + "~cell");
+        let cellBL = document.getElementById((wallLine + 1) + "-" + wallColumn + "~cell");
+        let cellAR = document.getElementById("" + wallLine + "-" + (wallColumn + 1) + "~cell");
+        let cellBR = document.getElementById((wallLine + 1) + "-" + (wallColumn + 1) + "~cell");
 
-    if(!wall.id.includes("space")) {
-        //contact with horizontal wall
-        if (hORv === "wh") {
-            let cellAbove = document.getElementById(wallLine + "-" + wallColumn + "~cell");
-            let cellBelow = document.getElementById((wallLine + 1) + "-" + wallColumn + "~cell");
+        let cellAAL = document.getElementById("" + (wallLine - 1) + "-" + wallColumn + "~cell");
+        let cellAAR = document.getElementById("" + (wallLine - 1) + "-" + (wallColumn + 1) + "~cell");
+        let cellBBL = document.getElementById("" + (wallLine + 2) + "-" + wallColumn + "~cell");
+        let cellBBR = document.getElementById((wallLine + 2) + "-" + (wallColumn + 1) + "~cell");
 
-            if (cellAbove) cellAbove.visibility = "" + (parseInt(cellAbove.visibility) + 2*visionSign);
-            if (cellBelow) cellBelow.visibility = "" + (parseInt(cellBelow.visibility) + 2*visionSign);
+        let cellALL = document.getElementById("" + wallLine + "-" + (wallColumn - 1) + "~cell");
+        let cellARR = document.getElementById("" + wallLine + "-" + (wallColumn + 2) + "~cell");
+        let cellBLL = document.getElementById("" + (wallLine + 1) + "-" + (wallColumn - 1) + "~cell");
+        let cellBRR = document.getElementById((wallLine + 1) + "-" + (wallColumn + 2) + "~cell");
 
-            if(wall.classList.contains("firstWall")){
-                let cellLeftAbove = document.getElementById(""+wallLine+"-"+(wallColumn-1)+"~cell");
-                if(cellLeftAbove) cellLeftAbove.visibility=""+ (parseInt(cellLeftAbove.visibility)+1*visionSign);
+        const plusTwoCells = [cellAL, cellBL, cellAR, cellBR];
+        const plusOneCell = [cellAAL, cellAAR, cellBBL, cellBBR, cellALL, cellARR, cellBLL, cellBRR];
 
-                let cellLeftBelow = document.getElementById(""+(wallLine+1)+"-"+(wallColumn-1)+"~cell");
-                if(cellLeftBelow) cellLeftBelow.visibility=""+ (parseInt(cellLeftBelow.visibility)+1*visionSign);
-            }
-            else{
-                let cellRightAbove = document.getElementById(""+wallLine+"-"+(wallColumn+1)+"~cell");
-                if(cellRightAbove) cellRightAbove.visibility=""+ (parseInt(cellRightAbove.visibility)+1*visionSign);
-
-                let cellRightBelow = document.getElementById(""+(wallLine+1)+"-"+(wallColumn+1)+"~cell");
-                if(cellRightBelow) cellRightBelow.visibility=""+ (parseInt(cellRightBelow.visibility)+1*visionSign);
-            }
-
-            let cellDoubleAbove = document.getElementById((wallLine - 1) + "-" + wallColumn + "~cell");
-            let cellDoubleBelow = document.getElementById((wallLine + 2) + "-" + wallColumn + "~cell");
-
-            if (cellDoubleAbove) cellDoubleAbove.visibility = "" + (parseInt(cellDoubleAbove.visibility) + 1*visionSign);
-            if (cellDoubleBelow) cellDoubleBelow.visibility = "" + (parseInt(cellDoubleBelow.visibility) + 1*visionSign);
-        }
-
-        //contact with vertical wall
-        if(hORv==="wv"){
-            let cellLeft = document.getElementById(""+wallLine+"-"+wallColumn+"~cell");
-            let cellRight = document.getElementById(""+wallLine+"-"+(wallColumn+1)+"~cell");
-
-            if(cellLeft) cellLeft.visibility =""+(parseInt(cellLeft.visibility)+2*visionSign);
-            if(cellRight) cellRight.visibility =""+(parseInt(cellRight.visibility)+2*visionSign);
-
-            if(wall.classList.contains("firstWall")){
-                let cellAboveLeft = document.getElementById(""+(wallLine-1)+"-"+wallColumn+"~cell");
-                if(cellAboveLeft) cellAboveLeft.visibility=""+ (parseInt(cellAboveLeft.visibility)+1*visionSign);
-
-                let cellAboveRight = document.getElementById(""+(wallLine-1)+"-"+(wallColumn+1)+"~cell");
-                if(cellAboveRight) cellAboveRight.visibility=""+ (parseInt(cellAboveRight.visibility)+1*visionSign);
-            }
-            else{
-                let cellBelowLeft = document.getElementById(""+(wallLine+1)+"-"+wallColumn+"~cell");
-                if(cellBelowLeft) cellBelowLeft.visibility=""+ (parseInt(cellBelowLeft.visibility)+1*visionSign);
-
-                let cellBelowRight = document.getElementById(""+(wallLine+1)+"-"+(wallColumn+1)+"~cell");
-                if(cellBelowRight) cellBelowRight.visibility=""+ (parseInt(cellBelowRight.visibility)+1*visionSign);
-            }
-
-            let cellDoubleLeft = document.getElementById(""+wallLine+"-"+(wallColumn-1)+"~cell");
-            let cellDoubleRight = document.getElementById(""+wallLine+"-"+(wallColumn+2)+"~cell");
-
-            if(cellDoubleLeft) cellDoubleLeft.visibility =""+ (parseInt(cellDoubleLeft.visibility)+1*visionSign);
-            if(cellDoubleRight) cellDoubleRight.visibility =""+ (parseInt(cellDoubleRight.visibility)+1*visionSign);
-        }
+        plusTwoCells.forEach(cell => {
+            if (cell) cell.visibility = "" + (parseInt(cell.visibility) + 2 * visionSign);
+        })
+        plusOneCell.forEach(cell => {
+            if (cell) cell.visibility = "" + (parseInt(cell.visibility) + 1 * visionSign);
+        })
     }
 }
 
