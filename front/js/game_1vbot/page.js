@@ -3,6 +3,11 @@ import {beginningPositionIsValid,moveIsValid} from "../game_local_1v1/referee.js
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
 import {computeMove} from "./ai.js";
 
+
+
+let socket;
+
+
 let currentPlayer = 1;
 let nbWallsPlayer1 = 10;
 let nbWallsPlayer2 = 10;
@@ -31,6 +36,9 @@ document.addEventListener("DOMContentLoaded", main);
 
 
 function main() {
+    //On initialise le socket quand la partie commence
+    socket = io();
+
     board = document.getElementById("grid");
 
     //On ajoute un event listener sur l'écran anti triche
@@ -120,6 +128,7 @@ function addPlayerCircle(cell, player) {
     circle.classList.add("player" + player + "-circle");
     circle.id="player" + currentPlayer + "-circle";
     cell.appendChild(circle);
+
 }
 
 /**
