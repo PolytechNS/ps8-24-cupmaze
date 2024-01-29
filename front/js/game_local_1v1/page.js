@@ -262,6 +262,11 @@ function wallLaid(event) {
     if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
         return;
     }
+    //ancien to do: Vérifier si un mur n'est pas déjà posé ?
+    if((firstWallToColor.classList.contains("wall-laid")) || (secondWallToColor.classList.contains("wall-laid")) || (spaceToColor.classList.contains("wall-laid"))){
+        alert("Unexpected Error : wall shouldn't be clickable");
+        return;
+    }
 
     /**
      * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
