@@ -3,7 +3,8 @@ export {
     findAdjacentWall,
     findAdjacentSpace,
     highlightElements,
-    removeHighlight
+    removeHighlight,
+    updateNumberAction
 };
 
 function extractWallInfo(wallId) {
@@ -66,4 +67,9 @@ function removeHighlight(firstWall, secondWall, space) {
     firstWall.classList.remove("wall-hovered");
     secondWall.classList.remove("wall-hovered");
     space.classList.remove("space-hovered");
+}
+
+
+function updateNumberAction(nombreAction){
+    document.getElementById("display-number-actions").innerHTML = "Nombre d'actions restantes : "+nombreAction;
 }

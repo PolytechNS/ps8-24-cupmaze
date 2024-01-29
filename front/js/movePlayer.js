@@ -1,5 +1,7 @@
 import {moveIsValid} from "./referee.js";
-export {movePlayer, addPlayerCircle, updateNumberAction};
+import {updateNumberAction} from "./utils.js";
+
+export {movePlayer, addPlayerCircle};
 function movePlayer(cell,playerPositions,currentPlayer,actionsToDo,lastActionType) {
     const clickedCell = cell;
     // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
@@ -40,8 +42,4 @@ function removePlayerCircle(playerPositions,currentPlayer) {
     const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
     if(playerCircle) oldCell.removeChild(playerCircle);
 
-}
-
-function updateNumberAction(nombreAction){
-    document.getElementById("display-number-actions").innerHTML = "Nombre d'actions restantes : "+nombreAction;
 }
