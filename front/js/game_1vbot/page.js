@@ -332,15 +332,18 @@ function validateRound(event) {
         //On va faire jouer le bot
         currentPlayer = 2;
 
-        //On supprime l'ancienne position
-        if(playerPositions["player2"] !== null) removePlayerCircle();
-
         //On récupère la nouvelle position générée par l'IA
         let newPositionBot = computeMove(playerPositions["player2"]);
-        console.log(newPositionBot);
+
+        if(playerPositions["player2"] !== null){
+            while(!moveIsValid(lastPlayerPositions["player2"],document.getElementById(newPositionBot))){
+                newPositionBot = computeMove(playerPositions["player2"]);
+            }
+        }
         let circle_bot = document.getElementById(newPositionBot);
-        console.log(circle_bot);
+        if(playerPositions["player2"] !== null) removePlayerCircle();
         addPlayerCircle(circle_bot, 2);
+
 
         //Mettre les cases en bon état
         if(numberTour === 1){
