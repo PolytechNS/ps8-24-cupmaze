@@ -147,21 +147,6 @@ function choosePositionToBegin(event) {
     playerPositions[`player${currentPlayer}`] = clickedCell.id;
     addPlayerCircle(clickedCell, currentPlayer);
 
-    if (playerPositions.player1 && playerPositions.player2) {
-        const cells = document.querySelectorAll(".cell");
-        cells.forEach(cell => {
-            cell.removeEventListener("click", choosePositionToBegin);
-            cell.addEventListener("click", movePlayer)
-        });
-
-        const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-        walls.forEach(wall=>{
-            wall.addEventListener("mouseenter",wallListener);
-            wall.addEventListener("click",wallLaid);
-        })
-
-    }
-
     //On enlève l'action réalisée au compteur
     actionsToDo--;
     document.getElementById("button-validate-action").style.display = "flex";
@@ -347,11 +332,30 @@ function validateRound(event) {
         //On va faire jouer le bot
         currentPlayer = 2;
 
+        //On supprime l'ancienne position
         if(playerPositions["player2"] !== null) removePlayerCircle();
+
+        //On récupère la nouvelle position générée par l'IA
         let newPositionBot = computeMove(playerPositions["player2"]);
-        let circle_bot = document.getElementById(playerPositions["player2"]);
         console.log(newPositionBot);
+        let circle_bot = document.getElementById(newPositionBot);
+        console.log(circle_bot);
         addPlayerCircle(circle_bot, 2);
+
+        //Mettre les cases en bon état
+        if(numberTour === 1){
+            const cells = document.querySelectorAll(".cell");
+            cells.forEach(cell => {
+                cell.removeEventListener("click", choosePositionToBegin);
+                cell.addEventListener("click", movePlayer)
+            });
+
+            const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+            walls.forEach(wall=>{
+                wall.addEventListener("mouseenter",wallListener);
+                wall.addEventListener("click",wallLaid);
+            });
+        }
 
         //On augmente le nombre de tours car le bot vient de jouer
         currentPlayer = 1;
@@ -365,15 +369,12 @@ function validateRound(event) {
             document.getElementById("popup-button").style.display = "none";
         }
 
+        playerPositions["player2"] = newPositionBot;
+        console.log(playerPositions);
+
         //On applique la sauvegarde des états des pions
         lastPlayerPositions["player1"] = playerPositions["player1"];
         lastPlayerPositions["player2"] = playerPositions["player2"];
-
-        //On applique le brouillard de guerre
-        //On met en commentaire pour l'instant car pas forcément utile vu qu'on reste toujours sur la même POV
-        /*setVisionForPlayer(currentPlayer,playerPositions);
-        const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
-        if(playerCircle) playerCircle.style.display="block";*/
 
         setUpNewRound();
     }
