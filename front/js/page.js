@@ -1,6 +1,6 @@
-import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight } from "./utils.js";
+import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction } from "./utils.js";
 import {beginningPositionIsValid} from "./referee.js";
-import {movePlayer, addPlayerCircle, updateNumberAction} from "./actions.js";
+import {movePlayer, addPlayerCircle} from "./movePlayer.js";
 import {setVisionForPlayer} from "./fog_of_war.js";
 
 let currentPlayer = 1;
@@ -216,16 +216,13 @@ function wallLaid(event) {
      * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
      */
     if(actionsToDo>0 && ((currentPlayer===1 && nbWallsPlayer1>0) || (currentPlayer===2 && nbWallsPlayer2>0))) {
-        secondWallToColor.classList.add("wall-laid");
-        secondWallToColor.classList.add("laidBy" + currentPlayer);
+        secondWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
         secondWallToColor.removeEventListener("mouseenter",wallListener);
         secondWallToColor.removeEventListener("click",wallLaid);
 
-        spaceToColor.classList.add("wall-laid");
-        spaceToColor.classList.add("laidBy" + currentPlayer);
+        spaceToColor.classList.add("wall-laid","laidBy" + currentPlayer);
 
-        firstWallToColor.classList.add("wall-laid");
-        firstWallToColor.classList.add("laidBy" + currentPlayer);
+        firstWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
         firstWallToColor.removeEventListener("mouseenter",wallListener);
         firstWallToColor.removeEventListener("click",wallLaid);
 
@@ -373,16 +370,13 @@ function undoAction(){
         let space=document.getElementById(parse[2]);
         let secondWall=document.getElementById(parse[3]);
 
-        firstWall.classList.remove("wall-laid");
-        firstWall.classList.remove("laidBy"+currentPlayer);
+        firstWall.classList.remove("wall-laid","laidBy"+currentPlayer);
         firstWall.addEventListener("mouseenter",wallListener);
         firstWall.addEventListener("click",wallLaid);
 
-        space.classList.remove("wall-laid");
-        space.classList.remove("laidBy"+currentPlayer);
+        space.classList.remove("wall-laid","laidBy"+currentPlayer);
 
-        secondWall.classList.remove("wall-laid");
-        secondWall.classList.remove("laidBy"+currentPlayer);
+        secondWall.classList.remove("wall-laid","laidBy"+currentPlayer);
         secondWall.addEventListener("mouseenter",wallListener);
         secondWall.addEventListener("click",wallLaid);
 
