@@ -1,6 +1,7 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight } from "../game_local_1v1/utils.js";
 import {beginningPositionIsValid,moveIsValid} from "../game_local_1v1/referee.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
+import {movePlayer, addPlayerCircle} from "../game_local_1v1/movePlayer.js";
 import {computeMove} from "./ai.js";
 
 let currentPlayer = 1;
@@ -115,12 +116,7 @@ function initializeTable() {
     return boardInfo;
 }
 
-function addPlayerCircle(cell, player) {
-    const circle = document.createElement("div");
-    circle.classList.add("player" + player + "-circle");
-    circle.id="player" + currentPlayer + "-circle";
-    cell.appendChild(circle);
-}
+
 
 /**
  * Fonction qui gere le placement des pions la 1er fois :
@@ -147,6 +143,21 @@ function choosePositionToBegin(event) {
     playerPositions[`player${currentPlayer}`] = clickedCell.id;
     addPlayerCircle(clickedCell, currentPlayer);
 
+    if (playerPositions.player1 && playerPositions.player2) {
+        const cells = document.querySelectorAll(".cell");
+        cells.forEach(cell => {
+            cell.removeEventListener("click", choosePositionToBegin);
+            cell.addEventListener("click", ()=>movePlayer(cell,playerPositions,currentPlayer,actionsToDo,lastActionType))
+        });
+
+        const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+        walls.forEach(wall=>{
+            wall.addEventListener("mouseenter",wallListener);
+            wall.addEventListener("click",wallLaid);
+        })
+
+    }
+
     //On enlève l'action réalisée au compteur
     actionsToDo--;
     document.getElementById("button-validate-action").style.display = "flex";
@@ -155,42 +166,6 @@ function choosePositionToBegin(event) {
 
     //On sauvegarde la dernière action
     lastActionType = "position";
-}
-
-// fonction pour effacer l'anncienne position du joueur
-function removePlayerCircle() {
-    const oldPosition = playerPositions[`player${currentPlayer}`];
-    const oldCell = document.getElementById(oldPosition);
-
-    oldCell.classList.remove("occupied");
-    // ne pas mettre firstChild car je veut juste retirer
-    // le cercle et pas tout ce qu'il y a dans la cellule
-    const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
-    if(playerCircle) oldCell.removeChild(playerCircle);
-
-}
-
-
-// autre listener
-function movePlayer(event) {
-    const clickedCell = event.target;
-    // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
-
-    if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
-        removePlayerCircle();
-        playerPositions[`player${currentPlayer}`] = clickedCell.id;
-        console.log(playerPositions);
-        addPlayerCircle(clickedCell, currentPlayer);
-
-        actionsToDo--;
-        document.getElementById("button-validate-action").style.display = "flex";
-        document.getElementById("button-undo-action").style.display = "flex";
-        updateNumberAction(0);
-        //On sauvegarde la dernière action
-        lastActionType = "position";
-    } else {
-        alert("Mouvement impossible ou pas assez d'actions");
-    }
 }
 
 /*
@@ -232,44 +207,42 @@ function wallLaid(event) {
     const secondWallToColor = findAdjacentWall(wallType, wallPosition);
     const spaceToColor = findAdjacentSpace(wallPosition);
 
-    //TODO potentiel : Vérifier si un mur n'est pas déjà posé ?
+    //ancien to do: Vérifier si un mur n'est pas déjà posé ?
+    if((firstWallToColor.classList.contains("wall-laid")) || (secondWallToColor.classList.contains("wall-laid")) || (spaceToColor.classList.contains("wall-laid"))){
+        alert("Unexpected Error : wall shouldn't be clickable");
+        return;
+    }
 
     /**
      * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
      */
-    if(currentPlayer===1){
-        if(nbWallsPlayer1>0 && actionsToDo===1){
-            //On colore les murs en noirs pour indiquer qu'ils sont posés
-            secondWallToColor.classList.add("wall-laid");
-            secondWallToColor.classList.add("laidBy"+currentPlayer);
-            spaceToColor.classList.add("wall-laid");
-            spaceToColor.classList.add("laidBy"+currentPlayer);
-            firstWallToColor.classList.add("wall-laid");
-            firstWallToColor.classList.add("firstWall");
-            firstWallToColor.classList.add("laidBy"+currentPlayer);
-            nbWallsPlayer1--;
+    if(actionsToDo>0 && ((currentPlayer===1 && nbWallsPlayer1>0) || (currentPlayer===2 && nbWallsPlayer2>0))) {
+        secondWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
+        secondWallToColor.removeEventListener("mouseenter",wallListener);
+        secondWallToColor.removeEventListener("click",wallLaid);
 
-        }
-    }else{
-        if(nbWallsPlayer2>0 && actionsToDo===1){
-            //On colore les murs en noirs pour indiquer qu'ils sont posés
-            secondWallToColor.classList.add("wall-laid");
-            secondWallToColor.classList.add("laidBy"+currentPlayer);
-            spaceToColor.classList.add("wall-laid");
-            spaceToColor.classList.add("laidBy"+currentPlayer);
-            firstWallToColor.classList.add("wall-laid");
-            firstWallToColor.classList.add("firstWall");
-            firstWallToColor.classList.add("laidBy"+currentPlayer);
-            nbWallsPlayer2--;
-        }
+        spaceToColor.classList.add("wall-laid","laidBy" + currentPlayer);
+
+        firstWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
+        firstWallToColor.removeEventListener("mouseenter",wallListener);
+        firstWallToColor.removeEventListener("click",wallLaid);
+
+        //TODO enlever l'event listener pour le mur juste avant
+
+        if (currentPlayer === 1) nbWallsPlayer1--;
+        else nbWallsPlayer2--;
+
+        actionsToDo--;
+        document.getElementById("button-validate-action").style.display = "flex";
+        document.getElementById("button-undo-action").style.display = "flex";
+        updateNumberAction(0);
+        //On sauvegarde la dernière action
+        lastActionType = "wall " + firstWallToColor.id + " " + spaceToColor.id + " " + secondWallToColor.id;
+        updateNumberWallsDisplay();
     }
-    actionsToDo--;
-    document.getElementById("button-validate-action").style.display = "flex";
-    document.getElementById("button-undo-action").style.display = "flex";
-    updateNumberAction(0);
-    //On sauvegarde la dernière action
-    lastActionType = "wall "+firstWallToColor.id+" "+spaceToColor.id+" "+secondWallToColor.id;
-    updateNumberWallsDisplay();
+    else{
+        alert("Insufficent number of actions and/or walls");
+    }
 }
 
 function updateNumberWallsDisplay(){
@@ -282,14 +255,12 @@ function updateNumberWallsDisplay(){
  * Event listener que l'on ajoute au bouton sur l'écran anti triche
  * Quand l'utilisateur veut jouer son tour, on va enlever l'écran anti triche, affiche la grille et le texte au dessus
  */
-function startNewRound(event){
+function startNewRound(){
     const popup = document.getElementById('popup');
     popup.style.display = 'none';
     document.getElementById("grid").style.display = 'grid';
     document.getElementById("display-current-player").style.display = "flex";
     document.getElementById("display-current-walls").style.display = "flex";
-    //document.getElementById("button-validate-action").style.display = "flex"
-    //document.getElementById("button-undo-action").style.display = "flex";
     document.getElementById("display-number-actions").style.display = "flex";
     document.getElementById("display-number-tour").style.display = "flex";
 }
@@ -322,7 +293,7 @@ function setUpNewRound(){
  * Fonction qui est appelée à la fin du round du joueur pour appeler le bot à jouer
  * Elle comporte tt les appels au fichier ai.js pour se voir le nouveau comportement du bot
  */
-function validateRound(event) {
+function validateRound() {
 
     if(isGameOver()){
         document.getElementById("popup-ready-message").innerHTML = victoryAnswer;
@@ -394,88 +365,60 @@ function validateRound(event) {
  * Si la dernière action est la pose d'un mur, alors la variable ressemble à ceci : lastActionType = "wall "+firstWallToColor.id+" "+spaceToColor.id+" "+secondWallToColor.id;
  * Si la dernière action est la mouvement d'un pion, alors on va regarder dans les données sauvegardées au début du tour pour replacer le pion correctement
  */
-function undoAction(event){
+function undoAction(){
     //On remet le nombre d'actions à 1
     actionsToDo=1;
     updateNumberAction(1);
+
+    //On re-cache les boutons
+    document.getElementById("button-validate-action").style.display = "none";
+    document.getElementById("button-undo-action").style.display = "none";
+
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
-        if(currentPlayer === 1){
-            if(lastPlayerPositions["player1"] === null){ //Cette condition est vraie si et seulement si on est dans le premier tour
-                document.getElementById(playerPositions["player1"]).innerHTML = "";
-                document.getElementById(playerPositions["player1"]).classList.remove("occupied");
-                playerPositions["player1"] = lastPlayerPositions["player1"];
-                document.getElementById("button-validate-action").style.display = "none";
-                document.getElementById("button-undo-action").style.display = "none";
+        document.getElementById(playerPositions["player"+currentPlayer]).innerHTML = "";
 
-                const cells = document.querySelectorAll(".cell");
-                cells.forEach(cell => {
-                    cell.removeEventListener("click", movePlayer);
-                    cell.addEventListener("click", choosePositionToBegin);
-                });
+        if(lastPlayerPositions["player"+currentPlayer] === null){ //Cette condition est vraie si et seulement si on est dans le premier tour
+            document.getElementById(playerPositions["player"+currentPlayer]).classList.remove("occupied");
 
-                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-                walls.forEach(wall=>{
-                    wall.removeEventListener("mouseenter",wallListener);
-                    wall.removeEventListener("click",wallLaid);
-                })
+            const cells = document.querySelectorAll(".cell");
+            cells.forEach(cell => {
+                cell.removeEventListener("click", ()=>movePlayer(cell,playerPositions,currentPlayer,actionsToDo,lastActionType));
+                cell.addEventListener("click", choosePositionToBegin);
+            });
 
-            }else{ //Si on est pas dans le premier tour
-                addPlayerCircle(document.getElementById(lastPlayerPositions["player1"]),1);
-                document.getElementById(playerPositions["player1"]).innerHTML = "";
-                playerPositions["player1"] = lastPlayerPositions["player1"];
-                document.getElementById("button-validate-action").style.display = "none";
-                document.getElementById("button-undo-action").style.display = "none";
-            }
-        }else{
-            if(lastPlayerPositions["player2"] === null){ //Cette condition est vraie si et seulement si on est dans le premier tour
-                document.getElementById(playerPositions["player2"]).innerHTML = "";
-                document.getElementById(playerPositions["player2"]).classList.remove("occupied");
-                playerPositions["player2"] = lastPlayerPositions["player2"];
-                document.getElementById("button-validate-action").style.display = "none";
-                document.getElementById("button-undo-action").style.display = "none";
+            const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+            walls.forEach(wall=>{
+                wall.removeEventListener("mouseenter",wallListener);
+                wall.removeEventListener("click",wallLaid);
+            })
 
-                const cells = document.querySelectorAll(".cell");
-                cells.forEach(cell => {
-                    cell.removeEventListener("click", movePlayer);
-                    cell.addEventListener("click", choosePositionToBegin);
-                });
-
-                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-                walls.forEach(wall=>{
-                    wall.removeEventListener("mouseenter",wallListener);
-                    wall.removeEventListener("click",wallLaid);
-                })
-
-            }else{//Si on est pas dans le premier tour
-                addPlayerCircle(document.getElementById(lastPlayerPositions["player2"]), 2);
-                document.getElementById(playerPositions["player2"]).innerHTML = "";
-                playerPositions["player2"] = lastPlayerPositions["player2"];
-                document.getElementById("button-validate-action").style.display = "none";
-                document.getElementById("button-undo-action").style.display = "none";
-            }
+        }else{ //Si on est pas dans le premier tour
+            addPlayerCircle(document.getElementById(lastPlayerPositions["player"+currentPlayer]),currentPlayer);
         }
+        playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
     }else{ //Si la dernière action la placement d'un mur
         if(currentPlayer === 1) nbWallsPlayer1++;
         else nbWallsPlayer2++;
         //On parle la string pour récupérer les id des 3 murs que l'on va devoir remettre en "normal"
         let parse = lastActionType.split(" ");
-        document.getElementById(parse[1]).classList.remove("wall-laid");
-        document.getElementById(parse[2]).classList.remove("wall-laid");
-        document.getElementById(parse[3]).classList.remove("wall-laid");
+        let firstWall=document.getElementById(parse[1]);
+        let space=document.getElementById(parse[2]);
+        let secondWall=document.getElementById(parse[3]);
 
-        document.getElementById(parse[1]).classList.remove("laidBy"+currentPlayer);
-        document.getElementById(parse[2]).classList.remove("laidBy"+currentPlayer);
-        document.getElementById(parse[3]).classList.remove("laidBy"+currentPlayer);
+        firstWall.classList.remove("wall-laid","laidBy"+currentPlayer);
+        firstWall.addEventListener("mouseenter",wallListener);
+        firstWall.addEventListener("click",wallLaid);
+
+        space.classList.remove("wall-laid","laidBy"+currentPlayer);
+
+        secondWall.classList.remove("wall-laid","laidBy"+currentPlayer);
+        secondWall.addEventListener("mouseenter",wallListener);
+        secondWall.addEventListener("click",wallLaid);
+
         //On update la phrase affichée sur le site
         updateNumberWallsDisplay();
-        document.getElementById("button-validate-action").style.display = "none";
-        document.getElementById("button-undo-action").style.display = "none";
     }
-}
-
-function updateNumberAction(nombreAction){
-    document.getElementById("display-number-actions").innerHTML = "Nombre d'actions restantes : "+nombreAction;
 }
 
 

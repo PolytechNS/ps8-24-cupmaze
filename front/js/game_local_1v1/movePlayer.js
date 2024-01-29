@@ -1,4 +1,4 @@
-import {moveIsValid} from "./referee.js";
+import {moveIsValid} from "./referee";
 import {updateNumberAction} from "./utils.js";
 
 export {movePlayer, addPlayerCircle};
