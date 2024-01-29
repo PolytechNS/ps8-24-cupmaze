@@ -316,11 +316,11 @@ function setUpNewRound(){
 
 }
 
-//TODO : CHANGER CETTE FONCTION POUR APPELER LE MOUVEMENT DU BOT
+
 
 /**
- * Cette fonction est appelée à chaque fois qu'un utilisateur va valider un round
- * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
+ * Fonction qui est appelée à la fin du round du joueur pour appeler le bot à jouer
+ * Elle comporte tt les appels au fichier ai.js pour se voir le nouveau comportement du bot
  */
 function validateRound(event) {
 
@@ -335,11 +335,14 @@ function validateRound(event) {
         //On récupère la nouvelle position générée par l'IA
         let newPositionBot = computeMove(playerPositions["player2"]);
 
+        //On vérifie que le mouvement est légal, sinon on recommence
         if(playerPositions["player2"] !== null){
             while(!moveIsValid(lastPlayerPositions["player2"],document.getElementById(newPositionBot))){
                 newPositionBot = computeMove(playerPositions["player2"]);
             }
         }
+
+        //On ajout le cercle du joueur au bon endroit
         let circle_bot = document.getElementById(newPositionBot);
         if(playerPositions["player2"] !== null) removePlayerCircle();
         addPlayerCircle(circle_bot, 2);
@@ -372,6 +375,7 @@ function validateRound(event) {
             document.getElementById("popup-button").style.display = "none";
         }
 
+        //On sauvegarde la nouvelle position du pot dans le jeu
         playerPositions["player2"] = newPositionBot;
         console.log(playerPositions);
 
@@ -379,6 +383,7 @@ function validateRound(event) {
         lastPlayerPositions["player1"] = playerPositions["player1"];
         lastPlayerPositions["player2"] = playerPositions["player2"];
 
+        //On lance le nouveau round pour le joueur1
         setUpNewRound();
     }
 }
