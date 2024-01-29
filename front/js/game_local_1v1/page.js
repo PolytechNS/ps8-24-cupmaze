@@ -208,6 +208,17 @@ function movePlayer(event) {
 }
 
 /*
+fonction pour verifier que le mur est sur un placement valide
+ */
+function isWallPlacementValid(firstWall, secondWall, space) {
+    const isLaid = firstWall.classList.contains("wall-laid") || secondWall.classList.contains("wall-laid") || space.classList.contains("wall-laid");
+
+    console.log("Is Wall Laid: ", isLaid);
+
+    return !isLaid;
+}
+
+/*
  fonction pour gerer le survol des murs
  */
 function wallListener(event) {
@@ -221,6 +232,11 @@ function wallListener(event) {
     // la on va chercher les mur a colorier et l'espace entre les murs a colorier
     const secondWallToColor = findAdjacentWall(wallType, wallPosition);
     const spaceToColor = findAdjacentSpace(wallPosition);
+
+    if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
+        removeHighlight(firstWallToColor, secondWallToColor, spaceToColor)
+        return;
+    }
 
     // on rajoute les classes pour colorier
     highlightElements(firstWallToColor, secondWallToColor, spaceToColor);
