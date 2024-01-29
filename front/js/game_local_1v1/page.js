@@ -263,6 +263,9 @@ function wallLaid(event) {
     const spaceToColor = findAdjacentSpace(wallPosition);
 
     //TODO potentiel : Vérifier si un mur n'est pas déjà posé ?
+    if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
+        return;
+    }
 
     /**
      * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
