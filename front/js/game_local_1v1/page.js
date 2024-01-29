@@ -1,5 +1,6 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight } from "./utils.js";
-import {beginningPositionIsValid,moveIsValid} from "./referee.js";
+import {beginningPositionIsValid} from "./referee.js";
+import {movePlayer, addPlayerCircle, updateNumberAction} from "./actions.js";
 import {setVisionForPlayer} from "./fog_of_war.js";
 
 let currentPlayer = 1;
@@ -114,13 +115,7 @@ function initializeTable() {
     return boardInfo;
 }
 
-function addPlayerCircle(cell, player) {
-    const circle = document.createElement("div");
-    circle.classList.add("player" + player + "-circle");
-    circle.id="player" + currentPlayer + "-circle";
-    cell.classList.add("occupied");
-    cell.appendChild(circle);
-}
+
 
 /**
  * Fonction qui gere le placement des pions la 1er fois :
@@ -151,7 +146,7 @@ function choosePositionToBegin(event) {
         const cells = document.querySelectorAll(".cell");
         cells.forEach(cell => {
             cell.removeEventListener("click", choosePositionToBegin);
-            cell.addEventListener("click", movePlayer)
+            cell.addEventListener("click", ()=>movePlayer(cell,playerPositions,currentPlayer,actionsToDo,lastActionType))
         });
 
         const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
@@ -170,38 +165,6 @@ function choosePositionToBegin(event) {
     
     //On sauvegarde la dernière action 
     lastActionType = "position";
-}
-
-// fonction pour effacer l'anncienne position du joueur
-function removePlayerCircle() {
-    const oldPosition = playerPositions[`player${currentPlayer}`];
-    const oldCell = document.getElementById(oldPosition);
-    oldCell.classList.remove("occupied");
-    const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
-    if(playerCircle) oldCell.removeChild(playerCircle);
-}
-
-
-// autre listener
-function movePlayer(event) {
-    const clickedCell = event.target;
-    // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
-
-    if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
-        removePlayerCircle();
-        playerPositions[`player${currentPlayer}`] = clickedCell.id;
-        console.log(playerPositions);
-        addPlayerCircle(clickedCell, currentPlayer);
-
-        actionsToDo--;
-        document.getElementById("button-validate-action").style.display = "flex";
-        document.getElementById("button-undo-action").style.display = "flex";
-        updateNumberAction(0);
-        //On sauvegarde la dernière action
-        lastActionType = "position";
-    } else {
-        alert("Mouvement impossible ou pas assez d'actions");
-    }
 }
 
 /*
@@ -406,7 +369,7 @@ function undoAction(){
 
             const cells = document.querySelectorAll(".cell");
             cells.forEach(cell => {
-                cell.removeEventListener("click", movePlayer);
+                cell.removeEventListener("click", ()=>movePlayer(cell,playerPositions,currentPlayer,actionsToDo,lastActionType));
                 cell.addEventListener("click", choosePositionToBegin);
             });
 
@@ -445,10 +408,6 @@ function undoAction(){
         //On update la phrase affichée sur le site
         updateNumberWallsDisplay();
     }
-}
-
-function updateNumberAction(nombreAction){
-    document.getElementById("display-number-actions").innerHTML = "Nombre d'actions restantes : "+nombreAction;
 }
 
 
