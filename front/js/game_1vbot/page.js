@@ -1,7 +1,7 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight } from "../game_local_1v1/utils.js";
 import {beginningPositionIsValid,moveIsValid} from "../game_local_1v1/referee.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
-
+import {computeMove} from "./ai.js";
 
 let currentPlayer = 1;
 let nbWallsPlayer1 = 10;
@@ -344,14 +344,22 @@ function validateRound(event) {
         document.getElementById("popup").style.display = 'flex';
         document.getElementById("popup-button").style.display = "none";
     } else {
-        //On augmente le nombre de tours
-        if(currentPlayer === 2) numberTour++;
+        //On va faire jouer le bot
+        currentPlayer = 2;
 
-        currentPlayer = (currentPlayer === 1) ? 2 : 1;
+        if(playerPositions["player2"] !== null) removePlayerCircle();
+        let newPositionBot = computeMove(playerPositions["player2"]);
+        let circle_bot = document.getElementById(playerPositions["player2"]);
+        console.log(newPositionBot);
+        addPlayerCircle(circle_bot, 2);
+
+        //On augmente le nombre de tours car le bot vient de jouer
+        currentPlayer = 1;
+        numberTour++;
         actionsToDo=1;
 
         //On regarde si on est arrivé au 100ème tour, si c'est le cas alors => égalité
-        if(currentPlayer === 1 && numberTour === 101){
+        if(numberTour === 101){
             document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
             document.getElementById("popup").style.display = 'flex';
             document.getElementById("popup-button").style.display = "none";
@@ -362,9 +370,10 @@ function validateRound(event) {
         lastPlayerPositions["player2"] = playerPositions["player2"];
 
         //On applique le brouillard de guerre
-        setVisionForPlayer(currentPlayer,playerPositions);
+        //On met en commentaire pour l'instant car pas forcément utile vu qu'on reste toujours sur la même POV
+        /*setVisionForPlayer(currentPlayer,playerPositions);
         const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
-        if(playerCircle) playerCircle.style.display="block";
+        if(playerCircle) playerCircle.style.display="block";*/
 
         setUpNewRound();
     }
