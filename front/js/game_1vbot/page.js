@@ -342,19 +342,30 @@ function validateRound(event) {
         currentPlayer = 2;
 
         //On récupère la nouvelle position générée par l'IA
-        let newPositionBot = computeMove(playerPositions["player2"]);
+        socket.emit("newMove", playerPositions["player2"]);
 
-        //On vérifie que le mouvement est légal, sinon on recommence
-        if(playerPositions["player2"] !== null){
-            while(!moveIsValid(lastPlayerPositions["player2"],document.getElementById(newPositionBot))){
-                newPositionBot = computeMove(playerPositions["player2"]);
-            }
-        }
+        socket.on("updatedBoard", (newPositionBot) => {
+            console.log(newPositionBot);
 
-        //On ajout le cercle du joueur au bon endroit
-        let circle_bot = document.getElementById(newPositionBot);
-        if(playerPositions["player2"] !== null) removePlayerCircle();
-        addPlayerCircle(circle_bot, 2);
+            //On vérifie que le mouvement est légal, sinon on recommence
+            /*if(playerPositions["player2"] !== null){
+                while(!moveIsValid(lastPlayerPositions["player2"],document.getElementById(newPositionBot))){
+                    newPositionBot = computeMove(playerPositions["player2"]);
+                }
+            }*/
+
+            //On ajout le cercle du joueur au bon endroit
+            let circle_bot = document.getElementById(newPositionBot);
+            if(playerPositions["player2"] !== null) removePlayerCircle();
+            addPlayerCircle(circle_bot, 2);
+
+            //On sauvegarde la nouvelle position du pot dans le jeu
+            playerPositions["player2"] = newPositionBot;
+            console.log(playerPositions);
+
+            socket.off("updatedBoard");
+        });
+
 
 
         //Mettre les cases en bon état
@@ -384,9 +395,6 @@ function validateRound(event) {
             document.getElementById("popup-button").style.display = "none";
         }
 
-        //On sauvegarde la nouvelle position du pot dans le jeu
-        playerPositions["player2"] = newPositionBot;
-        console.log(playerPositions);
 
         //On applique la sauvegarde des états des pions
         lastPlayerPositions["player1"] = playerPositions["player1"];

@@ -1,5 +1,5 @@
 // This function doesn't handle walls.
-export function computeMove(gameState) {
+function computeMove(gameState) {
     if (gameState === null) {
         let moveIndex = Math.floor(Math.random() * 7);
         return "8-" + moveIndex.toString() + "~cell";
@@ -36,3 +36,5 @@ export function computeMove(gameState) {
     let moveIndex = Math.floor(Math.random() * possibleMoves.length);
     return possibleMoves[moveIndex];
 }
+
+module.exports = { computeMove };

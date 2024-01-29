@@ -7,6 +7,10 @@ const apiQuery = require('./queryManagers/api.js')
 //TEST SOCKET IO
 const { Server } = require("socket.io");
 
+
+//Import AI
+const AIEasy = require("./logic/ai.js");
+
 /* The http module contains a createServer function, which takes one argument, which is the function that
 ** will be called whenever a new request arrives to the server.
  */
@@ -41,14 +45,14 @@ io.on("connection", (socket) => {
     console.log("a user connected");
 
     socket.on("newMove", (msg) => {
-        console.log();
-        io.emit("updatedBoard", msg);
+        let newPosition = AIEasy.computeMove(msg);
+        io.emit("updatedBoard", newPosition);
     });
 
-    /*
+
     socket.on("disconnect", () => {
         console.log("user disconnected");
-    });*/
+    });
 
 
 });
