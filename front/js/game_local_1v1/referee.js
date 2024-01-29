@@ -21,9 +21,11 @@ function moveIsValid(oldPosition, cell) {
     let oldPositionLine = parseInt(oldPosition[0]);
     let oldPositionColumn = parseInt(oldPosition[2]);
 
-    const adjacentPlayer = findAdjacentPlayer(newPosition);
-    if(adjacentPlayer){
-        const wallBehindAdjacentPlayer = findWallBehindPlayer(adjacentPlayer);
+    const adjacentPlayerCell = findAdjacentPlayer(oldPosition);
+    if(adjacentPlayerCell){
+        const OrientationAdjacentPlayer = findOrientationAdjacentPlayer(adjacentPlayerCell, oldPosition);
+        const wallBehindAdjacentPlayer = findWallBehindPlayer(newPosition, OrientationAdjacentPlayer);
+        console.log(wallBehindAdjacentPlayer);
         if (wallBehindAdjacentPlayer) {
             alert("Vous ne pouvez pas sauter il y a un mur derrière le joueur");
             return false;
@@ -108,6 +110,56 @@ function findAdjacentPlayer(position){
     return false;
 }
 
-function findWallBehindPlayer(adjacentPlayer) {
-    console.log("adjacentPlayer", adjacentPlayer);
+function findOrientationAdjacentPlayer(adjacentPlayerCell, oldPosition){
+    const adjacentPlayerCellId = adjacentPlayerCell.id;
+    const adjacentPlayerCellLine = parseInt(adjacentPlayerCellId[0]);
+    const adjacentPlayerCellColumn = parseInt(adjacentPlayerCellId[2]);
+    const oldPositionLine = parseInt(oldPosition[0]);
+    const oldPositionColumn = parseInt(oldPosition[2]);
+
+    if (adjacentPlayerCellLine === oldPositionLine - 1) {
+        return "N";
+    }
+    if (adjacentPlayerCellLine === oldPositionLine + 1) {
+        return "S";
+    }
+    if (adjacentPlayerCellColumn === oldPositionColumn + 1) {
+        return "E";
+    }
+    if (adjacentPlayerCellColumn === oldPositionColumn - 1) {
+        return "O";
+    }
+}
+
+function findWallBehindPlayer(newPosition, orientationAdjactentPlayer){
+    // chercher si il y a un mur derrière le joueur adjacent celon l'orientation du joueur adjacent
+    const newPositionLine = parseInt(newPosition[0]);
+    const newPositionColumn = parseInt(newPosition[2]);
+
+    switch (orientationAdjactentPlayer) {
+        case "N":
+            const wallNId = "wh~" + newPositionLine + "-" + newPositionColumn;
+            if (document.getElementById(wallNId).classList.contains("wall-laid")) {
+                return true;
+            }
+            break;
+        case "S":
+            const wallSId = "wh~" + newPositionLine-1 + "-" + newPositionColumn;
+            if (document.getElementById(wallSId).classList.contains("wall-laid")) {
+                return true;
+            }
+            break;
+        case "E":
+            const wallEId = "wv~" + newPositionLine + "-" + newPositionColumn-1;
+            if (document.getElementById(wallEId).classList.contains("wall-laid")) {
+                return true;
+            }
+            break;
+        case "O":
+            const wallOId = "wv~" + newPositionLine + "-" + newPositionColumn;
+            if (document.getElementById(wallOId).classList.contains("wall-laid")) {
+                return true;
+            }
+            break;
+    }
 }
