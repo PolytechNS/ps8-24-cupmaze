@@ -1,6 +1,7 @@
 export {
     setVisionForPlayer
 }
+const INFINITY = 9999;
 function calculateVisibility(playerPositions) {
     let position1Line ;
     let position1Column ;
@@ -111,31 +112,21 @@ function setVisionForPlayer(currentPlayer,playerPositions){
             let player1circle = document.getElementById("player" + 1 + "-circle");
             let player2circle = document.getElementById("player" + 2 + "-circle");
 
+            if(cell.id===playerPositions["player"+currentPlayer]){
+                cell.visibility=""+(INFINITY*(currentPlayer===1? -1:1));
+            }
             if((parseInt(cell.visibility)>0 && currentPlayer === 1) || (currentPlayer === 2 && parseInt(cell.visibility)<0)){
-                cell.style.backgroundColor="lime";
-                if(!document.getElementById("fog~"+cell.id.split("~")[0])){
-                    let fogImage = document.createElement("img");
-                    fogImage.id = "fog~" + cell.id.split("~")[0];
-                    fogImage.src = "imageResources/fog.png";
-                    fogImage.alt = "brouillard de guerre";
-                    fogImage.classList.add("fog");
-                    cell.appendChild(fogImage);
-
-                    //hide player if on cell
-                    if (currentPlayer === 1 && playerPositions.player2 === cell.id) {
-                        player2circle.style.display = 'none';
-                    }
-                    if (currentPlayer === 2 && playerPositions.player1 === cell.id) {
-                        player1circle.style.display = 'none';
-                    }
+                applyFogOfWar(cell);
+                //hide player if on cell
+                if (currentPlayer === 1 && playerPositions.player2 === cell.id) {
+                    player2circle.style.display = 'none';
+                }
+                if (currentPlayer === 2 && playerPositions.player1 === cell.id) {
+                    player1circle.style.display = 'none';
                 }
             }
             if((parseInt(cell.visibility)<=0 && currentPlayer === 1) || (currentPlayer === 2 && parseInt(cell.visibility)>=0)){
-                cell.style.backgroundColor="darkseagreen";
-                let fogImage =document.getElementById("fog~"+cell.id.split("~")[0]);
-                if(fogImage) {
-                    cell.removeChild(fogImage)
-                }
+                removeFogOfWar(cell);
 
                 //show player if on cell
                 if(currentPlayer === 1 && playerPositions.player2 === cell.id) {
@@ -147,4 +138,24 @@ function setVisionForPlayer(currentPlayer,playerPositions){
             }
         }
     )
+}
+
+function applyFogOfWar(cell){
+    cell.style.backgroundColor="lime";
+    if(!document.getElementById("fog~"+cell.id.split("~")[0])){
+        let fogImage = document.createElement("img");
+        fogImage.id = "fog~" + cell.id.split("~")[0];
+        fogImage.src = "imageResources/fog.png";
+        fogImage.alt = "brouillard de guerre";
+        fogImage.classList.add("fog");
+        cell.appendChild(fogImage);
+    }
+}
+
+function removeFogOfWar(cell){
+    cell.style.backgroundColor="darkseagreen";
+    let fogImage =document.getElementById("fog~"+cell.id.split("~")[0]);
+    if(fogImage) {
+        cell.removeChild(fogImage)
+    }
 }
