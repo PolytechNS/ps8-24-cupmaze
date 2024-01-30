@@ -313,6 +313,7 @@ function movePlayer(event) {
         updateDueToAction(actionsToDo);
         //On sauvegarde la dernière action
         lastActionType = "position";
+
     }
 }
 

@@ -114,6 +114,7 @@ function setVisionForPlayer(currentPlayer,playerPositions){
 
             if(cell.id===playerPositions["player"+currentPlayer]){
                 cell.visibility=""+(INFINITY*(currentPlayer===1? -1:1));
+                document.getElementById("player" + currentPlayer + "-circle").style.display="block";
             }
             if((parseInt(cell.visibility)>0 && currentPlayer === 1) || (currentPlayer === 2 && parseInt(cell.visibility)<0)){
                 applyFogOfWar(cell);
