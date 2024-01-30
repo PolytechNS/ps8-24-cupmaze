@@ -1,6 +1,6 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction } from "./utils.js";
-import {beginningPositionIsValid} from "./referee.js";
-import {movePlayer, addPlayerCircle} from "./movePlayer.js";
+import {beginningPositionIsValid, moveIsValid} from "./referee.js";
+//import {movePlayer, addPlayerCircle} from "./movePlayer.js";
 import {setVisionForPlayer} from "./fog_of_war.js";
 
 let currentPlayer = 1;
@@ -146,7 +146,7 @@ function choosePositionToBegin(event) {
         const cells = document.querySelectorAll(".cell");
         cells.forEach(cell => {
             cell.removeEventListener("click", choosePositionToBegin);
-            cell.addEventListener("click", ()=>movePlayer(cell,playerPositions,currentPlayer,actionsToDo,lastActionType))
+            cell.addEventListener("click", movePlayer);
         });
 
         const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
@@ -360,13 +360,13 @@ function undoAction(){
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
         document.getElementById(playerPositions["player"+currentPlayer]).innerHTML = "";
-
-        if(lastPlayerPositions["player"+currentPlayer] === null){ //Cette condition est vraie si et seulement si on est dans le premier tour
-            document.getElementById(playerPositions["player"+currentPlayer]).classList.remove("occupied");
-
+        document.getElementById(playerPositions["player"+currentPlayer]).classList.remove("occupied");
+        playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
+        if(numberTour===1){
+            console.log("Player "+currentPlayer+" wants to undo putting their circle");
             const cells = document.querySelectorAll(".cell");
             cells.forEach(cell => {
-                cell.removeEventListener("click", ()=>movePlayer(cell,playerPositions,currentPlayer,actionsToDo,lastActionType));
+                cell.removeEventListener("click", movePlayer);
                 cell.addEventListener("click", choosePositionToBegin);
             });
 
@@ -379,7 +379,6 @@ function undoAction(){
         }else{ //Si on est pas dans le premier tour
             addPlayerCircle(document.getElementById(lastPlayerPositions["player"+currentPlayer]),currentPlayer);
         }
-        playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
     }else{ //Si la dernière action la placement d'un mur
         if(currentPlayer === 1) nbWallsPlayer1++;
         else nbWallsPlayer2++;
@@ -426,4 +425,48 @@ function isGameOver(){
     }
     //console.log(playerPositions["player1"] + " "+playerPositions["player2"]);
     return false;
+}
+
+
+
+function movePlayer(event) {
+    const clickedCell = event.target;
+    // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
+
+    if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
+        removePlayerCircle();
+        playerPositions[`player${currentPlayer}`] = clickedCell.id;
+        console.log(playerPositions);
+        addPlayerCircle(clickedCell);
+
+        actionsToDo--;
+        document.getElementById("button-validate-action").style.display = "flex";
+        document.getElementById("button-undo-action").style.display = "flex";
+        updateNumberAction(0);
+        //On sauvegarde la dernière action
+        lastActionType = "position";
+    } else {
+        alert("Mouvement impossible ou pas assez d'actions");
+    }
+}
+
+function addPlayerCircle(cell) {
+    const circle = document.createElement("div");
+    circle.classList.add("player" + currentPlayer + "-circle");
+    circle.id="player" + currentPlayer + "-circle";
+    cell.classList.add("occupied");
+    cell.appendChild(circle);
+}
+
+// fonction pour effacer l'anncienne position du joueur
+function removePlayerCircle() {
+    const oldPosition = playerPositions[`player${currentPlayer}`];
+    const oldCell = document.getElementById(oldPosition);
+
+    oldCell.classList.remove("occupied");
+    // ne pas mettre firstChild car je veut juste retirer
+    // le cercle et pas tout ce qu'il y a dans la cellule
+    const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
+    if(playerCircle) oldCell.removeChild(playerCircle);
+
 }
