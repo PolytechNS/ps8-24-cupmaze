@@ -301,9 +301,20 @@ function choosePositionToBegin(event) {
 }
 
 function movePlayer(event) {
-    const clickedCell = event.target;
+    const target = event.target;
+    let cellId="";
     // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
-
+    if(target.id.includes("circle")){
+        alert("occupied");
+        return;
+    }
+    else if(target.classList.contains("cell")){
+        cellId=target.id;
+    }
+    else if(target.classList.contains("fog")){
+        cellId=target.id.split("~")[1]+"~cell";
+    }
+    const clickedCell=document.getElementById(cellId);
     if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
         removePlayerCircle(playerPositions,currentPlayer);
         playerPositions[`player${currentPlayer}`] = clickedCell.id;
