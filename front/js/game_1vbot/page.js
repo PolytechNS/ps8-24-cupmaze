@@ -1,7 +1,7 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight } from "../game_local_1v1/utils.js";
-import {beginningPositionIsValid,moveIsValid} from "../game_local_1v1/referee.js";
+import {beginningPositionIsValid,moveIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
-import {movePlayer, addPlayerCircle} from "../game_local_1v1/movePlayer.js";
+import {movePlayer, addPlayerCircle} from "../game_local_1v1/movePlayerUtils.js";
 import {computeMove} from "./ai.js";
 
 let currentPlayer = 1;

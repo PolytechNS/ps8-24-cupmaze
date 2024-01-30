@@ -1,6 +1,8 @@
-import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction } from "./utils.js";
-import {beginningPositionIsValid, moveIsValid} from "./referee.js";
-//import {movePlayer, addPlayerCircle} from "./movePlayer.js";
+import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction, updateDueToAction } from "./utils.js";
+import {beginningPositionIsValid, moveIsValid} from "./movePlayerReferee.js";
+import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
+import {isWallPlacementValid,updateNumberWallsDisplay} from "./wallLayingUtils.js"
+import {startNewRound, setUpNewRound} from "./roundUtils.js";
 import {setVisionForPlayer} from "./fog_of_war.js";
 
 let currentPlayer = 1;
@@ -48,7 +50,7 @@ function main() {
     setVisionForPlayer(currentPlayer,playerPositions);
 
     //On setup les différents textes nécessaires
-    setUpNewRound();
+    setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
 }
 
 /*
@@ -113,6 +115,64 @@ function initializeTable() {
         boardInfo.push(row);
     }
     return boardInfo;
+}
+
+/** #############################################  ROUND METHODS  ############################################# **/
+
+/**
+ * Cette fonction est appelée à chaque fois qu'un utilisateur va valider un round
+ * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
+ */
+function validateRound() {
+
+    if(isGameOver()){
+        document.getElementById("popup-ready-message").innerHTML = victoryAnswer;
+        document.getElementById("popup").style.display = 'flex';
+        document.getElementById("popup-button").style.display = "none";
+    } else {
+        //On augmente le nombre de tours
+        if(currentPlayer === 2) numberTour++;
+
+        currentPlayer = (currentPlayer === 1) ? 2 : 1;
+        actionsToDo=1;
+
+        //On regarde si on est arrivé au 100ème tour, si c'est le cas alors => égalité
+        if(currentPlayer === 1 && numberTour === 101){
+            document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
+            document.getElementById("popup").style.display = 'flex';
+            document.getElementById("popup-button").style.display = "none";
+        }
+
+        //On applique la sauvegarde des états des pions
+        lastPlayerPositions["player1"] = playerPositions["player1"];
+        lastPlayerPositions["player2"] = playerPositions["player2"];
+
+        //On applique le brouillard de guerre
+        setVisionForPlayer(currentPlayer,playerPositions);
+        setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
+    }
+}
+
+/**
+ * Fonction qui analyse si un joueur à fini une partie ou pas
+ * @returns {boolean}
+ */
+function isGameOver(){
+    if(currentPlayer === 2){
+        if((playerPositions["player1"] && playerPositions["player1"][0] === "8") && (!playerPositions["player2"] || playerPositions["player2"][0] !== "0")){
+            victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
+            return true;
+        }
+        if((playerPositions["player1"] && playerPositions["player1"][0] === "8") && (playerPositions["player2"] && playerPositions["player2"][0] === "0")){
+            victoryAnswer = "Egalité entre les deux joueurs !";
+            return true;
+        }
+        if((playerPositions["player2"] && playerPositions["player2"][0] === "0") && (!playerPositions["player1"] || playerPositions["player1"][0] !== "8")){
+            victoryAnswer = "Victoire du joueur 2 !! Félicitations ! ";
+            return true;
+        }
+    }
+    return false;
 }
 
 /** #############################################  WALL LAYING METHODS  ############################################# **/
@@ -182,135 +242,80 @@ function wallLaid(event) {
         if (currentPlayer === 1) nbWallsPlayer1--;
         else nbWallsPlayer2--;
 
-        updateDueToAction();
+        updateDueToAction(actionsToDo);
         //On sauvegarde la dernière action
         lastActionType = "wall " + firstWallToColor.id + " " + spaceToColor.id + " " + secondWallToColor.id;
-        updateNumberWallsDisplay();
+        updateNumberWallsDisplay(currentPlayer,nbWallsPlayer1,nbWallsPlayer2);
     }
     else{
         alert("Insufficent number of actions and/or walls");
     }
 }
 
-/*
-fonction pour verifier que le mur est sur un placement valide
- */
-function isWallPlacementValid(firstWall, secondWall, space) {
-    const isLaid = firstWall.classList.contains("wall-laid") || secondWall.classList.contains("wall-laid") || space.classList.contains("wall-laid");
 
-    console.log("Is Wall Laid: ", isLaid);
-
-    return !isLaid;
-}
-
-function updateNumberWallsDisplay(){
-    if(currentPlayer===1) document.getElementById("display-current-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer1;
-    else document.getElementById("display-current-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer2;
-}
-
-function updateDueToAction(){
-    actionsToDo--;
-    document.getElementById("button-validate-action").style.display = "flex";
-    document.getElementById("button-undo-action").style.display = "flex";
-    updateNumberAction(0);
-}
-
-
-/** #############################################  ROUND METHODS  ############################################# **/
-
+/** #############################################  MOVE PLAYER METHODS  ############################################# **/
 
 /**
- * Event listener que l'on ajoute au bouton sur l'écran anti triche
- * Quand l'utilisateur veut jouer son tour, on va enlever l'écran anti triche, affiche la grille et le texte au dessus
+ * Fonction qui gere le placement des pions la 1er fois :
+ * Chaque joueur doit placer un pion sur la 1er ligne pour le joueur 1
+ * et sur la derniere ligne pour le joueur 2 sinon on affiche un message d'erreur
+ * et ensuite on change de listener pour le tour suivant car le comportement change
+ *
  */
-function startNewRound(){
-    const popup = document.getElementById('popup');
-    popup.style.display = 'none';
-    document.getElementById("grid").style.display = 'grid';
-    document.getElementById("display-current-player").style.display = "flex";
-    document.getElementById("display-current-walls").style.display = "flex";
-    document.getElementById("display-number-actions").style.display = "flex";
-    document.getElementById("display-number-tour").style.display = "flex";
+function choosePositionToBegin(event) {
+
+    const clickedCell = event.target;
+    if(!beginningPositionIsValid(currentPlayer,clickedCell.id[0])){
+        alert("Vous devez commencez par la première ligne")
+        return;
+    }
+
+    //On vérifie si le joueur possède assez d'actions
+    if(actionsToDo===0){
+        alert("Vous n'avez plus d'actions disponibles");
+        return;
+    }
+
+    clickedCell.classList.add("occupied");
+    playerPositions[`player${currentPlayer}`] = clickedCell.id;
+    addPlayerCircle(clickedCell, currentPlayer);
+
+    if (playerPositions.player1 && playerPositions.player2) {
+        const cells = document.querySelectorAll(".cell");
+        cells.forEach(cell => {
+            cell.removeEventListener("click", choosePositionToBegin);
+            cell.addEventListener("click", movePlayer);
+        });
+
+        const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+        walls.forEach(wall=>{
+            wall.addEventListener("mouseenter",wallListener);
+            wall.addEventListener("click",wallLaid);
+        })
+
+    }
+    //On enlève l'action réalisée au compteur
+    updateDueToAction(actionsToDo);
+    //On sauvegarde la dernière action
+    lastActionType = "position";
 }
 
-/**
- * Fonction permettant de pouvoir afficher la pop-up pour l'écran anti-triche
- * On va donc cacher la grille derrière pour éviter la triche
- */
-function setUpNewRound(){
-    document.getElementById("button-validate-action").style.display = "none";
-    document.getElementById("button-undo-action").style.display = "none"
-    document.getElementById("popup-ready-message").innerHTML = "C'est à vous de jouer : Joueur " +currentPlayer;
-    document.getElementById("popup").style.display = 'flex';
-    document.getElementById("grid").style.display = 'none';
-    document.getElementById("display-current-player").style.display = "none";
-    document.getElementById("display-current-player").innerHTML = "Joueur "+currentPlayer+" : ";
-    document.getElementById("display-current-walls").style.display = "none";
-    if(currentPlayer===1) document.getElementById("display-current-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer1;
-    else document.getElementById("display-current-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer2;
-    document.getElementById("display-number-actions").innerHTML = "Nombre d'actions restantes : 1";
-    document.getElementById("display-number-actions").style.display = "none";
-    document.getElementById("display-number-tour").innerHTML = "Tour numéro : "+numberTour;
-    document.getElementById("display-number-tour").style.display = "none";
+function movePlayer(event) {
+    const clickedCell = event.target;
+    // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
 
-}
+    if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
+        removePlayerCircle(playerPositions,currentPlayer);
+        playerPositions[`player${currentPlayer}`] = clickedCell.id;
+        console.log(playerPositions);
+        addPlayerCircle(clickedCell,currentPlayer);
 
-/**
- * Cette fonction est appelée à chaque fois qu'un utilisateur va valider un round
- * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
- */
-function validateRound() {
-
-    if(isGameOver()){
-        document.getElementById("popup-ready-message").innerHTML = victoryAnswer;
-        document.getElementById("popup").style.display = 'flex';
-        document.getElementById("popup-button").style.display = "none";
-    } else {
-        //On augmente le nombre de tours
-        if(currentPlayer === 2) numberTour++;
-
-        currentPlayer = (currentPlayer === 1) ? 2 : 1;
-        actionsToDo=1;
-
-        //On regarde si on est arrivé au 100ème tour, si c'est le cas alors => égalité
-        if(currentPlayer === 1 && numberTour === 101){
-            document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
-            document.getElementById("popup").style.display = 'flex';
-            document.getElementById("popup-button").style.display = "none";
-        }
-
-        //On applique la sauvegarde des états des pions
-        lastPlayerPositions["player1"] = playerPositions["player1"];
-        lastPlayerPositions["player2"] = playerPositions["player2"];
-
-        //On applique le brouillard de guerre
-        setVisionForPlayer(currentPlayer,playerPositions);
-
-        setUpNewRound();
+        updateDueToAction(actionsToDo);
+        //On sauvegarde la dernière action
+        lastActionType = "position";
     }
 }
 
-/**
- * Fonction qui analyse si un joueur à fini une partie ou pas
- * @returns {boolean}
- */
-function isGameOver(){
-    if(currentPlayer === 2){
-        if((playerPositions["player1"] && playerPositions["player1"][0] === "8") && (!playerPositions["player2"] || playerPositions["player2"][0] !== "0")){
-            victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
-            return true;
-        }
-        if((playerPositions["player1"] && playerPositions["player1"][0] === "8") && (playerPositions["player2"] && playerPositions["player2"][0] === "0")){
-            victoryAnswer = "Egalité entre les deux joueurs !";
-            return true;
-        }
-        if((playerPositions["player2"] && playerPositions["player2"][0] === "0") && (!playerPositions["player1"] || playerPositions["player1"][0] !== "8")){
-            victoryAnswer = "Victoire du joueur 2 !! Félicitations ! ";
-            return true;
-        }
-    }
-    return false;
-}
 
 /** #############################################  UNDO METHODS  ############################################# **/
 
@@ -358,7 +363,7 @@ function undoAction(){
         undoLayingWall(lastActionType.split(" "));
 
         //On update la phrase affichée sur le site
-        updateNumberWallsDisplay();
+        updateNumberWallsDisplay(currentPlayer,nbWallsPlayer1,nbWallsPlayer2);
     }
 }
 
@@ -367,98 +372,15 @@ function undoLayingWall(wall){
     let space=document.getElementById(wall[2]);
     let secondWall=document.getElementById(wall[3]);
 
+    //Remove classes used for coloring
     firstWall.classList.remove("wall-laid","laidBy"+currentPlayer);
+    space.classList.remove("wall-laid","laidBy"+currentPlayer);
+    secondWall.classList.remove("wall-laid","laidBy"+currentPlayer);
+
+    //Add back eventListeners
     firstWall.addEventListener("mouseenter",wallListener);
     firstWall.addEventListener("click",wallLaid);
 
-    space.classList.remove("wall-laid","laidBy"+currentPlayer);
-
-    secondWall.classList.remove("wall-laid","laidBy"+currentPlayer);
     secondWall.addEventListener("mouseenter",wallListener);
     secondWall.addEventListener("click",wallLaid);
-}
-
-/** #############################################  MOVE PLAYER METHODS  ############################################# **/
-
-/**
- * Fonction qui gere le placement des pions la 1er fois :
- * Chaque joueur doit placer un pion sur la 1er ligne pour le joueur 1
- * et sur la derniere ligne pour le joueur 2 sinon on affiche un message d'erreur
- * et ensuite on change de listener pour le tour suivant car le comportement change
- *
- */
-function choosePositionToBegin(event) {
-
-    const clickedCell = event.target;
-    if(!beginningPositionIsValid(currentPlayer,clickedCell.id[0])){
-        alert("Vous devez commencez par la première ligne")
-        return;
-    }
-
-    //On vérifie si le joueur possède assez d'actions
-    if(actionsToDo===0){
-        alert("Vous n'avez plus d'actions disponibles");
-        return;
-    }
-
-    clickedCell.classList.add("occupied");
-    playerPositions[`player${currentPlayer}`] = clickedCell.id;
-    addPlayerCircle(clickedCell, currentPlayer);
-
-    if (playerPositions.player1 && playerPositions.player2) {
-        const cells = document.querySelectorAll(".cell");
-        cells.forEach(cell => {
-            cell.removeEventListener("click", choosePositionToBegin);
-            cell.addEventListener("click", movePlayer);
-        });
-
-        const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-        walls.forEach(wall=>{
-            wall.addEventListener("mouseenter",wallListener);
-            wall.addEventListener("click",wallLaid);
-        })
-
-    }
-    //On enlève l'action réalisée au compteur
-    updateDueToAction();
-    //On sauvegarde la dernière action
-    lastActionType = "position";
-}
-
-function movePlayer(event) {
-    const clickedCell = event.target;
-    // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
-
-    if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
-        removePlayerCircle();
-        playerPositions[`player${currentPlayer}`] = clickedCell.id;
-        console.log(playerPositions);
-        addPlayerCircle(clickedCell);
-
-        updateDueToAction();
-        //On sauvegarde la dernière action
-        lastActionType = "position";
-    } else {
-        alert("Mouvement impossible ou pas assez d'actions");
-    }
-}
-
-function addPlayerCircle(cell) {
-    const circle = document.createElement("div");
-    circle.classList.add("player" + currentPlayer + "-circle");
-    circle.id="player" + currentPlayer + "-circle";
-    cell.classList.add("occupied");
-    cell.appendChild(circle);
-}
-
-// fonction pour effacer l'anncienne position du joueur
-function removePlayerCircle() {
-    const oldPosition = playerPositions[`player${currentPlayer}`];
-    const oldCell = document.getElementById(oldPosition);
-
-    oldCell.classList.remove("occupied");
-    // ne pas mettre firstChild car je veut juste retirer
-    // le cercle et pas tout ce qu'il y a dans la cellule
-    const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
-    if(playerCircle) oldCell.removeChild(playerCircle);
 }
