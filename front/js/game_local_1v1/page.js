@@ -115,68 +115,7 @@ function initializeTable() {
     return boardInfo;
 }
 
-
-
-/**
- * Fonction qui gere le placement des pions la 1er fois :
- * Chaque joueur doit placer un pion sur la 1er ligne pour le joueur 1
- * et sur la derniere ligne pour le joueur 2 sinon on affiche un message d'erreur
- * et ensuite on change de listener pour le tour suivant car le comportement change
- *
- */
-function choosePositionToBegin(event) {
-
-    const clickedCell = event.target;
-    if(!beginningPositionIsValid(currentPlayer,clickedCell.id[0])){
-        alert("Vous devez commencez par la première ligne")
-        return;
-    }
-
-    //On vérifie si le joueur possède assez d'actions
-    if(actionsToDo===0){
-        alert("Vous n'avez plus d'actions disponibles");
-        return;
-    }
-
-    clickedCell.classList.add("occupied");
-    playerPositions[`player${currentPlayer}`] = clickedCell.id;
-    addPlayerCircle(clickedCell, currentPlayer);
-
-    if (playerPositions.player1 && playerPositions.player2) {
-        const cells = document.querySelectorAll(".cell");
-        cells.forEach(cell => {
-            cell.removeEventListener("click", choosePositionToBegin);
-            cell.addEventListener("click", movePlayer);
-        });
-
-        const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-        walls.forEach(wall=>{
-            wall.addEventListener("mouseenter",wallListener);
-            wall.addEventListener("click",wallLaid);
-        })
-
-    }
-
-    //On enlève l'action réalisée au compteur
-    actionsToDo--;
-    document.getElementById("button-validate-action").style.display = "flex";
-    document.getElementById("button-undo-action").style.display = "flex";
-    updateNumberAction(0);
-    
-    //On sauvegarde la dernière action 
-    lastActionType = "position";
-}
-
-/*
-fonction pour verifier que le mur est sur un placement valide
- */
-function isWallPlacementValid(firstWall, secondWall, space) {
-    const isLaid = firstWall.classList.contains("wall-laid") || secondWall.classList.contains("wall-laid") || space.classList.contains("wall-laid");
-
-    console.log("Is Wall Laid: ", isLaid);
-
-    return !isLaid;
-}
+/** #############################################  WALL LAYING METHODS  ############################################# **/
 
 /*
  fonction pour gerer le survol des murs
@@ -243,10 +182,7 @@ function wallLaid(event) {
         if (currentPlayer === 1) nbWallsPlayer1--;
         else nbWallsPlayer2--;
 
-        actionsToDo--;
-        document.getElementById("button-validate-action").style.display = "flex";
-        document.getElementById("button-undo-action").style.display = "flex";
-        updateNumberAction(0);
+        updateDueToAction();
         //On sauvegarde la dernière action
         lastActionType = "wall " + firstWallToColor.id + " " + spaceToColor.id + " " + secondWallToColor.id;
         updateNumberWallsDisplay();
@@ -256,10 +192,31 @@ function wallLaid(event) {
     }
 }
 
+/*
+fonction pour verifier que le mur est sur un placement valide
+ */
+function isWallPlacementValid(firstWall, secondWall, space) {
+    const isLaid = firstWall.classList.contains("wall-laid") || secondWall.classList.contains("wall-laid") || space.classList.contains("wall-laid");
+
+    console.log("Is Wall Laid: ", isLaid);
+
+    return !isLaid;
+}
+
 function updateNumberWallsDisplay(){
     if(currentPlayer===1) document.getElementById("display-current-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer1;
     else document.getElementById("display-current-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer2;
 }
+
+function updateDueToAction(){
+    actionsToDo--;
+    document.getElementById("button-validate-action").style.display = "flex";
+    document.getElementById("button-undo-action").style.display = "flex";
+    updateNumberAction(0);
+}
+
+
+/** #############################################  ROUND METHODS  ############################################# **/
 
 
 /**
@@ -334,6 +291,30 @@ function validateRound() {
 }
 
 /**
+ * Fonction qui analyse si un joueur à fini une partie ou pas
+ * @returns {boolean}
+ */
+function isGameOver(){
+    if(currentPlayer === 2){
+        if((playerPositions["player1"] && playerPositions["player1"][0] === "8") && (!playerPositions["player2"] || playerPositions["player2"][0] !== "0")){
+            victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
+            return true;
+        }
+        if((playerPositions["player1"] && playerPositions["player1"][0] === "8") && (playerPositions["player2"] && playerPositions["player2"][0] === "0")){
+            victoryAnswer = "Egalité entre les deux joueurs !";
+            return true;
+        }
+        if((playerPositions["player2"] && playerPositions["player2"][0] === "0") && (!playerPositions["player1"] || playerPositions["player1"][0] !== "8")){
+            victoryAnswer = "Victoire du joueur 2 !! Félicitations ! ";
+            return true;
+        }
+    }
+    return false;
+}
+
+/** #############################################  UNDO METHODS  ############################################# **/
+
+/**
  * Cette fonction est appelée quand un joueur veut annuler l'action qu'il vient d'effectuer
  * On va donc regarder la variable lastActionType pour savoir qu'elle est la dernière action utilisée
  * Si la dernière action est la pose d'un mur, alors la variable ressemble à ceci : lastActionType = "wall "+firstWallToColor.id+" "+spaceToColor.id+" "+secondWallToColor.id;
@@ -397,30 +378,52 @@ function undoLayingWall(wall){
     secondWall.addEventListener("click",wallLaid);
 }
 
+/** #############################################  MOVE PLAYER METHODS  ############################################# **/
 
 /**
- * Fonction qui analyse si un joueur à fini une partie ou pas
- * @returns {boolean}
+ * Fonction qui gere le placement des pions la 1er fois :
+ * Chaque joueur doit placer un pion sur la 1er ligne pour le joueur 1
+ * et sur la derniere ligne pour le joueur 2 sinon on affiche un message d'erreur
+ * et ensuite on change de listener pour le tour suivant car le comportement change
+ *
  */
-function isGameOver(){
-    if(currentPlayer === 2){
-        if((playerPositions["player1"] && playerPositions["player1"][0] === "8") && (!playerPositions["player2"] || playerPositions["player2"][0] !== "0")){
-            victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
-            return true;
-        }
-        if((playerPositions["player1"] && playerPositions["player1"][0] === "8") && (playerPositions["player2"] && playerPositions["player2"][0] === "0")){
-            victoryAnswer = "Egalité entre les deux joueurs !";
-            return true;
-        }
-        if((playerPositions["player2"] && playerPositions["player2"][0] === "0") && (!playerPositions["player1"] || playerPositions["player1"][0] !== "8")){
-            victoryAnswer = "Victoire du joueur 2 !! Félicitations ! ";
-            return true;
-        }
-    }
-    return false;
-}
+function choosePositionToBegin(event) {
 
-/** #############################################  MOVE PLAYER METHODS  ############################################# **/
+    const clickedCell = event.target;
+    if(!beginningPositionIsValid(currentPlayer,clickedCell.id[0])){
+        alert("Vous devez commencez par la première ligne")
+        return;
+    }
+
+    //On vérifie si le joueur possède assez d'actions
+    if(actionsToDo===0){
+        alert("Vous n'avez plus d'actions disponibles");
+        return;
+    }
+
+    clickedCell.classList.add("occupied");
+    playerPositions[`player${currentPlayer}`] = clickedCell.id;
+    addPlayerCircle(clickedCell, currentPlayer);
+
+    if (playerPositions.player1 && playerPositions.player2) {
+        const cells = document.querySelectorAll(".cell");
+        cells.forEach(cell => {
+            cell.removeEventListener("click", choosePositionToBegin);
+            cell.addEventListener("click", movePlayer);
+        });
+
+        const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+        walls.forEach(wall=>{
+            wall.addEventListener("mouseenter",wallListener);
+            wall.addEventListener("click",wallLaid);
+        })
+
+    }
+    //On enlève l'action réalisée au compteur
+    updateDueToAction();
+    //On sauvegarde la dernière action
+    lastActionType = "position";
+}
 
 function movePlayer(event) {
     const clickedCell = event.target;
@@ -432,10 +435,7 @@ function movePlayer(event) {
         console.log(playerPositions);
         addPlayerCircle(clickedCell);
 
-        actionsToDo--;
-        document.getElementById("button-validate-action").style.display = "flex";
-        document.getElementById("button-undo-action").style.display = "flex";
-        updateNumberAction(0);
+        updateDueToAction();
         //On sauvegarde la dernière action
         lastActionType = "position";
     } else {
