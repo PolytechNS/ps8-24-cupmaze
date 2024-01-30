@@ -1,8 +1,6 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight } from "../game_local_1v1/utils.js";
 import {beginningPositionIsValid,moveIsValid} from "../game_local_1v1/referee.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
-import {computeMove} from "./ai.js";
-
 
 
 let socket;
@@ -338,12 +336,9 @@ function validateRound(event) {
         document.getElementById("popup").style.display = 'flex';
         document.getElementById("popup-button").style.display = "none";
     } else {
-        //On va faire jouer le bot
-        currentPlayer = 2;
 
         //On récupère la nouvelle position générée par l'IA
         socket.emit("newMove", playerPositions["player2"]);
-
         socket.on("updatedBoard", (newPositionBot) => {
             console.log(newPositionBot);
 
@@ -356,13 +351,15 @@ function validateRound(event) {
 
             //On ajout le cercle du joueur au bon endroit
             let circle_bot = document.getElementById(newPositionBot);
+            console.log("PLAYER POSITION 2 : "+playerPositions["player2"]);
+            currentPlayer = 2;
             if(playerPositions["player2"] !== null) removePlayerCircle();
             addPlayerCircle(circle_bot, 2);
 
             //On sauvegarde la nouvelle position du pot dans le jeu
             playerPositions["player2"] = newPositionBot;
             console.log(playerPositions);
-
+            currentPlayer = 1;
             socket.off("updatedBoard");
         });
 
@@ -384,7 +381,6 @@ function validateRound(event) {
         }
 
         //On augmente le nombre de tours car le bot vient de jouer
-        currentPlayer = 1;
         numberTour++;
         actionsToDo=1;
 
