@@ -4,9 +4,6 @@ fonction pour verifier que le mur est sur un placement valide
  */
 function isWallPlacementValid(firstWall, secondWall, space) {
     const isLaid = firstWall.classList.contains("wall-laid") || secondWall.classList.contains("wall-laid") || space.classList.contains("wall-laid");
-
-    console.log("Is Wall Laid: ", isLaid);
-
     return !isLaid;
 }
 

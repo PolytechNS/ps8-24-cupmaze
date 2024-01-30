@@ -307,7 +307,6 @@ function movePlayer(event) {
     if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
         removePlayerCircle(playerPositions,currentPlayer);
         playerPositions[`player${currentPlayer}`] = clickedCell.id;
-        console.log(playerPositions);
         addPlayerCircle(clickedCell,currentPlayer);
 
         updateDueToAction(actionsToDo);

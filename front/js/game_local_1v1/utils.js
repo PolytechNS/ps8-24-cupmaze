@@ -48,7 +48,6 @@ function findAdjacentSpace(wallPosition) {
 
     if (row < 8 && col < 8) {
         var space = document.getElementById(spaceId);
-        console.log(space);
         return document.getElementById(spaceId);
 
     } else {

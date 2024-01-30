@@ -8,7 +8,6 @@ function beginningPositionIsValid(currentPlayer, position) {
 }
 
 function moveIsValid(oldPosition, cell) {
-    console.log(getAdjacentCells(oldPosition));
     if(cell.classList.contains("occupied")){
         alert("Cette cellule est déjà occupée. Choisissez une autre.");
         return false;
@@ -25,7 +24,6 @@ function moveIsValid(oldPosition, cell) {
     if(adjacentPlayerCell){
         const OrientationAdjacentPlayer = findOrientationAdjacentPlayer(adjacentPlayerCell, oldPosition);
         const wallBehindAdjacentPlayer = findWallBehindPlayer(newPosition, OrientationAdjacentPlayer);
-        console.log(wallBehindAdjacentPlayer);
         if (wallBehindAdjacentPlayer) {
             alert("Vous ne pouvez pas sauter il y a un mur derrière le joueur");
             return false;
