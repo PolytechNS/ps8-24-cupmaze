@@ -225,11 +225,6 @@ function wallLaid(event) {
     if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
         return;
     }
-    //ancien to do: Vérifier si un mur n'est pas déjà posé ?
-    if((firstWallToColor.classList.contains("wall-laid")) || (secondWallToColor.classList.contains("wall-laid")) || (spaceToColor.classList.contains("wall-laid"))){
-        alert("Unexpected Error : wall shouldn't be clickable");
-        return;
-    }
 
     /**
      * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
@@ -244,8 +239,6 @@ function wallLaid(event) {
         firstWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
         firstWallToColor.removeEventListener("mouseenter",wallListener);
         firstWallToColor.removeEventListener("click",wallLaid);
-
-        //TODO enlever l'event listener pour le mur juste avant
 
         if (currentPlayer === 1) nbWallsPlayer1--;
         else nbWallsPlayer2--;
@@ -335,8 +328,6 @@ function validateRound() {
 
         //On applique le brouillard de guerre
         setVisionForPlayer(currentPlayer,playerPositions);
-        const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
-        if(playerCircle) playerCircle.style.display="block";
 
         setUpNewRound();
     }
@@ -363,7 +354,6 @@ function undoAction(){
         document.getElementById(playerPositions["player"+currentPlayer]).classList.remove("occupied");
         playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
         if(numberTour===1){
-            console.log("Player "+currentPlayer+" wants to undo putting their circle");
             const cells = document.querySelectorAll(".cell");
             cells.forEach(cell => {
                 cell.removeEventListener("click", movePlayer);
@@ -382,25 +372,29 @@ function undoAction(){
     }else{ //Si la dernière action la placement d'un mur
         if(currentPlayer === 1) nbWallsPlayer1++;
         else nbWallsPlayer2++;
+
         //On parle la string pour récupérer les id des 3 murs que l'on va devoir remettre en "normal"
-        let parse = lastActionType.split(" ");
-        let firstWall=document.getElementById(parse[1]);
-        let space=document.getElementById(parse[2]);
-        let secondWall=document.getElementById(parse[3]);
-
-        firstWall.classList.remove("wall-laid","laidBy"+currentPlayer);
-        firstWall.addEventListener("mouseenter",wallListener);
-        firstWall.addEventListener("click",wallLaid);
-
-        space.classList.remove("wall-laid","laidBy"+currentPlayer);
-
-        secondWall.classList.remove("wall-laid","laidBy"+currentPlayer);
-        secondWall.addEventListener("mouseenter",wallListener);
-        secondWall.addEventListener("click",wallLaid);
+        undoLayingWall(lastActionType.split(" "));
 
         //On update la phrase affichée sur le site
         updateNumberWallsDisplay();
     }
+}
+
+function undoLayingWall(wall){
+    let firstWall=document.getElementById(wall[1]);
+    let space=document.getElementById(wall[2]);
+    let secondWall=document.getElementById(wall[3]);
+
+    firstWall.classList.remove("wall-laid","laidBy"+currentPlayer);
+    firstWall.addEventListener("mouseenter",wallListener);
+    firstWall.addEventListener("click",wallLaid);
+
+    space.classList.remove("wall-laid","laidBy"+currentPlayer);
+
+    secondWall.classList.remove("wall-laid","laidBy"+currentPlayer);
+    secondWall.addEventListener("mouseenter",wallListener);
+    secondWall.addEventListener("click",wallLaid);
 }
 
 
@@ -423,11 +417,10 @@ function isGameOver(){
             return true;
         }
     }
-    //console.log(playerPositions["player1"] + " "+playerPositions["player2"]);
     return false;
 }
 
-
+/** #############################################  MOVE PLAYER METHODS  ############################################# **/
 
 function movePlayer(event) {
     const clickedCell = event.target;
@@ -468,5 +461,4 @@ function removePlayerCircle() {
     // le cercle et pas tout ce qu'il y a dans la cellule
     const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
     if(playerCircle) oldCell.removeChild(playerCircle);
-
 }
