@@ -30,7 +30,7 @@ let lastPlayerPositions = {
 
 let board;
 let board_Info;
-let possibleMoves;
+let possibleMoves=[];
 document.addEventListener("DOMContentLoaded", main);
 
 
@@ -50,7 +50,6 @@ function main() {
 
     //Mettre le brouillard de guerre
     setVisionForPlayer(currentPlayer,playerPositions);
-    possibleMoves = getPossibleMoves(playerPositions[`player${currentPlayer}`]);
     //On setup les différents textes nécessaires
     setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
 }
@@ -131,6 +130,8 @@ function validateRound() {
         document.getElementById("popup").style.display = 'flex';
         document.getElementById("popup-button").style.display = "none";
     } else {
+        if(numberTour>1) possibleMoves.forEach(cell=>cell.classList.remove("possible-move"));
+
         //On augmente le nombre de tours
         if(currentPlayer === 2) numberTour++;
 
@@ -150,6 +151,7 @@ function validateRound() {
 
         //On applique le brouillard de guerre
         setVisionForPlayer(currentPlayer,playerPositions);
+        if(numberTour>1)possibleMoves = getPossibleMoves(playerPositions[`player${currentPlayer}`]);
         setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
     }
 }
