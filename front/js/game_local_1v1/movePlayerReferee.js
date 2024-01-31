@@ -1,10 +1,44 @@
 export {
     beginningPositionIsValid,
-    moveIsValid
+    moveIsValid,
+    getPossibleMoves
 };
 
 function beginningPositionIsValid(currentPlayer, position) {
     return (currentPlayer === 1) ? position === "0" : position === "8";
+}
+
+function getPossibleMoves(position) {
+    console.log(position);
+    if (position === null) { return; }
+    const possibleMoves = [];
+    const [line, column] = position.split("-").map((value) => parseInt(value));
+
+    function checkMove(newLine, newColumn, posibleMoves) {
+        if (newLine < 0 || newLine > 8 || newColumn < 0 || newColumn > 8) {
+            return;
+        }
+        const cell = document.getElementById(`${newLine}-${newColumn}~cell`);
+        // si la cellule est occupée, on ne peut pas s'y déplacer
+        // TODO: verifier si on un mur derriere le joueur adjacent
+        if (cell.classList.contains("occupied")) {
+            return;
+        }
+        const wallId = (newLine === line) ? `wv~${line}-${Math.min(column, newColumn)}` : `wh~${Math.min(line, newLine)}-${column}`;
+        const wall = document.getElementById(wallId);
+        if (!wall.classList.contains("wall-laid")) {
+            posibleMoves.push(cell);
+            cell.classList.add("possible-move");
+        }
+    }
+
+    // verifie l'axe vertical
+    checkMove(line - 1, column, possibleMoves);
+    checkMove(line + 1, column, possibleMoves);
+    // verifie l'axe horizontal
+    checkMove(line, column - 1, possibleMoves);
+    checkMove(line, column + 1, possibleMoves);
+    return possibleMoves;
 }
 
 function moveIsValid(oldPosition, cell) {

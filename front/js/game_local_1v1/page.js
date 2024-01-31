@@ -1,9 +1,11 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction, updateDueToAction } from "./utils.js";
-import {beginningPositionIsValid, moveIsValid} from "./movePlayerReferee.js";
+import {beginningPositionIsValid, moveIsValid, getPossibleMoves} from "./movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {isWallPlacementValid,updateNumberWallsDisplay} from "./wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "./roundUtils.js";
 import {setVisionForPlayer} from "./fog_of_war.js";
+
+
 
 let currentPlayer = 1;
 let nbWallsPlayer1 = 10;
@@ -28,7 +30,7 @@ let lastPlayerPositions = {
 
 let board;
 let board_Info;
-
+let possibleMoves;
 document.addEventListener("DOMContentLoaded", main);
 
 
@@ -48,7 +50,7 @@ function main() {
 
     //Mettre le brouillard de guerre
     setVisionForPlayer(currentPlayer,playerPositions);
-
+    possibleMoves = getPossibleMoves(playerPositions[`player${currentPlayer}`]);
     //On setup les différents textes nécessaires
     setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
 }
@@ -124,7 +126,6 @@ function initializeTable() {
  * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
  */
 function validateRound() {
-
     if(isGameOver()){
         document.getElementById("popup-ready-message").innerHTML = victoryAnswer;
         document.getElementById("popup").style.display = 'flex';
@@ -312,8 +313,9 @@ function movePlayer(event) {
     else if(target.classList.contains("fog")){
         cellId=target.id.split("~")[1]+"~cell";
     }
-    console.log(cellId);
+
     const clickedCell=document.getElementById(cellId);
+    //const move = getPossibleMoves(playerPositions[`player${currentPlayer}`]);
     if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
         removePlayerCircle(playerPositions,currentPlayer);
         playerPositions[`player${currentPlayer}`] = clickedCell.id;
