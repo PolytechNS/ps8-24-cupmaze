@@ -305,6 +305,7 @@ function choosePositionToBegin(event) {
 
 function movePlayer(event) {
     const target = event.target;
+    console.log(target);
     console.log(target.id);
     let cellId=target.id;
     // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
@@ -317,16 +318,14 @@ function movePlayer(event) {
     }
 
     const clickedCell=document.getElementById(cellId);
-    //const move = getPossibleMoves(playerPositions[`player${currentPlayer}`]);
-    if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
+    if (target.classList.contains("possible-move") && actionsToDo===1) {
+        console.log("move valid");
         removePlayerCircle(playerPositions,currentPlayer);
         playerPositions[`player${currentPlayer}`] = clickedCell.id;
         addPlayerCircle(clickedCell,currentPlayer);
-
         updateDueToAction(actionsToDo);
         //On sauvegarde la dernière action
         lastActionType = "position";
-
     }
 }
 
