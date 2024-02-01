@@ -9,7 +9,6 @@ function beginningPositionIsValid(currentPlayer, position) {
 }
 
 function getPossibleMoves(position) {
-    console.log(position);
     if (position === null) { return; }
     const possibleMoves = [];
     const [line, column] = position.split("-").map((value) => parseInt(value));
@@ -19,10 +18,26 @@ function getPossibleMoves(position) {
             return;
         }
         const cell = document.getElementById(`${newLine}-${newColumn}~cell`);
-        // si la cellule est occupée, on ne peut pas s'y déplacer
-        // TODO: verifier si on un mur derriere le joueur adjacent
         if (cell.classList.contains("occupied")) {
-            return;
+            const adjacentPlayerCell = findAdjacentPlayer(line, column);
+            if (adjacentPlayerCell) {
+                const orientationAdjactentPlayer = findOrientationAdjacentPlayer(adjacentPlayerCell, position);
+                const wallBehindAdjacentPlayer = findWallBehindPlayer(position, orientationAdjactentPlayer);
+                //console.log(wallBehindAdjacentPlayer);
+                //console.log(orientationAdjactentPlayer);
+                if (wallBehindAdjacentPlayer) {
+                    return;
+                }
+                /*
+                const jumpCell = findJumpCell(newLine, newColumn, orientationAdjactentPlayer);
+                if (jumpCell) {
+                    console.log(jumpCell);
+                    posibleMoves.push(jumpCell);
+                    jumpCell.classList.add("possible-move");
+
+                 */
+                }
+            }
         }
         const wallId = (newLine === line) ? `wv~${line}-${Math.min(column, newColumn)}` : `wh~${Math.min(line, newLine)}-${column}`;
         const wall = document.getElementById(wallId);
@@ -41,6 +56,55 @@ function getPossibleMoves(position) {
     return possibleMoves;
 }
 
+function findAdjacentPlayer(line, column) {
+    const checkAdjacentCell = (deltaLine, deltaColumn) => {
+        const adjacentCell = document.getElementById(`${line + deltaLine}-${column + deltaColumn}~cell`);
+        return adjacentCell && adjacentCell.classList.contains("occupied") ? adjacentCell : null;
+    };
+    return checkAdjacentCell(-1, 0) || checkAdjacentCell(1, 0) || checkAdjacentCell(0, -1) || checkAdjacentCell(0, 1);
+}
+
+function findOrientationAdjacentPlayer(adjacentPlayerCell, currentPosition) {
+    const [adjacentLine, adjacentColumn] = adjacentPlayerCell.id.split("-").map((value) => parseInt(value));
+    const [currentLine, currentColumn] = currentPosition.split("-").map((value) => parseInt(value));
+    return adjacentLine === currentLine ? "horizontal" : adjacentColumn === currentColumn ? "vertical" : null;
+}
+
+function findWallBehindPlayer(currentPosition, orientationAdjactentPlayer) {
+    const [currentLine, currentColumn] = currentPosition.split("-").map((value) => parseInt(value));
+    const wallId =
+        orientationAdjactentPlayer === "horizontal" ? `wv~${currentLine}-${Math.min(currentColumn, currentColumn + 1)}` : `wh~${Math.min(currentLine, currentLine + 1)}-${currentColumn}`;
+    return wallId ? document.getElementById(wallId).classList.contains("wall-laid") : false;
+}
+
+function findJumpCell(line, column, orientationAdjactentPlayer) {
+    const jumpLine = orientationAdjactentPlayer === "horizontal" ? line : line - 1;
+    const jumpColumn = orientationAdjactentPlayer === "vertical" ? column : column + 2;
+    if (jumpLine >= 0 && jumpLine <= 8 && jumpColumn >= 0 && jumpColumn <= 8) {
+        return document.getElementById(`${jumpLine}-${jumpColumn}~cell`);
+    }
+    return null;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function moveIsValid(oldPosition, cell) {
     if(cell.classList.contains("occupied")){
         alert("Cette cellule est déjà occupée. Choisissez une autre.");
@@ -54,7 +118,7 @@ function moveIsValid(oldPosition, cell) {
     let oldPositionLine = parseInt(oldPosition[0]);
     let oldPositionColumn = parseInt(oldPosition[2]);
 
-    const adjacentPlayerCell = findAdjacentPlayer(oldPosition);
+    const adjacentPlayerCell = findAdjacentPlayer2(oldPosition);
     if(adjacentPlayerCell){
         const OrientationAdjacentPlayer = findOrientationAdjacentPlayer(adjacentPlayerCell, oldPosition);
         const wallBehindAdjacentPlayer = findWallBehindPlayer(newPosition, OrientationAdjacentPlayer);
@@ -133,7 +197,7 @@ function getAdjacentCells(position) {
     }
     return adjacentCells;
 }
-function findAdjacentPlayer(position){
+function findAdjacentPlayer2(position){
     const adjacentCells = getAdjacentCells(position);
     for (const cell of adjacentCells) {
         if(cell.classList.contains("occupied"))
@@ -142,7 +206,7 @@ function findAdjacentPlayer(position){
     return false;
 }
 
-function findOrientationAdjacentPlayer(adjacentPlayerCell, oldPosition){
+function findOrientationAdjacentPlayer2(adjacentPlayerCell, oldPosition){
     const adjacentPlayerCellId = adjacentPlayerCell.id;
     const adjacentPlayerCellLine = parseInt(adjacentPlayerCellId[0]);
     const adjacentPlayerCellColumn = parseInt(adjacentPlayerCellId[2]);
@@ -163,7 +227,7 @@ function findOrientationAdjacentPlayer(adjacentPlayerCell, oldPosition){
     }
 }
 
-function findWallBehindPlayer(newPosition, orientationAdjactentPlayer){
+function findWallBehindPlayer2(newPosition, orientationAdjactentPlayer){
     // chercher si il y a un mur derrière le joueur adjacent celon l'orientation du joueur adjacent
     const newPositionLine = parseInt(newPosition[0]);
     const newPositionColumn = parseInt(newPosition[2]);
