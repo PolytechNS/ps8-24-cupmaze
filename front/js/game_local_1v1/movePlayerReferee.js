@@ -38,7 +38,6 @@ function getPossibleMoves(position) {
                  */
                 }
             }
-        }
         const wallId = (newLine === line) ? `wv~${line}-${Math.min(column, newColumn)}` : `wh~${Math.min(line, newLine)}-${column}`;
         const wall = document.getElementById(wallId);
         if (!wall.classList.contains("wall-laid")) {
