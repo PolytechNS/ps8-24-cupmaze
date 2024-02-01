@@ -315,15 +315,15 @@ function movePlayer(event) {
     }
     else if(target.classList.contains("fog")){
         cellId=target.id.split("~")[1]+"~cell";
+        console.log(cellId);
     }
-
     const clickedCell=document.getElementById(cellId);
-    if (target.classList.contains("possible-move") && actionsToDo===1) {
+    if (clickedCell.classList.contains("possible-move") && actionsToDo===1) {
         console.log("move valid");
         removePlayerCircle(playerPositions,currentPlayer);
         playerPositions[`player${currentPlayer}`] = clickedCell.id;
         addPlayerCircle(clickedCell,currentPlayer);
-        updateDueToAction(actionsToDo);
+        updateDueToAction();
         //On sauvegarde la dernière action
         lastActionType = "position";
     }
