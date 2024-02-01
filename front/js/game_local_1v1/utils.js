@@ -4,8 +4,7 @@ export {
     findAdjacentSpace,
     highlightElements,
     removeHighlight,
-    updateNumberAction,
-    updateDueToAction
+    updateNumberAction
 };
 
 function extractWallInfo(wallId) {
@@ -72,11 +71,4 @@ function removeHighlight(firstWall, secondWall, space) {
 
 function updateNumberAction(nombreAction){
     document.getElementById("display-number-actions").innerHTML = "Nombre d'actions restantes : "+nombreAction;
-}
-
-function updateDueToAction(actionsToDo){
-    actionsToDo--;
-    document.getElementById("button-validate-action").style.display = "flex";
-    document.getElementById("button-undo-action").style.display = "flex";
-    updateNumberAction(0);
 }

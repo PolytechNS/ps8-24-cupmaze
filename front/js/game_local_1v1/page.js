@@ -1,4 +1,4 @@
-import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction, updateDueToAction } from "./utils.js";
+import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction } from "./utils.js";
 import {beginningPositionIsValid, moveIsValid, getPossibleMoves} from "./movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {isWallPlacementValid,updateNumberWallsDisplay} from "./wallLayingUtils.js"
@@ -245,7 +245,7 @@ function wallLaid(event) {
         if (currentPlayer === 1) nbWallsPlayer1--;
         else nbWallsPlayer2--;
 
-        updateDueToAction(actionsToDo);
+        updateDueToAction();
         //On sauvegarde la dernière action
         lastActionType = "wall " + firstWallToColor.id + " " + spaceToColor.id + " " + secondWallToColor.id;
         updateNumberWallsDisplay(currentPlayer,nbWallsPlayer1,nbWallsPlayer2);
@@ -298,7 +298,7 @@ function choosePositionToBegin(event) {
 
     }
     //On enlève l'action réalisée au compteur
-    updateDueToAction(actionsToDo);
+    updateDueToAction();
     //On sauvegarde la dernière action
     lastActionType = "position";
 }
@@ -396,4 +396,14 @@ function undoLayingWall(wall){
 
     secondWall.addEventListener("mouseenter",wallListener);
     secondWall.addEventListener("click",wallLaid);
+}
+
+
+
+/**UTILS **/
+function updateDueToAction(){
+    actionsToDo--;
+    document.getElementById("button-validate-action").style.display = "flex";
+    document.getElementById("button-undo-action").style.display = "flex";
+    updateNumberAction(0);
 }
