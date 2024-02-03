@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", main);
 
 function main() {
     //On initialise le socket quand la partie commence
-    socket = io();
+    socket = io("/api/game");
 
     board = document.getElementById("grid");
 
@@ -363,7 +363,6 @@ function validateRound() {
             currentPlayer = 1;
             socket.off("updatedBoard");
         });
-
 
 
         //Mettre les cases en bon état

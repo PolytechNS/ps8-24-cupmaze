@@ -6,17 +6,19 @@ const { Server } = require("socket.io");
  * Cette fonction est appelée dans le fichier "index.js" pour l'initialiser en attendant une connexion d'un client
  * @param server
  */
-function createSocket(server){
-    //On passe en paramètre le serveur que l'on reçoit en paramètre de la fonction
+
+function createSocket(server) {
     const io = new Server(server);
-    io.on("connection", (socket) => {
+
+
+    const gameNamespace = io.of("/api/game");
+    gameNamespace.on("connection", (socket) => {
         console.log("a user connected");
 
-        //Quand on reçoit un message "newMove" alors on doit demander à l'IA de jouer et on envoie le résultat au client (io.emit)
         socket.on("newMove", (msg) => {
-            console.log("Player1 make a new movement, we will compute the AI's move and send it back to the client");
+            console.log("Player1 makes a new movement, computing AI's move and sending it back to the client");
             let newPosition = AIEasy.computeMove(msg);
-            io.emit("updatedBoard", newPosition);
+            gameNamespace.emit("updatedBoard", newPosition);
         });
 
         socket.on("disconnect", () => {
