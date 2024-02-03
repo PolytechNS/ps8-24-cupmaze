@@ -1,9 +1,16 @@
-import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight } from "../game_local_1v1/utils.js";
+import {
+    extractWallInfo,
+    findAdjacentWall,
+    findAdjacentSpace,
+    highlightElements,
+    removeHighlight,
+    updateNumberAction
+} from "../game_local_1v1/utils.js";
 import {beginningPositionIsValid,moveIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
 
-import {movePlayer, addPlayerCircle} from "../game_local_1v1/movePlayerUtils.js";
-import {computeMove} from "./ai.js";
+import {addPlayerCircle, removePlayerCircle} from "../game_local_1v1/movePlayerUtils.js";
+
 
 let socket;
 
@@ -172,6 +179,32 @@ function choosePositionToBegin(event) {
     lastActionType = "position";
 }
 
+function movePlayer(event) {
+    const clickedCell = event.target;
+    // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
+
+    if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
+        removePlayerCircle(playerPositions, currentPlayer);
+        playerPositions[`player${currentPlayer}`] = clickedCell.id;
+        console.log(playerPositions);
+        addPlayerCircle(clickedCell, currentPlayer);
+
+        actionsToDo--;
+        document.getElementById("button-validate-action").style.display = "flex";
+        document.getElementById("button-undo-action").style.display = "flex";
+        updateNumberAction(0);
+        //On sauvegarde la dernière action
+        lastActionType = "position";
+    } else {
+        alert("Mouvement impossible ou pas assez d'actions");
+    }
+}
+
+
+
+
+
+
 /*
  fonction pour gerer le survol des murs
  */
@@ -321,7 +354,7 @@ function validateRound() {
             let circle_bot = document.getElementById(newPositionBot);
             console.log("PLAYER POSITION 2 : "+playerPositions["player2"]);
             currentPlayer = 2;
-            if(playerPositions["player2"] !== null) removePlayerCircle();
+            if(playerPositions["player2"] !== null) removePlayerCircle(playerPositions, currentPlayer);
             addPlayerCircle(circle_bot, 2);
 
             //On sauvegarde la nouvelle position du pot dans le jeu
@@ -408,8 +441,7 @@ function undoAction(){
         }
         playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
     }else{ //Si la dernière action la placement d'un mur
-        if(currentPlayer === 1) nbWallsPlayer1++;
-        else nbWallsPlayer2++;
+        nbWallsPlayer1++;
         //On parle la string pour récupérer les id des 3 murs que l'on va devoir remettre en "normal"
         let parse = lastActionType.split(" ");
         let firstWall=document.getElementById(parse[1]);
