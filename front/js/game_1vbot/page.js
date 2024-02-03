@@ -1,8 +1,18 @@
-import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight } from "../game_local_1v1/utils.js";
+import {
+    extractWallInfo,
+    findAdjacentWall,
+    findAdjacentSpace,
+    highlightElements,
+    removeHighlight,
+    updateNumberAction
+} from "../game_local_1v1/utils.js";
 import {beginningPositionIsValid,moveIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
-import {movePlayer, addPlayerCircle} from "../game_local_1v1/movePlayerUtils.js";
-import {computeMove} from "./ai.js";
+
+import {addPlayerCircle, removePlayerCircle} from "../game_local_1v1/movePlayerUtils.js";
+
+
+let socket;
 
 let currentPlayer = 1;
 let nbWallsPlayer1 = 10;
@@ -32,6 +42,9 @@ document.addEventListener("DOMContentLoaded", main);
 
 
 function main() {
+    //On initialise le socket quand la partie commence
+    socket = io("/api/game");
+
     board = document.getElementById("grid");
 
     //On ajoute un event listener sur l'écran anti triche
@@ -116,8 +129,6 @@ function initializeTable() {
     return boardInfo;
 }
 
-
-
 /**
  * Fonction qui gere le placement des pions la 1er fois :
  * Chaque joueur doit placer un pion sur la 1er ligne pour le joueur 1
@@ -167,6 +178,32 @@ function choosePositionToBegin(event) {
     //On sauvegarde la dernière action
     lastActionType = "position";
 }
+
+function movePlayer(event) {
+    const clickedCell = event.target;
+    // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
+
+    if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
+        removePlayerCircle(playerPositions, currentPlayer);
+        playerPositions[`player${currentPlayer}`] = clickedCell.id;
+        console.log(playerPositions);
+        addPlayerCircle(clickedCell, currentPlayer);
+
+        actionsToDo--;
+        document.getElementById("button-validate-action").style.display = "flex";
+        document.getElementById("button-undo-action").style.display = "flex";
+        updateNumberAction(0);
+        //On sauvegarde la dernière action
+        lastActionType = "position";
+    } else {
+        alert("Mouvement impossible ou pas assez d'actions");
+    }
+}
+
+
+
+
+
 
 /*
  fonction pour gerer le survol des murs
@@ -300,23 +337,32 @@ function validateRound() {
         document.getElementById("popup").style.display = 'flex';
         document.getElementById("popup-button").style.display = "none";
     } else {
-        //On va faire jouer le bot
-        currentPlayer = 2;
 
         //On récupère la nouvelle position générée par l'IA
-        let newPositionBot = computeMove(playerPositions["player2"]);
+        socket.emit("newMove", playerPositions["player2"]);
+        socket.on("updatedBoard", (newPositionBot) => {
+            console.log(newPositionBot);
 
-        //On vérifie que le mouvement est légal, sinon on recommence
-        if(playerPositions["player2"] !== null){
-            while(!moveIsValid(lastPlayerPositions["player2"],document.getElementById(newPositionBot))){
-                newPositionBot = computeMove(playerPositions["player2"]);
-            }
-        }
+            //On vérifie que le mouvement est légal, sinon on recommence
+            /*if(playerPositions["player2"] !== null){
+                while(!moveIsValid(lastPlayerPositions["player2"],document.getElementById(newPositionBot))){
+                    newPositionBot = computeMove(playerPositions["player2"]);
+                }
+            }*/
 
-        //On ajout le cercle du joueur au bon endroit
-        let circle_bot = document.getElementById(newPositionBot);
-        if(playerPositions["player2"] !== null) removePlayerCircle();
-        addPlayerCircle(circle_bot, 2);
+            //On ajout le cercle du joueur au bon endroit
+            let circle_bot = document.getElementById(newPositionBot);
+            console.log("PLAYER POSITION 2 : "+playerPositions["player2"]);
+            currentPlayer = 2;
+            if(playerPositions["player2"] !== null) removePlayerCircle(playerPositions, currentPlayer);
+            addPlayerCircle(circle_bot, 2);
+
+            //On sauvegarde la nouvelle position du pot dans le jeu
+            playerPositions["player2"] = newPositionBot;
+            console.log(playerPositions);
+            currentPlayer = 1;
+            socket.off("updatedBoard");
+        });
 
 
         //Mettre les cases en bon état
@@ -335,7 +381,6 @@ function validateRound() {
         }
 
         //On augmente le nombre de tours car le bot vient de jouer
-        currentPlayer = 1;
         numberTour++;
         actionsToDo=1;
 
@@ -346,9 +391,6 @@ function validateRound() {
             document.getElementById("popup-button").style.display = "none";
         }
 
-        //On sauvegarde la nouvelle position du pot dans le jeu
-        playerPositions["player2"] = newPositionBot;
-        console.log(playerPositions);
 
         //On applique la sauvegarde des états des pions
         lastPlayerPositions["player1"] = playerPositions["player1"];
@@ -398,8 +440,7 @@ function undoAction(){
         }
         playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
     }else{ //Si la dernière action la placement d'un mur
-        if(currentPlayer === 1) nbWallsPlayer1++;
-        else nbWallsPlayer2++;
+        nbWallsPlayer1++;
         //On parle la string pour récupérer les id des 3 murs que l'on va devoir remettre en "normal"
         let parse = lastActionType.split(" ");
         let firstWall=document.getElementById(parse[1]);
