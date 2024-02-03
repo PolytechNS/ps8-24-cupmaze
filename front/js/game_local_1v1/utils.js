@@ -3,7 +3,8 @@ export {
     findAdjacentWall,
     findAdjacentSpace,
     highlightElements,
-    removeHighlight
+    removeHighlight,
+    updateNumberAction
 };
 
 function extractWallInfo(wallId) {
@@ -46,7 +47,6 @@ function findAdjacentSpace(wallPosition) {
 
     if (row < 8 && col < 8) {
         var space = document.getElementById(spaceId);
-        console.log(space);
         return document.getElementById(spaceId);
 
     } else {
@@ -66,4 +66,9 @@ function removeHighlight(firstWall, secondWall, space) {
     firstWall.classList.remove("wall-hovered");
     secondWall.classList.remove("wall-hovered");
     space.classList.remove("space-hovered");
+}
+
+
+function updateNumberAction(nombreAction){
+    document.getElementById("display-number-actions").innerHTML = "Nombre d'actions restantes : "+nombreAction;
 }
