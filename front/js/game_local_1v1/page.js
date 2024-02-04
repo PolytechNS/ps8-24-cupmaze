@@ -4,7 +4,7 @@ import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {isWallPlacementValid,updateNumberWallsDisplay} from "./wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "./roundUtils.js";
 import {setVisionForPlayer} from "./fog_of_war.js";
-
+import {Graph} from "./graphUtils.js";
 
 
 let currentPlayer = 1;
@@ -198,7 +198,7 @@ function wallListener(event) {
     const secondWallToColor = findAdjacentWall(wallType, wallPosition);
     const spaceToColor = findAdjacentSpace(wallPosition);
 
-    if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
+    if (!isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor)) {
         removeHighlight(firstWallToColor, secondWallToColor, spaceToColor)
         return;
     }
@@ -235,6 +235,13 @@ function wallLaid(event) {
      * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
      */
     if(actionsToDo>0 && ((currentPlayer===1 && nbWallsPlayer1>0) || (currentPlayer===2 && nbWallsPlayer2>0))) {
+        const enemyPlayer = currentPlayer===1? 2:1;
+        console.log("current player: "+currentPlayer+" enemy player: "+enemyPlayer);
+        if(!cellGraph.checkAndAdd(playerPositions["player"+enemyPlayer].split("~")[0],currentPlayer,wallType,wallPosition)){
+            return;
+        }
+        console.log("wallType: "+wallType+" wallPosition: "+wallPosition);
+
         secondWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
         secondWallToColor.removeEventListener("mouseenter",wallListener);
         secondWallToColor.removeEventListener("click",wallLaid);
