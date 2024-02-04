@@ -395,6 +395,9 @@ function undoLayingWall(wall){
     let space=document.getElementById(wall[2]);
     let secondWall=document.getElementById(wall[3]);
 
+    const [firstWallType, firstWallPosition] = firstWall.id.split("~");
+    const [secondWallType, secondWallPosition] = secondWall.id.split("~");
+
     //Remove classes used for coloring
     firstWall.classList.remove("wall-laid","laidBy"+currentPlayer);
     space.classList.remove("wall-laid","laidBy"+currentPlayer);
@@ -403,9 +406,11 @@ function undoLayingWall(wall){
     //Add back eventListeners
     firstWall.addEventListener("mouseenter",wallListener);
     firstWall.addEventListener("click",wallLaid);
+    cellGraph.removeWall(firstWallPosition,firstWallType);
 
     secondWall.addEventListener("mouseenter",wallListener);
     secondWall.addEventListener("click",wallLaid);
+    cellGraph.removeWall(secondWallPosition,secondWallType);
 }
 
 
