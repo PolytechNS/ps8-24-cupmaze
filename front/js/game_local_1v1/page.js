@@ -31,6 +31,7 @@ let lastPlayerPositions = {
 let board;
 let board_Info;
 let possibleMoves=[];
+let cellGraph=new Graph();
 document.addEventListener("DOMContentLoaded", main);
 
 
@@ -80,6 +81,7 @@ function initializeTable() {
             cell.classList.add("cell");
             cell.addEventListener("click", choosePositionToBegin);
             board.appendChild(cell);
+            cellGraph.addVertex(cellId);
             if(j !== 8) {
                 const wallId = i + "-" + j + "~" + (i + 1) + "-" + j;
                 row.push({type: "wall-vertical", id: wallId});
@@ -115,6 +117,7 @@ function initializeTable() {
         }
         boardInfo.push(row);
     }
+    cellGraph.initializeEdges();
     return boardInfo;
 }
 
