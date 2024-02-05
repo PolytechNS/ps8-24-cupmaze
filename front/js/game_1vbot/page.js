@@ -181,7 +181,6 @@ function choosePositionToBegin(event) {
 
 function movePlayer(event) {
     const clickedCell = event.target;
-    // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
 
     if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
         removePlayerCircle(playerPositions, currentPlayer);
