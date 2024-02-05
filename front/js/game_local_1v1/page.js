@@ -4,7 +4,7 @@ import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {isWallPlacementValid,updateNumberWallsDisplay} from "./wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "./roundUtils.js";
 import {setVisionForPlayer} from "./fog_of_war.js";
-
+import {Graph} from "./graphUtils.js";
 
 
 let currentPlayer = 1;
@@ -31,6 +31,7 @@ let lastPlayerPositions = {
 let board;
 let board_Info;
 let possibleMoves=[];
+let cellGraph=new Graph();
 document.addEventListener("DOMContentLoaded", main);
 
 
@@ -80,6 +81,7 @@ function initializeTable() {
             cell.classList.add("cell");
             cell.addEventListener("click", choosePositionToBegin);
             board.appendChild(cell);
+            cellGraph.addVertex(cellId);
             if(j !== 8) {
                 const wallId = i + "-" + j + "~" + (i + 1) + "-" + j;
                 row.push({type: "wall-vertical", id: wallId});
@@ -115,6 +117,7 @@ function initializeTable() {
         }
         boardInfo.push(row);
     }
+    cellGraph.initializeEdges();
     return boardInfo;
 }
 
@@ -195,7 +198,7 @@ function wallListener(event) {
     const secondWallToColor = findAdjacentWall(wallType, wallPosition);
     const spaceToColor = findAdjacentSpace(wallPosition);
 
-    if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
+    if (!isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor)) {
         removeHighlight(firstWallToColor, secondWallToColor, spaceToColor)
         return;
     }
@@ -232,6 +235,13 @@ function wallLaid(event) {
      * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
      */
     if(actionsToDo>0 && ((currentPlayer===1 && nbWallsPlayer1>0) || (currentPlayer===2 && nbWallsPlayer2>0))) {
+        const enemyPlayer = currentPlayer===1? 2:1;
+        console.log("current player: "+currentPlayer+" enemy player: "+enemyPlayer);
+        if(!cellGraph.checkAndAdd(playerPositions["player"+enemyPlayer].split("~")[0],currentPlayer,wallType,wallPosition)){
+            return;
+        }
+        console.log("wallType: "+wallType+" wallPosition: "+wallPosition);
+
         secondWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
         secondWallToColor.removeEventListener("mouseenter",wallListener);
         secondWallToColor.removeEventListener("click",wallLaid);
@@ -385,6 +395,9 @@ function undoLayingWall(wall){
     let space=document.getElementById(wall[2]);
     let secondWall=document.getElementById(wall[3]);
 
+    const [firstWallType, firstWallPosition] = firstWall.id.split("~");
+    const [secondWallType, secondWallPosition] = secondWall.id.split("~");
+
     //Remove classes used for coloring
     firstWall.classList.remove("wall-laid","laidBy"+currentPlayer);
     space.classList.remove("wall-laid","laidBy"+currentPlayer);
@@ -393,9 +406,11 @@ function undoLayingWall(wall){
     //Add back eventListeners
     firstWall.addEventListener("mouseenter",wallListener);
     firstWall.addEventListener("click",wallLaid);
+    cellGraph.removeWall(firstWallPosition,firstWallType);
 
     secondWall.addEventListener("mouseenter",wallListener);
     secondWall.addEventListener("click",wallLaid);
+    cellGraph.removeWall(secondWallPosition,secondWallType);
 }
 
 
