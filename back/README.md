@@ -32,3 +32,11 @@ A folder `back/logic` has been created to handle the business logic of your webs
 You're free to use it, move it, or not. You decide the architecture.
 
 For now, it only contains an `ai.js` file with a function that can play a (~random) connect4 move.
+
+## Docker
+
+D'abord il faut construire l'image docker et son container avec les commande suivante:
+```bash
+docker build ./back
+docker run --name mongo_container -d mongo:4.2.3
+```
