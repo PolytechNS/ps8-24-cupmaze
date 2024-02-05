@@ -35,8 +35,3 @@ For now, it only contains an `ai.js` file with a function that can play a (~rand
 
 ## Docker
 
-D'abord il faut construire l'image docker et son container avec les commande suivante:
-```bash
-docker build ./back
-docker run --name mongo_container -d mongo:4.2.3
-```

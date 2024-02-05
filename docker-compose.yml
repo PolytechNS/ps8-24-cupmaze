@@ -1,0 +1,21 @@
+version: '3'
+
+
+
+services:
+
+    cupmaze:
+      build: .
+      ports:
+      - "8000:8000"
+      depends_on:
+      - mongodb
+      environment:
+      - MONGO_URI=mongodb://mongo_container:27017/cupmaze
+
+
+    mongodb:
+      image: mongo:latest
+      container_name: mongo_container
+      ports:
+      - "27017:27017"
