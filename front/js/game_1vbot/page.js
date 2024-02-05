@@ -14,6 +14,8 @@ import {addPlayerCircle, removePlayerCircle} from "../game_local_1v1/movePlayerU
 
 let socket;
 
+let numberTour = 1;
+
 let currentPlayer = 1;
 let nbWallsPlayer1 = 10;
 let nbWallsPlayer2 = 10;
@@ -21,7 +23,6 @@ let actionsToDo = 1;
 
 let lastActionType = "";
 
-let numberTour = 1;
 
 let victoryAnswer = "";
 
@@ -181,8 +182,23 @@ function choosePositionToBegin(event) {
 
 function movePlayer(event) {
     const clickedCell = event.target;
+    //TODO : AJOUTER L'APPEL AU SOCKET POUR POUVOIR MODIFIER
+    socket.emit("isMoveValid", clickedCell.id);
+    socket.on("moveIsValid", (isMoveValid) => {
+        if(isMoveValid) {
+            removePlayerCircle(playerPositions, currentPlayer);
+            addPlayerCircle(clickedCell, currentPlayer);
+            actionsToDo--;
+            document.getElementById("button-validate-action").style.display = "flex";
+            document.getElementById("button-undo-action").style.display = "flex";
+            lastActionType = "position";
+        } else {
+            alert("Mouvement impossible ou pas assez d'actions");
+        }
+    });
 
-    if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
+
+    /*if(moveIsValid(playerPositions[`player${currentPlayer}`],clickedCell) && actionsToDo===1) {
         removePlayerCircle(playerPositions, currentPlayer);
         playerPositions[`player${currentPlayer}`] = clickedCell.id;
         console.log(playerPositions);
@@ -196,7 +212,8 @@ function movePlayer(event) {
         lastActionType = "position";
     } else {
         alert("Mouvement impossible ou pas assez d'actions");
-    }
+    }*/
+
 }
 
 
