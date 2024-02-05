@@ -19,14 +19,19 @@ function createSocket(server) {
         console.log("a user connected");
         const game = new Game();
 
-        //TODO
         socket.on("isMoveValid", (msg) => {
             console.log("On vérifie si le mouvement est valide");
+            let caseWanted = game.retrieveCase(msg[0], msg[2]);
+            let answer = game.moveIsPossible(caseWanted);
+            gameNamespace.emit("moveIsValid", answer);
         });
 
         //TODO
         socket.on("newMovePlayer1", (msg) => {
             console.log("Appliquer le nouveau mouvement au joueur 1");
+            let caseWanted = game.retrieveCase(msg[0], msg[2]);
+            let answer = game.movePlayer(caseWanted);
+            gameNamespace.emit("isPlayer1Mooved", answer);
         });
 
         //TODO
@@ -34,7 +39,6 @@ function createSocket(server) {
             console.log("On applique un nouveau mur");
         });
 
-        //TODO
         socket.on("NewTurn", (msg) => {
             console.log("On change de tour");
             game.validateRound();

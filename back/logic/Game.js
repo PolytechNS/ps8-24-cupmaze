@@ -21,6 +21,7 @@ class Game {
         this.numberTour++;
     }
 
+
     init() {
         for (let i = 0; i < 9; i++) {
             for (let j = 0; j < 9; j++) {
@@ -38,13 +39,15 @@ class Game {
         }
     }
 
-    moveIsPossible(numberPlayer, caseWanted){
-        if(this.playerPosition[numberPlayer - 1] === null){
+    moveIsPossible(caseWanted){
+        if(this.playerPosition[this.currentPlayer - 1] === null){
+            console.log("[+] La position était nulle donc mouvement forcément autorisé");
             return true;
         }
         if(!caseWanted.getIsOccupied()){
-            if(this.playerPosition[numberPlayer - 1].isAdjacent(caseWanted)){
-                if(this.noWallsBetween(this.playerPosition[numberPlayer - 1], caseWanted)){
+            if(this.playerPosition[this.currentPlayer - 1].isAdjacent(caseWanted)){
+                if(this.noWallsBetween(this.playerPosition[this.currentPlayer - 1], caseWanted)){
+                    console.log("[+] Pas de murs entre les positions et pas de joueur sur la case voulue et cases adjacentes");
                     return true;
                 }
             }
@@ -77,11 +80,11 @@ class Game {
         return true;
     }
 
-    movePlayer(numberPlayer, caseWanted){
-        if(this.moveIsPossible(numberPlayer, caseWanted) && this.actionsToDo > 0){
-            this.playerPosition[numberPlayer - 1].setIsOccupied(false);
-            this.playerPosition[numberPlayer - 1] = caseWanted;
-            this.playerPosition[numberPlayer - 1].setIsOccupied(true);
+    movePlayer(caseWanted){
+        if(this.moveIsPossible(this.currentPlayer, caseWanted) && this.actionsToDo > 0){
+            this.playerPosition[this.currentPlayer - 1].setIsOccupied(false);
+            this.playerPosition[this.currentPlayer - 1] = caseWanted;
+            this.playerPosition[this.currentPlayer - 1].setIsOccupied(true);
             this.actionsToDo--;
             return true;
         }
@@ -106,6 +109,18 @@ class Game {
             }
         }
         return false;
+    }
+
+    retrievePlayerPosition(numberPlayer){
+        return this.playerPosition[numberPlayer - 1];
+    }
+
+    retrieveWalls(x,y){
+        return this.walls[x * 8 + y];
+    }
+
+    retrieveCase(x,y){
+        return this.cases[x * 9 + y];
     }
 
 }
