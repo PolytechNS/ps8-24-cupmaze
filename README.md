@@ -27,3 +27,5 @@ Note that this command should be run again every time you install / delete a pac
 ## All runs
 
 Simplement faire `docker compose up -d` pour lancer le projet.
+Le site sera accessible à l'adresse `http://localhost:8000/`.
+Et `docker compose down` pour l'arrêter.
