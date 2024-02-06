@@ -1,5 +1,6 @@
 const { Wall } = require('./Wall.js');
 const { Case } = require('./Case.js');
+const { getPossibleMoves } = require('./movePlayerReferee.js');
 
 
 class Game {
@@ -26,6 +27,10 @@ class Game {
                 this.elements.push(new Wall(i, j, true, "horizontal"));
             }
         }
+    }
+
+    getPossibleMoves(playerPosition) {
+        const possibleMoves = getPossibleMoves(playerPosition, this.elements);
     }
 }
 

@@ -5,11 +5,33 @@ export {
 };
 
 function beginningPositionIsValid(currentPlayer, position) {
-
+     return (currentPlayer === 1) ? position === "0" : position === "8";
 }
 
-function getPossibleMoves(position) {
+function getPossibleMoves(playerPosition, elements) {
+    const possibleMoves = [];
+    const [line, column] = playerPosition;
 
+    function checkMove(newLine, newColumn, possibleMoves, direction) {
+        if (newLine < 0 || newLine > 8 || newColumn < 0 || newColumn > 8) {
+            return;
+        }
+
+        // on recupere le mur
+        const wallId = (newLine === line) ?
+            this.elements.find((element) =>
+                element instanceof Wall &&
+                element.inclinaison === "vertical" &&
+                element.line === line &&
+                element.column === Math.min(column, newColumn)) :
+            this.elements.find((element) =>
+                element instanceof Wall &&
+                element.inclinaison === "horizontal" &&
+                element.line === Math.min(line, newLine) &&
+                element.column === column);
+
+        const cell = this.elements.find((element) => element instanceof Case && element.line === newLine && element.column === newColumn);
+    }
 }
 
 function findAdjacentPlayer(line, column) {
