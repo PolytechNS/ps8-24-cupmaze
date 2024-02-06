@@ -1,8 +1,9 @@
 class Wall{
-    constructor(pos_x, pos_y, isLaid){
+    constructor(pos_x, pos_y, isLaid, inclinaison){
         this.pos_x = pos_x;
         this.pos_y = pos_y;
         this.isLaid = isLaid;
+        this.inclinaison = inclinaison;
     }
 
     getPos_x(){
@@ -19,6 +20,14 @@ class Wall{
 
     setIsLaid(isLaid){
         this.isLaid = isLaid;
+    }
+
+    getInclinaison(){
+        return this.inclinaison;
+    }
+
+    equals(wall){
+        return this.pos_x === wall.getPos_x() && this.pos_y === wall.getPos_y() && this.inclinaison === wall.getInclinaison();
     }
 }
 
