@@ -19,10 +19,13 @@ function createSocket(server) {
         console.log("a user connected");
         const game = new Game();
 
+
+        //TODO
         socket.on("isMoveValid", (msg) => {
             console.log("On vérifie si le mouvement est valide");
             let caseWanted = game.retrieveCase(msg[0], msg[2]);
             let answer = game.moveIsPossible(caseWanted);
+            if(!answer) console.log("[-] Le mouvement n'est pas valide");
             gameNamespace.emit("moveIsValid", answer);
         });
 
@@ -45,9 +48,14 @@ function createSocket(server) {
         });
 
         socket.on("newMove", (msg) => {
-            console.log("Player1 makes a new movement, computing AI's move and sending it back to the client");
+            console.log("On demande à l'IA de jouer maintenant");
             let newPosition = AIEasy.computeMove(msg);
             gameNamespace.emit("updatedBoard", newPosition);
+        });
+
+        socket.on("undoPosition", (msg) => {
+            console.log("On a fait un undo sur une position");
+            game.undoPosition();
         });
 
         socket.on("disconnect", () => {

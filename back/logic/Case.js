@@ -29,6 +29,10 @@ class Case{
     isAdjacent(caseWanted){
         return (Math.abs(this.pos_x - caseWanted.getPos_x()) === 1 && this.pos_y === caseWanted.getPos_y()) || (Math.abs(this.pos_y - caseWanted.getPos_y()) === 1 && this.pos_x === caseWanted.getPos_x());
     }
+
+    toString(){
+        return "Case : " + this.pos_x + " " + this.pos_y;
+    }
 }
 
 module.exports = { Case } ;

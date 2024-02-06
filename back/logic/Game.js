@@ -10,12 +10,14 @@ class Game {
         this.actionsToDo = 1;
         this.numberTour = 1;
         this.playerPosition = [null, null];
+        this.lastPlayerPosition = [null, null];
         this.walls = [];
         this.cases = [];
         this.init();
     }
 
     validateRound(){
+        this.lastPlayerPosition[this.currentPlayer - 1] = this.playerPosition[this.currentPlayer - 1];
         this.currentPlayer === 1 ? this.currentPlayer = 2 : this.currentPlayer = 1;
         this.actionsToDo = 1;
         this.numberTour++;
@@ -40,17 +42,34 @@ class Game {
     }
 
     moveIsPossible(caseWanted){
-        if(this.playerPosition[this.currentPlayer - 1] === null){
-            console.log("[+] La position était nulle donc mouvement forcément autorisé");
-            return true;
-        }
-        if(!caseWanted.getIsOccupied()){
-            if(this.playerPosition[this.currentPlayer - 1].isAdjacent(caseWanted)){
-                if(this.noWallsBetween(this.playerPosition[this.currentPlayer - 1], caseWanted)){
-                    console.log("[+] Pas de murs entre les positions et pas de joueur sur la case voulue et cases adjacentes");
+        //console.log(caseWanted);
+        if(this.actionsToDo > 0){
+            if(this.numberTour===1){
+                if(this.currentPlayer === 1 && caseWanted.getPos_x() === 0){
+                    console.log("[+] Tour 1, le joueur1 peut se déplacer sur la ligne 0");
                     return true;
+                }else if(this.currentPlayer === 2 && caseWanted.getPos_x() === 8){
+                    console.log("[+] Tour 1, le joueur2 peut se déplacer sur la ligne 8");
+                    return true;
+                } else {
+                    console.log("[-] Tour 1, le joueur ne peut pas se déplacer sur cette ligne");
+                    return false;
                 }
             }
+            if(!caseWanted.getIsOccupied()){
+                if(this.playerPosition[this.currentPlayer - 1].isAdjacent(caseWanted)){
+                    if(this.noWallsBetween(this.playerPosition[this.currentPlayer - 1], caseWanted)){
+                        console.log("[+] Pas de murs entre les positions et pas de joueur sur la case voulue et cases adjacentes");
+                        return true;
+                    } else {
+                        console.log("[-] Il y a un mur entre les deux cases");
+                    }
+                }
+            }else{
+                console.log("[-] La case est occupée par un joueur");
+            }
+        }else{
+            console.log("[-] Plus de mouvements possibles pour ce tour");
         }
         return false;
     }
@@ -81,14 +100,12 @@ class Game {
     }
 
     movePlayer(caseWanted){
-        if(this.moveIsPossible(this.currentPlayer, caseWanted) && this.actionsToDo > 0){
-            this.playerPosition[this.currentPlayer - 1].setIsOccupied(false);
-            this.playerPosition[this.currentPlayer - 1] = caseWanted;
-            this.playerPosition[this.currentPlayer - 1].setIsOccupied(true);
-            this.actionsToDo--;
-            return true;
-        }
-        return false;
+        this.lastPlayerPosition[this.currentPlayer - 1] = this.playerPosition[this.currentPlayer - 1];
+        if(this.playerPosition[this.currentPlayer - 1]!==null) this.playerPosition[this.currentPlayer - 1].setIsOccupied(false);
+        this.playerPosition[this.currentPlayer - 1] = caseWanted;
+        this.playerPosition[this.currentPlayer - 1].setIsOccupied(true);
+        this.actionsToDo--;
+        return true;
     }
 
     layWall(numberPlayer, wallWanted){
@@ -120,7 +137,15 @@ class Game {
     }
 
     retrieveCase(x,y){
-        return this.cases[x * 9 + y];
+        //console.log("Retrieving case at position (" + x + ", " + y + ")");
+        return this.cases[parseInt(x) * 9 + parseInt(y)];
+    }
+
+    undoPosition(){
+        this.playerPosition[this.currentPlayer - 1].setIsOccupied(false);
+        this.playerPosition[this.currentPlayer - 1] = this.lastPlayerPosition[this.currentPlayer - 1];
+        this.playerPosition[this.currentPlayer - 1].setIsOccupied(true);
+        this.actionsToDo++;
     }
 
 }
