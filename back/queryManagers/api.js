@@ -1,3 +1,6 @@
+const { createUser } = require('../database/mongo');
+
+
 // Main method, exported at the end of the file. It's the one that will be called when a REST request is received.
 function manageRequest(request, response) {
     let url = new URL(request.url, `http://localhost:8000`);
@@ -10,12 +13,72 @@ function manageRequest(request, response) {
     // quand le endpoint est signup ca va trigger la fonction createUser
     switch (endpoint) {
         case 'signup':
-            createUser(request, response);
+            signup(request, response);
             break;
     }
 
+    /*
     response.statusCode = 200;
     response.end(`Thanks for calling ${request.url}`);
+     */
+}
+
+// Methode pour gerer l'inscription
+// je code tout en early return pour éviter les if else
+function signup(request, response) {
+    // on regarde si on a bien une méthode POST
+    if (request.method !== 'POST') {
+        response.statusCode = 405;
+        response.end('Method Not Allowed');
+        return;
+    }
+    parseBody(request).then((body) => {
+        // on check qu'on a bien mail, username, password dans le body
+        if (!body.email || !body.username || !body.password) {
+            response.statusCode = 400;
+            response.end('Manque des trucs dans le body');
+            return;
+        }
+        // on cree un utilisateur
+        creationOfUser(body.email, body.username, body.password, response);
+    });
+}
+
+// methode pour parser le body de la requete
+function parseBody(request) {
+    return new Promise((resolve, reject) => {
+        let body = '';
+        request.on('data', (chunk) => {
+            body += chunk;
+        });
+        request.on('end', () => {
+            resolve(JSON.parse(body));
+        });
+    });
+}
+
+// fonction pour cree un utilisateur
+function creationOfUser(email, username, password, response) {
+    // on check si l'utilisateur existe déjà
+    getUser(email).then((user) => {
+        if (user) {
+            response.statusCode = 409;
+            response.end('l\'utilisateur existe déjà');
+            return;
+        }
+        // on cree l'utilisateur
+        createUser({ email, username, password }).then(() => {
+            if (user) {
+                response.statusCode = 201;
+                response.end('Utilisateur créé');
+                return;
+            }
+            if (!user) {
+                response.statusCode = 500;
+                response.end('Erreur serveur');
+            }
+        });
+    });
 }
 
 /* This method is a helper in case you stumble upon CORS problems. It shouldn't be used as-is:
