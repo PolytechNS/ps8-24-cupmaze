@@ -138,7 +138,6 @@ function initializeTable() {
  *
  */
 function choosePositionToBegin(event) {
-
     const clickedCell = event.target;
     if(!beginningPositionIsValid(currentPlayer,clickedCell.id[0])){
         alert("Vous devez commencez par la première ligne")
@@ -151,15 +150,18 @@ function choosePositionToBegin(event) {
         return;
     }
 
+    socket.emit("newMovePlayer1", clickedCell.id);
     clickedCell.classList.add("occupied");
     playerPositions[`player${currentPlayer}`] = clickedCell.id;
     addPlayerCircle(clickedCell, currentPlayer);
+    document.getElementById("button-validate-action").style.display = "flex";
+    document.getElementById("button-undo-action").style.display = "flex";
 
     if (playerPositions.player1 && playerPositions.player2) {
         const cells = document.querySelectorAll(".cell");
         cells.forEach(cell => {
             cell.removeEventListener("click", choosePositionToBegin);
-            cell.addEventListener("click", ()=>movePlayer(cell,playerPositions,currentPlayer,actionsToDo,lastActionType))
+            cell.addEventListener("click", movePlayer);
         });
 
         const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
@@ -169,31 +171,27 @@ function choosePositionToBegin(event) {
         })
 
     }
-
-    //On enlève l'action réalisée au compteur
-    actionsToDo--;
-    document.getElementById("button-validate-action").style.display = "flex";
-    document.getElementById("button-undo-action").style.display = "flex";
-    updateNumberAction(0);
-
     //On sauvegarde la dernière action
     lastActionType = "position";
 }
 
 function movePlayer(event) {
     const clickedCell = event.target;
-    //TODO : AJOUTER L'APPEL AU SOCKET POUR POUVOIR MODIFIER
+
     socket.emit("isMoveValid", clickedCell.id);
+
     socket.on("moveIsValid", (isMoveValid) => {
-        if(isMoveValid) {
+        if(isMoveValid){
             removePlayerCircle(playerPositions, currentPlayer);
             addPlayerCircle(clickedCell, currentPlayer);
-            actionsToDo--;
+            playerPositions[`player${currentPlayer}`] = clickedCell.id;
+            console.log("Changement dans le deuxième fonction");
+            socket.emit("newMovePlayer1", clickedCell.id);
             document.getElementById("button-validate-action").style.display = "flex";
             document.getElementById("button-undo-action").style.display = "flex";
             lastActionType = "position";
         } else {
-            alert("Mouvement impossible ou pas assez d'actions");
+            alert("Mouvement impossible ou pas assez d'actions (moveIsValid)");
         }
     });
 
@@ -353,6 +351,8 @@ function validateRound() {
         document.getElementById("popup").style.display = 'flex';
         document.getElementById("popup-button").style.display = "none";
     } else {
+        //On change de joueur
+        socket.emit("NewTurn", currentPlayer);
 
         //On récupère la nouvelle position générée par l'IA
         socket.emit("newMove", playerPositions["player2"]);
@@ -400,6 +400,8 @@ function validateRound() {
         numberTour++;
         actionsToDo=1;
 
+        socket.emit("NewTurn", currentPlayer);
+
         //On regarde si on est arrivé au 100ème tour, si c'est le cas alors => égalité
         if(numberTour === 101){
             document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
@@ -425,8 +427,8 @@ function validateRound() {
  */
 function undoAction(){
     //On remet le nombre d'actions à 1
-    actionsToDo=1;
-    updateNumberAction(1);
+    //actionsToDo=1;
+    //updateNumberAction(1);
 
     //On re-cache les boutons
     document.getElementById("button-validate-action").style.display = "none";
@@ -435,10 +437,8 @@ function undoAction(){
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
         document.getElementById(playerPositions["player"+currentPlayer]).innerHTML = "";
-
         if(lastPlayerPositions["player"+currentPlayer] === null){ //Cette condition est vraie si et seulement si on est dans le premier tour
             document.getElementById(playerPositions["player"+currentPlayer]).classList.remove("occupied");
-
             const cells = document.querySelectorAll(".cell");
             cells.forEach(cell => {
                 cell.removeEventListener("click", ()=>movePlayer(cell,playerPositions,currentPlayer,actionsToDo,lastActionType));
@@ -454,6 +454,7 @@ function undoAction(){
         }else{ //Si on est pas dans le premier tour
             addPlayerCircle(document.getElementById(lastPlayerPositions["player"+currentPlayer]),currentPlayer);
         }
+        socket.emit("undoPosition", null);
         playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
     }else{ //Si la dernière action la placement d'un mur
         nbWallsPlayer1++;
