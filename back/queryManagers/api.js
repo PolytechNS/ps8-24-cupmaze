@@ -1,4 +1,4 @@
-const { createUser } = require('../database/mongo');
+const { createUser, getUser } = require('../database/mongo');
 
 
 // Main method, exported at the end of the file. It's the one that will be called when a REST request is received.
