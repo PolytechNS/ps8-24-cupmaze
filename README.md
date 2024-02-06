@@ -26,5 +26,6 @@ Note that this command should be run again every time you install / delete a pac
 
 ## All runs
 
-Run `npm start`. That's it, unless you need other scripts to run before or while the server is launched,
-but then you (probably?) know what you are doing.
+Simplement faire `docker compose up -d` pour lancer le projet.
+Le site sera accessible à l'adresse `http://localhost:8000/`.
+Et `docker compose down` pour l'arrêter.
