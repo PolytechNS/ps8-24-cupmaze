@@ -1,5 +1,19 @@
 // Main method, exported at the end of the file. It's the one that will be called when a REST request is received.
 function manageRequest(request, response) {
+    let url = new URL(request.url, `http://localhost:8000`);
+    // on split le pathname pour récupérer le premier élément qui est l'endpoint
+    // par exemple dans http://localhost:8000/users, on récupère "users"
+    let endpoint = url.pathname.split('/')[1];
+
+    // quand on a recupéré l'endpoint, on appelle la méthode correspondante, par exemple:
+    // quand tu veut t'inscrire tu te rend a https://localhost:8000/signup
+    // quand le endpoint est signup ca va trigger la fonction createUser
+    switch (endpoint) {
+        case 'signup':
+            createUser(request, response);
+            break;
+    }
+
     response.statusCode = 200;
     response.end(`Thanks for calling ${request.url}`);
 }
