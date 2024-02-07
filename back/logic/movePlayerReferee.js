@@ -17,21 +17,44 @@ function getPossibleMoves(playerPosition, elements) {
             return;
         }
 
-        // on recupere le mur
-        const wallId = (newLine === line) ?
+        // on recupere le mur meme si il nn'est pas placé pour le moment
+        // et on recupere la cellule
+        const wall = (newLine === line) ?
             this.elements.find((element) =>
                 element instanceof Wall &&
                 element.inclinaison === "vertical" &&
-                element.line === line &&
-                element.column === Math.min(column, newColumn)) :
+                element.pos_x === line &&
+                element.pos_y === Math.min(column, newColumn)) :
             this.elements.find((element) =>
                 element instanceof Wall &&
                 element.inclinaison === "horizontal" &&
-                element.line === Math.min(line, newLine) &&
-                element.column === column);
+                element.pos_x === Math.min(line, newLine) &&
+                element.pos_y === column);
 
-        const cell = this.elements.find((element) => element instanceof Case && element.line === newLine && element.column === newColumn);
+        const cell = this.elements.find((element) =>
+            element instanceof Case &&
+            element.pos_x === newLine &&
+            element.pos_y === newColumn);
+
+        // on verifie si le mur est placé
+        if (!wall || !wall.isLaid){
+            if (cell.isOccupied) {
+                var jumpCell = findJumpCell(newLine, newColumn, direction);
+                if (jumpCell) {
+                    possibleMoves.push(jumpCell);
+                }
+            } else {
+                possibleMoves.push(cell);
+            }
+        }
     }
+
+    // verifie l'axe vertical
+    checkMove(line - 1, column, possibleMoves, "A");
+    checkMove(line + 1, column, possibleMoves, "B");
+    // verifie l'axe horizontal
+    checkMove(line, column - 1, possibleMoves, "L");
+    checkMove(line, column + 1, possibleMoves, "R");
 }
 
 function findAdjacentPlayer(line, column) {
