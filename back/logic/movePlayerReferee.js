@@ -1,11 +1,10 @@
 export {
     beginningPositionIsValid,
-    moveIsValid,
     getPossibleMoves
 };
 
 function beginningPositionIsValid(currentPlayer, position) {
-     return (currentPlayer === 1) ? position === "0" : position === "8";
+    return (currentPlayer === 1) ? position === "0" : position === "8";
 }
 
 function getPossibleMoves(playerPosition, elements) {
@@ -17,29 +16,15 @@ function getPossibleMoves(playerPosition, elements) {
             return;
         }
 
-        // on recupere le mur meme si il nn'est pas placé pour le moment
-        // et on recupere la cellule
         const wall = (newLine === line) ?
-            this.elements.find((element) =>
-                element instanceof Wall &&
-                element.inclinaison === "vertical" &&
-                element.pos_x === line &&
-                element.pos_y === Math.min(column, newColumn)) :
-            this.elements.find((element) =>
-                element instanceof Wall &&
-                element.inclinaison === "horizontal" &&
-                element.pos_x === Math.min(line, newLine) &&
-                element.pos_y === column);
+            findWall(newLine, Math.min(column, newColumn), "vertical", elements) :
+            findWall(Math.min(line, newLine), column, "horizontal", elements);
 
-        const cell = this.elements.find((element) =>
-            element instanceof Case &&
-            element.pos_x === newLine &&
-            element.pos_y === newColumn);
+        const cell = findCase(newLine, newColumn, elements);
 
-        // on verifie si le mur est placé
-        if (!wall || !wall.isLaid){
+        if (!wall || !wall.isLaid) {
             if (cell.isOccupied) {
-                var jumpCell = findJumpCell(newLine, newColumn, direction);
+                const jumpCell = findJumpCell(newLine, newColumn, direction, elements);
                 if (jumpCell) {
                     possibleMoves.push(jumpCell);
                 }
@@ -49,58 +34,57 @@ function getPossibleMoves(playerPosition, elements) {
         }
     }
 
-    // verifie l'axe vertical
     checkMove(line - 1, column, possibleMoves, "A");
     checkMove(line + 1, column, possibleMoves, "B");
-    // verifie l'axe horizontal
     checkMove(line, column - 1, possibleMoves, "L");
     checkMove(line, column + 1, possibleMoves, "R");
+
     return possibleMoves;
 }
 
-/*
-function findAdjacentPlayer(line, column) {
-    var checkAdjacentCell = function(deltaLine, deltaColumn) {
-        var adjacentCell = this.elements.find((element) =>
-            element instanceof Case &&
-            element.pos_x === line + deltaLine &&
-            element.pos_y === column + deltaColumn);
-        return adjacentCell && adjacentCell.isOccupied ? adjacentCell : null;
-    };
-    return checkAdjacentCell(-1, 0) || checkAdjacentCell(1, 0) || checkAdjacentCell(0, -1) || checkAdjacentCell(0, 1);
+function findJumpCell(line, column, direction, elements) {
+    let jumpLine = line;
+    let jumpColumn = column;
+    let isWall = false;
+
+    switch (direction) {
+        case "A":
+            jumpLine--;
+            isWall = findWall(jumpLine, column, "horizontal", elements)?.isLaid || false;
+            break;
+        case "B":
+            jumpLine++;
+            isWall = findWall(line, column, "horizontal", elements)?.isLaid || false;
+            break;
+        case "L":
+            jumpColumn--;
+            isWall = findWall(line, jumpColumn, "vertical", elements)?.isLaid || false;
+            break;
+        case "R":
+            jumpColumn++;
+            isWall = findWall(line, column, "vertical", elements)?.isLaid || false;
+            break;
+    }
+
+    const inBoard = jumpLine >= 0 && jumpLine <= 8 && jumpColumn >= 0 && jumpColumn <= 8;
+
+    if (inBoard && !isWall) {
+        return findCase(jumpLine, jumpColumn, elements);
+    }
+    return null;
 }
 
-function findOrientationAdjacentPlayer(adjacentPlayerCell, currentPosition) {
-    const [adjacentLine, adjacentColumn] = adjacentPlayerCell;
-    const [currentLine, currentColumn] = currentPosition;
-    return adjacentLine === currentLine ? "horizontal" : adjacentColumn === currentColumn ? "vertical" : null;
+function findWall(pos_x, pos_y, inclinaison, elements) {
+    return elements.find((element) =>
+        element instanceof Wall &&
+        element.pos_x === pos_x &&
+        element.pos_y === pos_y &&
+        element.inclinaison === inclinaison);
 }
 
-function findWallBehindPlayer(currentPosition, orientationAdjactentPlayer) {
-
-}
- */
-
-function findJumpCell(line, column, direction) {
-
-}
-
-
-function moveIsValid(oldPosition, cell) {
-
-}
-
-function getAdjacentCells(position) {
-
-}
-function findAdjacentPlayer2(position){
-
-}
-
-function findOrientationAdjacentPlayer2(adjacentPlayerCell, oldPosition){
-
-}
-
-function findWallBehindPlayer2(newPosition, orientationAdjactentPlayer){
-
+function findCase(pos_x, pos_y, elements) {
+    return elements.find((element) =>
+        element instanceof Case &&
+        element.pos_x === pos_x &&
+        element.pos_y === pos_y);
 }
