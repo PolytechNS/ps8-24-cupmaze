@@ -1,5 +1,5 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction } from "../game_local_1v1/utils.js";
-import {beginningPositionIsValid, moveIsValid, getPossibleMoves} from "../game_local_1v1/movePlayerReferee.js";
+import {beginningPositionIsValid,getPossibleMoves} from "../game_local_1v1/movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "../game_local_1v1/movePlayerUtils.js";
 import {isWallPlacementValid,updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
@@ -127,11 +127,6 @@ function initializeTable() {
  * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
  */
 function validateRound() {
-    if(isGameOver()){
-        document.getElementById("popup-ready-message").innerHTML = victoryAnswer;
-        document.getElementById("popup").style.display = 'flex';
-        document.getElementById("popup-button").style.display = "none";
-    } else {
         if(numberTour>1) possibleMoves.forEach(cell=>cell.classList.remove("possible-move"));
 
 
@@ -144,6 +139,13 @@ function validateRound() {
             if(playerPositions["player2"] !== null) removePlayerCircle(playerPositions, currentPlayer);
             addPlayerCircle(circle_bot, 2);
             playerPositions["player2"] = newPositionBot;
+
+            if(isGameOver()) {
+                document.getElementById("popup-ready-message").innerHTML = victoryAnswer;
+                document.getElementById("popup").style.display = 'flex';
+                document.getElementById("popup-button").style.display = "none";
+            }
+
             currentPlayer = 1;
             socket.off("updatedBoard");
         });
@@ -168,7 +170,7 @@ function validateRound() {
         setVisionForPlayer(currentPlayer,playerPositions);
         if(numberTour>1)possibleMoves = getPossibleMoves(playerPositions[`player${currentPlayer}`]);
         setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
-    }
+
 }
 
 /**

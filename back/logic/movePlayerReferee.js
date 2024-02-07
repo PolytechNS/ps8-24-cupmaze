@@ -1,4 +1,4 @@
-import { findCase, findWall } from "./utils";
+const utils = require("./utils");
 
 function beginningPositionIsValid(currentPlayer, position) {
     return (currentPlayer === 1) ? position === "0" : position === "8";
@@ -14,10 +14,10 @@ function getPossibleMoves(playerPosition, elements) {
         }
 
         const wall = (newLine === line) ?
-            findWall(newLine, Math.min(column, newColumn), "vertical", elements) :
-            findWall(Math.min(line, newLine), column, "horizontal", elements);
+            utils.findWall(newLine, Math.min(column, newColumn), "vertical", elements) :
+            utils.findWall(Math.min(line, newLine), column, "horizontal", elements);
 
-        const cell = findCase(newLine, newColumn, elements);
+        const cell = utils.findCase(newLine, newColumn, elements);
 
         if (!wall || !wall.isLaid) {
             if (cell.isOccupied) {
@@ -47,26 +47,26 @@ function findJumpCell(line, column, direction, elements) {
     switch (direction) {
         case "A":
             jumpLine--;
-            isWall = findWall(jumpLine, column, "horizontal", elements)?.isLaid || false;
+            isWall = utils.findWall(jumpLine, column, "horizontal", elements)?.isLaid || false;
             break;
         case "B":
             jumpLine++;
-            isWall = findWall(line, column, "horizontal", elements)?.isLaid || false;
+            isWall = utils.findWall(line, column, "horizontal", elements)?.isLaid || false;
             break;
         case "L":
             jumpColumn--;
-            isWall = findWall(line, jumpColumn, "vertical", elements)?.isLaid || false;
+            isWall = utils.findWall(line, jumpColumn, "vertical", elements)?.isLaid || false;
             break;
         case "R":
             jumpColumn++;
-            isWall = findWall(line, column, "vertical", elements)?.isLaid || false;
+            isWall = utils.findWall(line, column, "vertical", elements)?.isLaid || false;
             break;
     }
 
     const inBoard = jumpLine >= 0 && jumpLine <= 8 && jumpColumn >= 0 && jumpColumn <= 8;
 
     if (inBoard && !isWall) {
-        return findCase(jumpLine, jumpColumn, elements);
+        return utils.findCase(jumpLine, jumpColumn, elements);
     }
     return null;
 }
