@@ -58,6 +58,7 @@ function getPossibleMoves(playerPosition, elements) {
     return possibleMoves;
 }
 
+/*
 function findAdjacentPlayer(line, column) {
     var checkAdjacentCell = function(deltaLine, deltaColumn) {
         var adjacentCell = this.elements.find((element) =>
@@ -70,12 +71,15 @@ function findAdjacentPlayer(line, column) {
 }
 
 function findOrientationAdjacentPlayer(adjacentPlayerCell, currentPosition) {
-
+    const [adjacentLine, adjacentColumn] = adjacentPlayerCell;
+    const [currentLine, currentColumn] = currentPosition;
+    return adjacentLine === currentLine ? "horizontal" : adjacentColumn === currentColumn ? "vertical" : null;
 }
 
 function findWallBehindPlayer(currentPosition, orientationAdjactentPlayer) {
 
 }
+ */
 
 function findJumpCell(line, column, direction) {
 
