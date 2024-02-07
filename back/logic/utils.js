@@ -1,13 +1,3 @@
-export {
-    findAdjacentWall,
-    findAdjacentSpace,
-    updateNumberAction,
-    findCase,
-    findWall,
-    findSpace
-};
-
-
 /*
 inutile puisque un wall est un objet
 
@@ -77,3 +67,5 @@ function highlightElements(firstWall, secondWall, space) {
 function updateNumberAction(nombreAction){
 
 }
+
+module.exports = { findWall, findCase, findSpace, findAdjacentWall, findAdjacentSpace, highlightElements, updateNumberAction };

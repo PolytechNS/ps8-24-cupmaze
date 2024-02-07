@@ -1,8 +1,3 @@
-export {
-    beginningPositionIsValid,
-    getPossibleMoves
-};
-
 import { findCase, findWall } from "./utils";
 
 function beginningPositionIsValid(currentPlayer, position) {
@@ -76,3 +71,4 @@ function findJumpCell(line, column, direction, elements) {
     return null;
 }
 
+module.exports = { beginningPositionIsValid, getPossibleMoves };
