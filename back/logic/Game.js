@@ -1,5 +1,6 @@
 const { Wall } = require('./Wall.js');
 const { Case } = require('./Case.js');
+const { Space } = require('./Space.js');
 const { getPossibleMoves } = require('./movePlayerReferee.js');
 
 

@@ -25,3 +25,5 @@ class Space {
         return this.pos_x === space.getPos_x() && this.pos_y === space.getPos_y();
     }
 }
+
+module.exports = { Space };
