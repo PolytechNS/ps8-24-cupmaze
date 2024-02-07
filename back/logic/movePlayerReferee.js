@@ -55,9 +55,18 @@ function getPossibleMoves(playerPosition, elements) {
     // verifie l'axe horizontal
     checkMove(line, column - 1, possibleMoves, "L");
     checkMove(line, column + 1, possibleMoves, "R");
+    return possibleMoves;
 }
 
 function findAdjacentPlayer(line, column) {
+    var checkAdjacentCell = function(deltaLine, deltaColumn) {
+        var adjacentCell = this.elements.find((element) =>
+            element instanceof Case &&
+            element.pos_x === line + deltaLine &&
+            element.pos_y === column + deltaColumn);
+        return adjacentCell && adjacentCell.isOccupied ? adjacentCell : null;
+    };
+    return checkAdjacentCell(-1, 0) || checkAdjacentCell(1, 0) || checkAdjacentCell(0, -1) || checkAdjacentCell(0, 1);
 }
 
 function findOrientationAdjacentPlayer(adjacentPlayerCell, currentPosition) {
