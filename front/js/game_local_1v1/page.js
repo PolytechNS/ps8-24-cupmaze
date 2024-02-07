@@ -1,5 +1,5 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction } from "./utils.js";
-import {beginningPositionIsValid, moveIsValid, getPossibleMoves} from "./movePlayerReferee.js";
+import {beginningPositionIsValid, getPossibleMoves} from "./movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {isWallPlacementValid,updateNumberWallsDisplay} from "./wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "./roundUtils.js";
