@@ -5,6 +5,10 @@ function extractWallInfo(wallId) {
 
 }
 */
+const {Wall} = require("./Wall");
+const {Case} = require("./Case");
+const {Space} = require("./Space");
+
 function findWall(pos_x, pos_y, inclinaison, elements) {
     return elements.find((element) =>
         element instanceof Wall &&
