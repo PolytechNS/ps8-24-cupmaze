@@ -3,6 +3,8 @@ export {
     getPossibleMoves
 };
 
+import { findCase, findWall } from "./utils";
+
 function beginningPositionIsValid(currentPlayer, position) {
     return (currentPlayer === 1) ? position === "0" : position === "8";
 }
@@ -74,17 +76,3 @@ function findJumpCell(line, column, direction, elements) {
     return null;
 }
 
-function findWall(pos_x, pos_y, inclinaison, elements) {
-    return elements.find((element) =>
-        element instanceof Wall &&
-        element.pos_x === pos_x &&
-        element.pos_y === pos_y &&
-        element.inclinaison === inclinaison);
-}
-
-function findCase(pos_x, pos_y, elements) {
-    return elements.find((element) =>
-        element instanceof Case &&
-        element.pos_x === pos_x &&
-        element.pos_y === pos_y);
-}
