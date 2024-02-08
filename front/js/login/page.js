@@ -30,6 +30,7 @@ document.getElementById("login-form").addEventListener("submit", function(event)
                 const token = response.headers.get('Set-Cookie');
                 setCookie('jwt', token, 2);
                 alert('Token sauvegardé dans le cookie');
+                window.location.href = "http://localhost:8000/mainMenu.html";
             }
         })
         .then(data => {

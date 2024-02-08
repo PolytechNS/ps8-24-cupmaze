@@ -6,8 +6,24 @@
 </head>
 <body>
     <h1>Bienvenue sur le menu principal du jeu !</h1>
+    <p id="nameCurrentPlayer"></p>
     <button id="button-launch-botGame">Lancer une partie contre un bot</button>
     <button id="button-launch-localGame">Lancer une partie locale</button>
+    <button id="button-retrieveGame">Récupérer la dernière partie sauvegardée</button>
+
+    <script>
+        document.getElementById('button-launch-botGame').addEventListener('click', function() {
+            window.location.href = 'http://localhost:8000/botgame.html';
+        });
+        document.getElementById('button-launch-localGame').addEventListener('click', function() {
+            window.location.href = 'http://localhost:8000/index.html'; //Changer le nom de index.html
+        });
+        /*document.getElementById('button-retrieveGame').addEventListener('click', function() {
+            window.location.href = 'http://localhost:8000/retrievegame.html';
+        });*/
+    </script>
+    <script src="./js/mainMenu/page.js"></script>
+
 
 </body>
 </html>
