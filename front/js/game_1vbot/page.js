@@ -127,30 +127,28 @@ function initializeTable() {
  * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
  */
 function validateRound() {
-        if(numberTour>1) possibleMoves.forEach(cell=>cell.classList.remove("possible-move"));
+    if(numberTour>1) possibleMoves.forEach(cell=>cell.classList.remove("possible-move"));
 
 
-        //On récupère la nouvelle position générée par l'IA
-        socket.emit("newMove", playerPositions["player2"]);
-        socket.on("updatedBoard", (newPositionBot) => {
-            console.log(newPositionBot);
-            let circle_bot = document.getElementById(newPositionBot);
-            currentPlayer = 2;
-            if(playerPositions["player2"] !== null) removePlayerCircle(playerPositions, currentPlayer);
-            addPlayerCircle(circle_bot, 2);
-            playerPositions["player2"] = newPositionBot;
+    console.log("pre socket call : " +playerPositions["player2"]);
 
-            if(isGameOver()) {
-                document.getElementById("popup-ready-message").innerHTML = victoryAnswer;
-                document.getElementById("popup").style.display = 'flex';
-                document.getElementById("popup-button").style.display = "none";
-            }
+    //On récupère la nouvelle position générée par l'IA
+    socket.emit("newMove", playerPositions["player2"]);
+    socket.on("updatedBoard", (newPositionBot) => {
+        console.log(newPositionBot);
+        let circle_bot = document.getElementById(newPositionBot);
+        currentPlayer = 2;
+        if(playerPositions["player2"] !== null) removePlayerCircle(playerPositions, currentPlayer);
+        addPlayerCircle(circle_bot, 2);
+        playerPositions["player2"] = newPositionBot;
 
-            currentPlayer = 1;
-            socket.off("updatedBoard");
-        });
+        if(isGameOver()) {
+            document.getElementById("popup-ready-message").innerHTML = victoryAnswer;
+            document.getElementById("popup").style.display = 'flex';
+            document.getElementById("popup-button").style.display = "none";
+        }
 
-
+        currentPlayer = 1;
         //On augmente le nombre de tours
         numberTour++;
         actionsToDo=1;
@@ -170,7 +168,8 @@ function validateRound() {
         setVisionForPlayer(currentPlayer,playerPositions);
         if(numberTour>1)possibleMoves = getPossibleMoves(playerPositions[`player${currentPlayer}`]);
         setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
-
+        socket.off("updatedBoard");
+    });
 }
 
 /**
