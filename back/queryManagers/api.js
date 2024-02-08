@@ -7,7 +7,7 @@ function manageRequest(request, response) {
     let url = new URL(request.url, `http://localhost:8000`);
     // on split le pathname pour récupérer le premier élément qui est l'endpoint
     // par exemple dans http://localhost:8000/users, on récupère "users"
-    let endpoint = url.pathname.split('/')[1];
+    let endpoint = url.pathname.split('/')[2];
 
     // quand on a recupéré l'endpoint, on appelle la méthode correspondante, par exemple:
     // quand tu veut t'inscrire tu te rend a https://localhost:8000/signup
@@ -124,16 +124,8 @@ function creationOfUser(email, username, password, response) {
 
         // on cree l'utilisateur
         createUser({ email, username, password }).then(() => {
-            if (user) {
-                response.statusCode = 201;
-                response.end('Utilisateur créé');
-                return;
-            }
-
-            if (!user) {
-                response.statusCode = 500;
-                response.end('Erreur serveur');
-            }
+            response.statusCode = 201;
+            response.end('Utilisateur créé');
         });
     });
 }
