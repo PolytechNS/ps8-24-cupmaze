@@ -90,6 +90,7 @@ function login(request, response) {
             console.log(token);
             token = JSON.stringify(token);
             response.setHeader('Set-Cookie', token);
+            response.setHeader("Nameaccount", user.username);
 
             // on envoie un token
             response.writeHead(200, {'Content-Type': 'text/plain'});

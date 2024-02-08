@@ -29,7 +29,7 @@ document.getElementById("login-form").addEventListener("submit", function(event)
                 alert("Utilisateur bien présent !");
                 const token = response.headers.get('Set-Cookie');
                 setCookie('jwt', token, 2);
-                alert('Token sauvegardé dans le cookie');
+                setCookie('Nameaccount', response.headers.get('Nameaccount'), 2);
                 window.location.href = "http://localhost:8000/mainMenu.html";
             }
         })

@@ -21,9 +21,9 @@
         /*document.getElementById('button-retrieveGame').addEventListener('click', function() {
             window.location.href = 'http://localhost:8000/retrievegame.html';
         });*/
+        let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+        console.log(username);
+        document.getElementById('nameCurrentPlayer').innerText = "Bienvenue "+username+" :";
     </script>
-    <script src="./js/mainMenu/page.js"></script>
-
-
 </body>
 </html>
