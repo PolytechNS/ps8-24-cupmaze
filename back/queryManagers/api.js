@@ -86,11 +86,14 @@ function login(request, response) {
             }
 
             // generate token
-            let token = jwt.sign({ email: user.email}, 'secret');
+            let token = jwt.sign({ email: user.email}, 'secret', { expiresIn: '2h' });
+            console.log(token);
+            token = JSON.stringify(token);
+            response.setHeader('Set-Cookie', token);
 
             // on envoie un token
-            response.statusCode = 200;
-            response.end('Token');
+            response.writeHead(200, {'Content-Type': 'text/plain'});
+            response.end('Token envoyé et sauvegardé dans le cookie.');
         });
     });
 }
