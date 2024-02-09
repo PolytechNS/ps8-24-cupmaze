@@ -1,4 +1,4 @@
-const { createUser, getUser } = require('../database/mongo');
+const { createUser, getUser, createGame, getGame } = require('../database/mongo');
 
 const jwt = require('jsonwebtoken');
 
@@ -18,6 +18,9 @@ function manageRequest(request, response) {
             break;
         case 'login':
             login(request, response);
+            break;
+        case 'saveGame':
+            saveGame(request, response);
             break;
         default:
             response.statusCode = 404;
@@ -95,6 +98,26 @@ function login(request, response) {
     });
 }
 
+function saveGame(request, response) {
+    // on regarde si on a bien une méthode POST
+    if (request.method !== 'POST') {
+        response.statusCode = 405;
+        response.end('Method Not Allowed');
+        return;
+    }
+    parseBody(request).then((body) => {
+        // on check qu'on a bien email, currentPlayer, wallsLaidBy1, wallsLaidBy2, playerPosition et numberTour dans le body
+        if (!body.game) {
+            response.statusCode = 400;
+            response.end('Manque des trucs dans le body');
+            return;
+        }
+        //on sauvegarde la partie
+        savingGame(body.game, response);
+    })
+}
+
+
 /*----------------------------------------*/
 
 // methode pour parser le body de la requete ca sera plus simple pour le traitement
@@ -134,6 +157,20 @@ function creationOfUser(email, username, password, response) {
                 response.statusCode = 500;
                 response.end('Erreur serveur');
             }
+        });
+    });
+}
+
+// fonction pour sauvegarder une partie
+function savingGame(toSaveGame, response) {
+    getGame(toSaveGame.userEmail).then((game) => {
+        if (game) {
+            // TODO si l'utilisateur a déjà une partie sauvegardée il faut voir s'il veut l'écraser ou pas
+        }
+        // on sauvegarde la partie
+        createGame(toSaveGame).then(() => {
+            response.statusCode = 500;
+            response.end('Erreur serveur');
         });
     });
 }

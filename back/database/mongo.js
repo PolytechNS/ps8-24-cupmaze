@@ -22,4 +22,16 @@ async function getUser(email) {
   return users.findOne({ email: email });
 }
 
+async function createGame(game) {
+  const db = await getDb();
+  const games = db.collection('games');
+  return games.insertOne(game);
+}
+
+async function getGame(userEmail) {
+  const db = await getDb();
+  const games = db.collection('games');
+  return games.findOne({ userEmail: userEmail });
+}
+
 exports.createUser = createUser;
