@@ -169,48 +169,7 @@ function validateRound() {
         setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
         socket.off("updateBoard");
     });
-
 }
-/*
-    console.log("pre socket call : " +playerPositions["player2"]);
-    //On récupère la nouvelle position générée par l'IA
-    socket.emit("newMove", playerPositions["player2"]);
-    socket.on("updatedBoard", (newPositionBot) => {
-        console.log(newPositionBot);
-        let circle_bot = document.getElementById(newPositionBot);
-        currentPlayer = 2;
-        if(playerPositions["player2"] !== null) removePlayerCircle(playerPositions, currentPlayer);
-        addPlayerCircle(circle_bot, 2);
-        playerPositions["player2"] = newPositionBot;
-
-        if(isGameOver()) {
-            document.getElementById("popup-ready-message").innerHTML = victoryAnswer;
-            document.getElementById("popup").style.display = 'flex';
-            document.getElementById("popup-button").style.display = "none";
-        }
-
-        //On augmente le nombre de tours
-        numberTour++;
-        actionsToDo=1;
-
-        //On regarde si on est arrivé au 100ème tour, si c'est le cas alors => égalité
-        if(currentPlayer === 1 && numberTour === 101){
-            document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
-            document.getElementById("popup").style.display = 'flex';
-            document.getElementById("popup-button").style.display = "none";
-        }
-
-        //On applique la sauvegarde des états des pions
-        lastPlayerPositions["player1"] = playerPositions["player1"];
-        lastPlayerPositions["player2"] = playerPositions["player2"];
-
-        //On applique le brouillard de guerre
-        setVisionForPlayer(currentPlayer,playerPositions);
-        if(numberTour>1)possibleMoves = getPossibleMoves(playerPositions[`player${currentPlayer}`]);
-        setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
-        socket.off("updatedBoard");
-    });
-    */
 
 /**
  * Fonction qui analyse si un joueur à fini une partie ou pas
