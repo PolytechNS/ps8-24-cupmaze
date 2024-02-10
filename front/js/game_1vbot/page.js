@@ -127,11 +127,54 @@ function initializeTable() {
  * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
  */
 function validateRound() {
-    if(numberTour>1) possibleMoves.forEach(cell=>cell.classList.remove("possible-move"));
+
+    // on envoie un message au serveur pour lui dire de valider le round
+    socket.emit("validateRound");
+    console.log("validateRound");
+    socket.on("updateRound", (possibleMoves, numberTour, playerPosition, currentplayer, nbWallsPlayer1, nbWallsPlayer2) => {
+        console.log("updateRound");
+        socket.on("numberTour", (numberTour) => {
+            if (numberTour > 1) possibleMoves.forEach(cell => cell.classList.remove("possible-move"));
+            socket.off("numberTour");
+        });
+
+        socket.on("positionAI", (newAIPosition, currentplayer) => {
+            console.log("positionAI");
+            let circle_Bot = document.getElementById(newAIPosition);
+            if (playerPosition["player2"] !== null) removePlayerCircle(playerPosition, currentplayer);
+            addPlayerCircle(circle_Bot, currentplayer);
+            socket.off("positionAI");
+        });
 
 
+        socket.on("gameOver", (winner) => {
+            console.log("gameOver");
+            if (winner != null) {
+                document.getElementById("popup-ready-message").innerHTML = "Le joueur " + winner + " a gagné";
+                document.getElementById("popup").style.display = 'flex';
+                document.getElementById("popup-button").style.display = "none";
+            }
+            socket.off("gameOver");
+        });
+
+
+        socket.on("numberTourAfter", (numberTour) => {
+            console.log("numberTourAfter");
+            if (numberTour === 101) {
+                document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
+                document.getElementById("popup").style.display = 'flex';
+                document.getElementById("popup-button").style.display = "none";
+            }
+            socket.off("numberTourAfter");
+        });
+
+        console.log("apres NumberTourAfter");
+        setVisionForPlayer(currentplayer, playerPosition);
+        setUpNewRound(currentplayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
+        socket.off("updateRound");
+    });
+/*
     console.log("pre socket call : " +playerPositions["player2"]);
-
     //On récupère la nouvelle position générée par l'IA
     socket.emit("newMove", playerPositions["player2"]);
     socket.on("updatedBoard", (newPositionBot) => {
@@ -148,7 +191,6 @@ function validateRound() {
             document.getElementById("popup-button").style.display = "none";
         }
 
-        currentPlayer = 1;
         //On augmente le nombre de tours
         numberTour++;
         actionsToDo=1;
@@ -170,6 +212,7 @@ function validateRound() {
         setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
         socket.off("updatedBoard");
     });
+    */
 }
 
 /**
@@ -283,7 +326,16 @@ function wallLaid(event) {
  */
 function choosePositionToBegin(event) {
 
+
+    console.log("choosePositionToBegin");
+    console.log(event.target);
+    socket.emit("choosePositionToBegin", event.target.id);
+    socket.on("choosePositionToBegin", () => {
+
+    });
+
     const clickedCell = event.target;
+    console.log(clickedCell);
     if(!beginningPositionIsValid(currentPlayer,clickedCell.id[0])){
         alert("Vous devez commencez par la première ligne")
         return;
