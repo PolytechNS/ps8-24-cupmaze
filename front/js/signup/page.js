@@ -50,3 +50,18 @@ async function hashPassword(password) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(byte => ('00' + byte.toString(16)).slice(-2)).join('');
 }
+
+
+/* UTILISER UNE CLE PUBLIQUE RSA POUR HACHER PLUS TARD
+function hashPassword(password) {
+    const publicKey = "-----BEGIN PUBLIC KEY-----" +
+        "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDMXQ3avyWg9w6C9s6E0TzGIbtf" +
+        "Fp2cIuugVQRiCwYXMBzsNGvCTdAlof1eVHpcL/YuNK/AAG2E2yYAcXju8NPHdAwX" +
+        "+3UOiotah+F+F1FHB4yW+P7HRnfO4w6rekPdYo/W8wt7PKsDuZBsB6T1EVtC4POE" +
+        "WrV23PfU27a1QcZNOwIDAQAB" +
+        "-----END PUBLIC KEY-----"
+    const buffer = Buffer.from(password, 'utf8');
+    const encrypted = crypto.publicEncrypt(publicKey, buffer);
+    return encrypted.toString('base64');
+}
+ */
