@@ -1,4 +1,4 @@
-document.getElementById("signup-form").addEventListener("submit", function(event){
+document.getElementById("signup-form").addEventListener("submit", async function (event) {
     event.preventDefault(); // Empêche le comportement par défaut du formulaire
 
     // Récupération des valeurs des champs
@@ -7,6 +7,13 @@ document.getElementById("signup-form").addEventListener("submit", function(event
         password: document.getElementById("password").value,
         username: document.getElementById("username").value
     };
+
+    // Hachage du mot de passe
+    await hashPassword(formData.password).then((hash) => {
+        console.log('Mot de passe haché:', hash);
+        formData.password = hash;
+        console.log('Mot de passe haché:', formData.password);
+    });
 
     // Envoi de la requête POST
     fetch("http://localhost:8000/api/signup", {
@@ -18,7 +25,7 @@ document.getElementById("signup-form").addEventListener("submit", function(event
     })
         .then(response => {
             if (!response.ok) {
-                if(response.status === 409){
+                if (response.status === 409) {
                     alert('Cet email est déjà utilisé');
                     return;
                 }
@@ -34,3 +41,12 @@ document.getElementById("signup-form").addEventListener("submit", function(event
             console.error('Erreur:', error);
         });
 });
+
+
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(byte => ('00' + byte.toString(16)).slice(-2)).join('');
+}
