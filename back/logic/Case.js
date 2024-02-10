@@ -31,7 +31,11 @@ class Case{
     }
 
     toString(){
-        return "Case : " + this.pos_x + " " + this.pos_y;
+        return "Case : " + this.pos_x + " " + this.pos_y+" "+this.isOccupied;
+    }
+
+    getCellID(){
+        return this.getPos_x()+"-"+this.getPos_y()+"~cell";
     }
 }
 

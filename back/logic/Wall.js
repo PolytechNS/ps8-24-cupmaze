@@ -29,6 +29,10 @@ class Wall{
     equals(wall){
         return this.pos_x === wall.getPos_x() && this.pos_y === wall.getPos_y() && this.inclinaison === wall.getInclinaison();
     }
+
+    toString(){
+        return "Wall : "+this.pos_x+" "+this.pos_y+" "+this.isLaid+" "+this.inclinaison;
+    }
 }
 
 module.exports = { Wall };
