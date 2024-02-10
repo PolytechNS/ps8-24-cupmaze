@@ -20,8 +20,8 @@ function findWall(pos_x, pos_y, inclinaison, elements) {
 function findCase(pos_x, pos_y, elements) {
     return elements.find((element) =>
         element instanceof Case &&
-        element.pos_x === pos_x &&
-        element.pos_y === pos_y);
+        element.getPos_x() === pos_x &&
+        element.getPos_y() === pos_y);
 }
 
 function findSpace(pos_x, pos_y, elements) {
