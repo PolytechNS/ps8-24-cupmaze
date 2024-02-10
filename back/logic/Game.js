@@ -22,21 +22,37 @@ class Game {
             for (let j = 0; j < 9; j++) {
                 //ajoute case, mur et à la fin on doit juste finir sur case
                 this.elements.push(new Case(i, j, false));
-                if(i<8) this.elements.push(new Wall(i, j, false, "vertical"));
+                if(j<8) this.elements.push(new Wall(i, j, false, "vertical"));
             }
             for(let j = 0; j < 9; j++){
-                this.elements.push(new Wall(i, j, true, "horizontal"));
-                // on rajoute un space entre chaque mur
-                if (j < 8) {
-                    this.elements.push(new Space(i, j, true));
+                if (i < 8) {
+                    this.elements.push(new Wall(i, j, false, "horizontal"));
+                    // on rajoute un space entre chaque mur
+                    this.elements.push(new Space(i, j, false));
                 }
             }
         }
     }
 
     getPossibleMoves(playerPosition) {
-        const possibleMoves = getPossibleMoves(playerPosition, this.elements);
+        return getPossibleMoves(playerPosition, this.elements);
     }
+
+    getWall(pos_x, pos_y, inclinaison) {
+        return this.elements.find((element) =>
+            element instanceof Wall &&
+            element.pos_x === pos_x &&
+            element.pos_y === pos_y &&
+            element.inclinaison === inclinaison);
+    }
+
+    getCase(pos_x, pos_y) {
+        return this.elements.find((element) =>
+            element instanceof Case &&
+            element.pos_x === pos_x &&
+            element.pos_y === pos_y);
+    }
+
 }
 
 module.exports = { Game };
