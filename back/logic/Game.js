@@ -11,9 +11,13 @@ class Game {
         this.nbWallsPlayer2 = 10;
         this.actionsToDo = 1;
         this.numberTour = 1;
-        this.playerPosition = [null, null];
+        this.playerPosition = {
+            player1: null,
+            player2: null
+        };
         this.lastPlayerPosition = [null, null];
         this.elements = [];
+        this.lastActionType = "";
         this.init();
     }
 
@@ -82,6 +86,13 @@ class Game {
     movePlayer(number, caseWanted, playerCurrentPosition) {
         this.playerPosition[number - 1] = caseWanted;
         this.lastPlayerPosition[number - 1] = playerCurrentPosition;
+        return getPossibleMoves(playerPosition, this.elements);
+    }
+
+    isGameOver(playersPositions) {
+        if (playersPositions.player1[0] === 8) return 1;
+        if (playersPositions.player2[0] === 0) return 2;
+        return 0;
     }
 }
 

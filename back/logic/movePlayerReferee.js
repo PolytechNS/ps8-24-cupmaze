@@ -1,13 +1,15 @@
 const utils = require("./utils");
 
 function beginningPositionIsValid(currentPlayer, position) {
-    return (currentPlayer === 1) ? position === "0" : position === "8";
+    return (currentPlayer === 1) ? position === 0 : position === 8;
 }
 
 function getPossibleMoves(playerPosition, elements) {
     const possibleMoves = [];
     const line = playerPosition.getPos_x();
     const column = playerPosition.getPos_y();
+    if (playerPosition === null) { return null; }
+    const [line, column] = playerPosition;
 
     function checkMove(newLine, newColumn, possibleMoves, direction) {
         if (newLine < 0 || newLine > 8 || newColumn < 0 || newColumn > 8) {
