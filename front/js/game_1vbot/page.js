@@ -29,7 +29,6 @@ let lastPlayerPositions = {
 }
 
 let board;
-let board_Info;
 let possibleMoves=[];
 document.addEventListener("DOMContentLoaded", main);
 
@@ -48,7 +47,7 @@ function main() {
     //On ajoute un event listener pour undo l'action
     document.getElementById("button-undo-action").addEventListener("click",undoAction);
 
-    board_Info = initializeTable();
+    initializeTable();
 
     //Mettre le brouillard de guerre
     setVisionForPlayer(currentPlayer,playerPositions);
@@ -68,45 +67,29 @@ function main() {
     *
  */
 function initializeTable() {
-    const boardInfo = [];
-
     for (let i = 0; i < 9; i++) {
-        const row = [];
         for (let j = 0; j < 9; j++) {
             const cellId = i + "-" + j;
-            row.push({type: "cell", id: cellId});
-
             const cell = document.createElement("div");
-
             cell.id = cellId+"~cell";
             cell.classList.add("cell");
             cell.addEventListener("click", choosePositionToBegin);
             board.appendChild(cell);
             if(j !== 8) {
                 const wallId = i + "-" + j + "~" + (i + 1) + "-" + j;
-                row.push({type: "wall-vertical", id: wallId});
-
                 const wall = document.createElement("div");
                 wall.id = "wv~"+i+"-"+j;
                 wall.classList.add("wall-vertical")
                 board.appendChild(wall);
             }
         }
-        if (i === 8) {
-            boardInfo.push(row);
-            break;
-        }
+        if(i === 8) break;
         for (let j = 0; j < 9; j++) {
             const wallId = i + "-" + j + "~" + i + "-" + (j + 1);
-            row.push({type: "wall-horizontal", id: wallId});
-
             const wall = document.createElement("div");
             wall.id = "wh~"+i+"-"+j;
             wall.classList.add("wall-horizontal");
-
             const spaceId = i + "-" + j;
-            row.push({type: "space", id: spaceId});
-
             const space = document.createElement("div");
             space.id = spaceId+"-space";
             space.classList.add("space");
@@ -115,9 +98,7 @@ function initializeTable() {
                 board.appendChild(space);
             }
         }
-        boardInfo.push(row);
     }
-    return boardInfo;
 }
 
 /** #############################################  ROUND METHODS  ############################################# **/
