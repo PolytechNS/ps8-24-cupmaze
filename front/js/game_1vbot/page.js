@@ -135,7 +135,7 @@ function validateRound() {
     //On récupère la nouvelle position générée par l'IA
     socket.emit("newMove", playerPositions["player2"]);
     socket.on("updatedBoard", (newPositionBot) => {
-        console.log(newPositionBot);
+        console.log("newPostion from updatedBoard: "+newPositionBot);
         let circle_bot = document.getElementById(newPositionBot);
         currentPlayer = 2;
         if(playerPositions["player2"] !== null) removePlayerCircle(playerPositions, currentPlayer);
@@ -247,28 +247,30 @@ function wallLaid(event) {
     /**
      * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
      */
-    if(actionsToDo>0 && ((currentPlayer===1 && nbWallsPlayer1>0) || (currentPlayer===2 && nbWallsPlayer2>0))) {
-        secondWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
-        secondWallToColor.removeEventListener("mouseenter",wallListener);
-        secondWallToColor.removeEventListener("click",wallLaid);
+    socket.emit("layWall",firstWallToColor.id + " " + spaceToColor.id + " " + secondWallToColor.id);
+    socket.on("wallLaying", ((isWallLayingPossible,nbWalls)=>{
+        if(isWallLayingPossible){
+            secondWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
+            secondWallToColor.removeEventListener("mouseenter",wallListener);
+            secondWallToColor.removeEventListener("click",wallLaid);
 
-        spaceToColor.classList.add("wall-laid","laidBy" + currentPlayer);
+            spaceToColor.classList.add("wall-laid","laidBy" + currentPlayer);
 
-        firstWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
-        firstWallToColor.removeEventListener("mouseenter",wallListener);
-        firstWallToColor.removeEventListener("click",wallLaid);
+            firstWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
+            firstWallToColor.removeEventListener("mouseenter",wallListener);
+            firstWallToColor.removeEventListener("click",wallLaid);
 
-        if (currentPlayer === 1) nbWallsPlayer1--;
-        else nbWallsPlayer2--;
+            if (currentPlayer === 1) nbWallsPlayer1=nbWalls;
 
-        updateDueToAction();
-        //On sauvegarde la dernière action
-        lastActionType = "wall " + firstWallToColor.id + " " + spaceToColor.id + " " + secondWallToColor.id;
-        updateNumberWallsDisplay(currentPlayer,nbWallsPlayer1,nbWallsPlayer2);
-    }
-    else{
-        alert("Insufficent number of actions and/or walls");
-    }
+            updateDueToAction();
+            //On sauvegarde la dernière action
+            lastActionType = "wall " + firstWallToColor.id + " " + spaceToColor.id + " " + secondWallToColor.id;
+            updateNumberWallsDisplay(currentPlayer,nbWallsPlayer1,nbWallsPlayer2);
+        }
+        else{
+            alert("Insufficent number of actions and/or walls");
+        }
+    }));
 }
 
 
