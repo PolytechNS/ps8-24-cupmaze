@@ -112,7 +112,6 @@ function setVisionForPlayer(currentPlayer,playerPositions){
         {
             let player1circle = document.getElementById("player" + 1 + "-circle");
             let player2circle = document.getElementById("player" + 2 + "-circle");
-
             if(cell.id===playerPositions["player"+currentPlayer]){
                 cell.visibility=""+(INFINITY*(currentPlayer===1? -1:1));
                 document.getElementById("player" + currentPlayer + "-circle").style.display="block";

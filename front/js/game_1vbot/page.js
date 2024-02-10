@@ -1,6 +1,6 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction } from "../game_local_1v1/utils.js";
 import {beginningPositionIsValid,getPossibleMoves} from "../game_local_1v1/movePlayerReferee.js";
-import {removePlayerCircle, addPlayerCircle} from "../game_local_1v1/movePlayerUtils.js";
+import {removePlayerCircle, addPlayerCircle, removePlayerCircleIA} from "../game_local_1v1/movePlayerUtils.js";
 import {isWallPlacementValid,updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
@@ -127,48 +127,47 @@ function initializeTable() {
  * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
  */
 function validateRound() {
-    if(numberTour>1) possibleMoves.forEach(cell=>cell.classList.remove("possible-move"));
 
-
-    console.log("pre socket call : " +playerPositions["player2"]);
-
-    //On récupère la nouvelle position générée par l'IA
-    socket.emit("newMove", playerPositions["player2"]);
-    socket.on("updatedBoard", (newPositionBot) => {
-        console.log(newPositionBot);
-        let circle_bot = document.getElementById(newPositionBot);
-        currentPlayer = 2;
-        if(playerPositions["player2"] !== null) removePlayerCircle(playerPositions, currentPlayer);
-        addPlayerCircle(circle_bot, 2);
-        playerPositions["player2"] = newPositionBot;
-
-        if(isGameOver()) {
-            document.getElementById("popup-ready-message").innerHTML = victoryAnswer;
+    // on envoie un message au serveur pour lui dire de valider le round
+    socket.emit("validateRound");
+    socket.on("numberTour", (numberTour) => {
+        console.log("numberTour", numberTour);
+        if (numberTour > 1) {
+            possibleMoves.forEach(cell => {
+                cell.classList.remove("possible-move");
+            });
+        }
+        socket.off("numberTour");
+    });
+    console.log("validateRound");
+    socket.on("positionAI", (AIPosition, currentplayer,playerPosition) => {
+        console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
+        if (AIPosition !== null) removePlayerCircle(playerPosition, currentplayer);
+        let circle_bot = document.getElementById(AIPosition);
+        addPlayerCircle(circle_bot, currentplayer);
+        socket.off("newAIPosition");
+    });
+    socket.on("gameOver", (winner) => {
+        if (winner !== null) {
+            document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + winner + " !! Félicitations ! ";
             document.getElementById("popup").style.display = 'flex';
             document.getElementById("popup-button").style.display = "none";
         }
-
-        currentPlayer = 1;
-        //On augmente le nombre de tours
-        numberTour++;
-        actionsToDo=1;
-
-        //On regarde si on est arrivé au 100ème tour, si c'est le cas alors => égalité
-        if(currentPlayer === 1 && numberTour === 101){
+        socket.off("gameOver");
+    });
+    socket.on("numberTourAfter", (numberTour) => {
+        if (numberTour === 101) {
             document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
             document.getElementById("popup").style.display = 'flex';
             document.getElementById("popup-button").style.display = "none";
         }
-
-        //On applique la sauvegarde des états des pions
-        lastPlayerPositions["player1"] = playerPositions["player1"];
-        lastPlayerPositions["player2"] = playerPositions["player2"];
-
-        //On applique le brouillard de guerre
-        setVisionForPlayer(currentPlayer,playerPositions);
-        if(numberTour>1)possibleMoves = getPossibleMoves(playerPositions[`player${currentPlayer}`]);
-        setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
-        socket.off("updatedBoard");
+        socket.off("numberTourAfter");
+    });
+    socket.on("updateRound", (numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
+        console.log("updateRound", numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
+        setVisionForPlayer(currentPlayer, playerPosition);
+        setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
+        socket.off("updateBoard");
     });
 }
 
@@ -283,7 +282,48 @@ function wallLaid(event) {
  */
 function choosePositionToBegin(event) {
 
+
+    socket.emit("choosePositionToBegin", event.target.id);
+    console.log("choosePositionToBegin", event.target.id);
+    console.log("choosePositionToBegin");
+    socket.on("beginningPositionIsValid", (res) => {
+        console.log("beginningPositionIsValid");
+        if (!res) {
+            alert("Vous devez commencez par la première ligne");
+            return;
+        }
+        socket.off("beginningPositionIsValid");
+    });
+    socket.on("checkAction", (res) => {
+        if (res) {
+            alert("Vous n'avez plus d'actions disponibles");
+            return;
+        }
+        socket.off("checkAction");
+    });
+    event.target.classList.add("occupied");
+    socket.on("currentPlayer", (currentPlayer, playerposition) => {
+        console.log("currentPlayer");
+        addPlayerCircle(event.target, currentPlayer);
+        if (playerposition) {
+            const cells = document.querySelectorAll(".cell");
+            cells.forEach(cell => {
+                cell.removeEventListener("click", choosePositionToBegin);
+                cell.addEventListener("click", movePlayer);
+            });
+            const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+            walls.forEach(wall => {
+                wall.addEventListener("mouseenter", wallListener);
+                wall.addEventListener("click", wallLaid);
+            })
+        }
+        socket.off("currentPlayer");
+    });
+    updateDueToAction();
+}
+/*
     const clickedCell = event.target;
+    console.log(clickedCell);
     if(!beginningPositionIsValid(currentPlayer,clickedCell.id[0])){
         alert("Vous devez commencez par la première ligne")
         return;
@@ -318,7 +358,7 @@ function choosePositionToBegin(event) {
     //On sauvegarde la dernière action
     lastActionType = "position";
 }
-
+*/
 function movePlayer(event) {
     const target = event.target;
     console.log(target);
