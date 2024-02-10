@@ -10,9 +10,7 @@ document.getElementById("signup-form").addEventListener("submit", async function
 
     // Hachage du mot de passe
     await hashPassword(formData.password).then((hash) => {
-        console.log('Mot de passe haché:', hash);
         formData.password = hash;
-        console.log('Mot de passe haché:', formData.password);
     });
 
     // Envoi de la requête POST

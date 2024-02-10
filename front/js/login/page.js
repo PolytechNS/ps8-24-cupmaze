@@ -1,4 +1,4 @@
-document.getElementById("login-form").addEventListener("submit", function(event){
+document.getElementById("login-form").addEventListener("submit", async function (event) {
     event.preventDefault(); // Empêche le comportement par défaut du formulaire
 
     // Récupération des valeurs des champs
@@ -6,6 +6,10 @@ document.getElementById("login-form").addEventListener("submit", function(event)
         email: document.getElementById("email").value,
         password: document.getElementById("password").value,
     };
+
+    await hashPassword(formData.password).then((hash) => {
+        formData.password = hash;
+    });
 
     // Envoi de la requête POST
     fetch("http://localhost:8000/api/login", {
@@ -17,11 +21,11 @@ document.getElementById("login-form").addEventListener("submit", function(event)
     })
         .then(response => {
             if (!response.ok) {
-                if(response.status === 400){
+                if (response.status === 400) {
                     alert("Il y'a des champs manquants au formulaire");
                     return;
                 }
-                if(response.status === 401){
+                if (response.status === 401) {
                     alert('Email ou mot de passe incorrect');
                     return;
                 }
@@ -50,4 +54,12 @@ function setCookie(name, value, hours) {
         expires = "; expires=" + date.toUTCString();
     }
     document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
+
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(byte => ('00' + byte.toString(16)).slice(-2)).join('');
 }
