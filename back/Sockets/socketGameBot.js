@@ -30,6 +30,18 @@ function createSocket(server) {
             let answer = game.isGameOver();
             gameNamespace.emit("gameOver", answer[0], answer[1]);
         });
+
+        socket.on("newMoveHumanIsPossible", async (positionY, positionX) => {
+            let possibleMoves = await game.getPossibleMoves(game.getPlayerCurrentPosition(1));
+            let caseWanted = await game.getCase(positionY, positionX);
+            let isPossible = possibleMoves.includes(caseWanted);
+            if (isPossible){
+                let saveOldPosition = game.getPlayerCurrentPosition(1);
+                game.movePlayer(1, caseWanted, game.getPlayerCurrentPosition(1));
+                if (saveOldPosition !== null) gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, saveOldPosition.translateHTMLCase(), game.getPlayerCurrentPosition(1).translateHTMLCase());
+                else gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, null, game.getPlayerCurrentPosition(1).translateHTMLCase());
+            }
+        });
     });
 }
 

@@ -6,7 +6,8 @@ function beginningPositionIsValid(currentPlayer, position) {
 
 function getPossibleMoves(playerPosition, elements) {
     const possibleMoves = [];
-    const [line, column] = playerPosition;
+    const line = playerPosition.getPos_x();
+    const column = playerPosition.getPos_y();
 
     function checkMove(newLine, newColumn, possibleMoves, direction) {
         if (newLine < 0 || newLine > 8 || newColumn < 0 || newColumn > 8) {

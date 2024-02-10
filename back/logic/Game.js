@@ -32,10 +32,15 @@ class Game {
                 }
             }
         }
+
+        //TODO: A SUPPRIMER IMPERATIVEMENT APRES CEST UN MOCK EN ATTENDANT QUARNAUD FASSE CHOOSEPOSITIONTO BEGIN
+        this.playerPosition[0] = this.elements[0];
+        this.lastPlayerPosition[0] = this.elements[0];
     }
 
     getPossibleMoves(playerPosition) {
-        const possibleMoves = getPossibleMoves(playerPosition, this.elements);
+        if(this.actionsToDo===0) return [];
+        return getPossibleMoves(playerPosition, this.elements);
     }
 
     isGameOver() {
@@ -53,6 +58,30 @@ class Game {
             return [true, 2];
         }
         return [false, -1];
+    }
+
+    getCase(y, x) {
+        console.log("On cherche la case : ", y, x);
+        for (let i = 0; i < this.elements.length; i++) {
+            if(this.elements[i] instanceof Case){
+                if(this.elements[i].getPos_x()===parseInt(x) && this.elements[i].getPos_y()===parseInt(y)){
+                    return this.elements[i];
+                }
+            }
+        }
+    }
+
+    getPlayerCurrentPosition(index) {
+        return this.playerPosition[index - 1];
+    }
+
+    getPlayerLastPosition(index) {
+        return this.lastPlayerPosition[index - 1];
+    }
+
+    movePlayer(number, caseWanted, playerCurrentPosition) {
+        this.playerPosition[number - 1] = caseWanted;
+        this.lastPlayerPosition[number - 1] = playerCurrentPosition;
     }
 }
 

@@ -1,6 +1,6 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction } from "../game_local_1v1/utils.js";
 import {beginningPositionIsValid,getPossibleMoves} from "../game_local_1v1/movePlayerReferee.js";
-import {removePlayerCircle, addPlayerCircle} from "../game_local_1v1/movePlayerUtils.js";
+import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {isWallPlacementValid,updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
@@ -119,8 +119,8 @@ function validateRound() {
         console.log(newPositionBot);
         let circle_bot = document.getElementById(newPositionBot);
         currentPlayer = 2;
-        if(playerPositions["player2"] !== null) removePlayerCircle(playerPositions, currentPlayer);
-        addPlayerCircle(circle_bot, 2);
+        if(playerPositions["player2"] !== null) removePlayerCircle(playerPositions["player2"], currentPlayer);
+        addPlayerCircle(circle_bot.id, 2);
         playerPositions["player2"] = newPositionBot;
 
         if(isGameOver()) {
@@ -238,7 +238,7 @@ function wallLaid(event) {
         if (currentPlayer === 1) nbWallsPlayer1--;
         else nbWallsPlayer2--;
 
-        updateDueToAction();
+        showButtonVisible();
         //On sauvegarde la dernière action
         lastActionType = "wall " + firstWallToColor.id + " " + spaceToColor.id + " " + secondWallToColor.id;
         updateNumberWallsDisplay(currentPlayer,nbWallsPlayer1,nbWallsPlayer2);
@@ -274,7 +274,7 @@ function choosePositionToBegin(event) {
 
     clickedCell.classList.add("occupied");
     playerPositions[`player${currentPlayer}`] = clickedCell.id;
-    addPlayerCircle(clickedCell, currentPlayer);
+    addPlayerCircle(clickedCell.id, currentPlayer);
 
     if (playerPositions.player1) {
         const cells = document.querySelectorAll(".cell");
@@ -291,7 +291,7 @@ function choosePositionToBegin(event) {
 
     }
     //On enlève l'action réalisée au compteur
-    updateDueToAction();
+    showButtonVisible();
     //On sauvegarde la dernière action
     lastActionType = "position";
 }
@@ -311,15 +311,30 @@ function movePlayer(event) {
         console.log(cellId);
     }
     const clickedCell=document.getElementById(cellId);
-    if (clickedCell.classList.contains("possible-move") && actionsToDo===1) {
+
+    socket.emit("newMoveHumanIsPossible", clickedCell.id[2], clickedCell.id[0]);
+    socket.on("isNewMoveHumanIsPossible", (isPossible, lastPosition, newPosition) => {
+        if(isPossible){
+            console.log("move valid");
+            if(lastPosition!==null) removePlayerCircle(lastPosition, currentPlayer);
+            console.log("allo");
+            addPlayerCircle(newPosition, 1);
+            lastActionType = "position";
+            showButtonVisible();
+        }else{
+            alert("Mouvement non autorisé");
+        }
+    });
+
+    /*if (clickedCell.classList.contains("possible-move") && actionsToDo===1) {
         console.log("move valid");
         removePlayerCircle(playerPositions,currentPlayer);
         playerPositions[`player${currentPlayer}`] = clickedCell.id;
         addPlayerCircle(clickedCell,currentPlayer);
-        updateDueToAction();
+        showButtonVisible();
         //On sauvegarde la dernière action
         lastActionType = "position";
-    }
+    }*/
 }
 
 
@@ -394,9 +409,7 @@ function undoLayingWall(wall){
 
 
 /**UTILS **/
-function updateDueToAction(){
-    actionsToDo--;
+function showButtonVisible(){
     document.getElementById("button-validate-action").style.display = "flex";
     document.getElementById("button-undo-action").style.display = "flex";
-    updateNumberAction(0);
 }

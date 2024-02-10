@@ -33,6 +33,10 @@ class Case{
     toString(){
         return "Case : " + this.pos_x + " " + this.pos_y;
     }
+
+    translateHTMLCase(){
+        return this.pos_x+"-"+this.pos_y+"~cell";
+    }
 }
 
 module.exports = { Case } ;
