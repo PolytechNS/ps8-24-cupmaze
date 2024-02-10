@@ -1,6 +1,6 @@
 import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction } from "../game_local_1v1/utils.js";
 import {beginningPositionIsValid,getPossibleMoves} from "../game_local_1v1/movePlayerReferee.js";
-import {removePlayerCircle, addPlayerCircle} from "../game_local_1v1/movePlayerUtils.js";
+import {removePlayerCircle, addPlayerCircle, removePlayerCircleIA} from "../game_local_1v1/movePlayerUtils.js";
 import {isWallPlacementValid,updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
@@ -130,49 +130,47 @@ function validateRound() {
 
     // on envoie un message au serveur pour lui dire de valider le round
     socket.emit("validateRound");
-    console.log("validateRound");
-    socket.on("updateRound", (possibleMoves, numberTour, playerPosition, currentplayer, nbWallsPlayer1, nbWallsPlayer2) => {
-        console.log("updateRound");
-        socket.on("numberTour", (numberTour) => {
-            if (numberTour > 1) possibleMoves.forEach(cell => cell.classList.remove("possible-move"));
-            socket.off("numberTour");
-        });
-
-        socket.on("positionAI", (newAIPosition, currentplayer) => {
-            console.log("positionAI");
-            let circle_Bot = document.getElementById(newAIPosition);
-            if (playerPosition["player2"] !== null) removePlayerCircle(playerPosition, currentplayer);
-            addPlayerCircle(circle_Bot, currentplayer);
-            socket.off("positionAI");
-        });
-
-
-        socket.on("gameOver", (winner) => {
-            console.log("gameOver");
-            if (winner != null) {
-                document.getElementById("popup-ready-message").innerHTML = "Le joueur " + winner + " a gagné";
-                document.getElementById("popup").style.display = 'flex';
-                document.getElementById("popup-button").style.display = "none";
-            }
-            socket.off("gameOver");
-        });
-
-
-        socket.on("numberTourAfter", (numberTour) => {
-            console.log("numberTourAfter");
-            if (numberTour === 101) {
-                document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
-                document.getElementById("popup").style.display = 'flex';
-                document.getElementById("popup-button").style.display = "none";
-            }
-            socket.off("numberTourAfter");
-        });
-
-        console.log("apres NumberTourAfter");
-        setVisionForPlayer(currentplayer, playerPosition);
-        setUpNewRound(currentplayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
-        socket.off("updateRound");
+    socket.on("numberTour", (numberTour) => {
+        console.log("numberTour", numberTour);
+        if (numberTour > 1) {
+            possibleMoves.forEach(cell => {
+                cell.classList.remove("possible-move");
+            });
+        }
+        socket.off("numberTour");
     });
+    console.log("validateRound");
+    socket.on("positionAI", (AIPosition, currentplayer,playerPosition) => {
+        console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
+        if (AIPosition !== null) removePlayerCircle(playerPosition, currentplayer);
+        let circle_bot = document.getElementById(AIPosition);
+        addPlayerCircle(circle_bot, currentplayer);
+        socket.off("newAIPosition");
+    });
+    socket.on("gameOver", (winner) => {
+        if (winner !== null) {
+            document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + winner + " !! Félicitations ! ";
+            document.getElementById("popup").style.display = 'flex';
+            document.getElementById("popup-button").style.display = "none";
+        }
+        socket.off("gameOver");
+    });
+    socket.on("numberTourAfter", (numberTour) => {
+        if (numberTour === 101) {
+            document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
+            document.getElementById("popup").style.display = 'flex';
+            document.getElementById("popup-button").style.display = "none";
+        }
+        socket.off("numberTourAfter");
+    });
+    socket.on("updateRound", (numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
+        console.log("updateRound", numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
+        setVisionForPlayer(currentPlayer, playerPosition);
+        setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
+        socket.off("updateBoard");
+    });
+
+}
 /*
     console.log("pre socket call : " +playerPositions["player2"]);
     //On récupère la nouvelle position générée par l'IA
@@ -213,7 +211,6 @@ function validateRound() {
         socket.off("updatedBoard");
     });
     */
-}
 
 /**
  * Fonction qui analyse si un joueur à fini une partie ou pas
@@ -365,7 +362,44 @@ function choosePositionToBegin(event) {
     });
     updateDueToAction();
 }
+/*
+    const clickedCell = event.target;
+    console.log(clickedCell);
+    if(!beginningPositionIsValid(currentPlayer,clickedCell.id[0])){
+        alert("Vous devez commencez par la première ligne")
+        return;
+    }
 
+    //On vérifie si le joueur possède assez d'actions
+    if(actionsToDo===0){
+        alert("Vous n'avez plus d'actions disponibles");
+        return;
+    }
+
+    clickedCell.classList.add("occupied");
+    playerPositions[`player${currentPlayer}`] = clickedCell.id;
+    addPlayerCircle(clickedCell, currentPlayer);
+
+    if (playerPositions.player1) {
+        const cells = document.querySelectorAll(".cell");
+        cells.forEach(cell => {
+            cell.removeEventListener("click", choosePositionToBegin);
+            cell.addEventListener("click", movePlayer);
+        });
+
+        const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+        walls.forEach(wall=>{
+            wall.addEventListener("mouseenter",wallListener);
+            wall.addEventListener("click",wallLaid);
+        })
+
+    }
+    //On enlève l'action réalisée au compteur
+    updateDueToAction();
+    //On sauvegarde la dernière action
+    lastActionType = "position";
+}
+*/
 function movePlayer(event) {
     const target = event.target;
     console.log(target);

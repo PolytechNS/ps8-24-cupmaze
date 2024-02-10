@@ -6,6 +6,7 @@ function beginningPositionIsValid(currentPlayer, position) {
 
 function getPossibleMoves(playerPosition, elements) {
     const possibleMoves = [];
+    if (playerPosition === null) { return null; }
     const [line, column] = playerPosition;
 
     function checkMove(newLine, newColumn, possibleMoves, direction) {

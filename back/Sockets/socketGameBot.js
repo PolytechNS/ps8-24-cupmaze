@@ -32,6 +32,7 @@ function createSocket(server) {
             const y = parseInt(cellId.split("-")[1]);
             const action = game.actionsToDo;
             const currentPlayer = game.currentPlayer;
+            console.log("currentPlayer", currentPlayer);
             console.log("action", x);
             var res = beginningPositionIsValid(game.currentPlayer, x);
             console.log("res", res);
@@ -45,9 +46,6 @@ function createSocket(server) {
             gameNamespace.emit("currentPlayer", currentPlayer, game.playerPosition.player1);
             game.actionsToDo--;
             game.lastActionType = "position"
-
-            gameNamespace.emit
-
         });
 
         socket.on("validateRound", (msg) => {
@@ -55,20 +53,20 @@ function createSocket(server) {
             console.log("playerPosition", playerPosition.player2);
             let possibleMoves = game.getPossibleMoves(playerPosition.player2);
             const numberTour = game.numberTour;
-            const currentplayer = game.currentPlayer;
+            let currentplayer = game.currentPlayer;
             const nbWallsPlayer1 = game.nbWallsPlayer1;
             const nbWallsPlayer2 = game.nbWallsPlayer2;
 
             console.log("validateRound", msg);
-            gameNamespace.emit("numberTour", numberTour);
+            gameNamespace.emit("numberTour", numberTour, possibleMoves);
 
             // on demande à l'IA de jouer
-            let newAIPosition = AIEasy.computeMove(possibleMoves);
+            console.log("possibleMoves", possibleMoves);
+            let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
             game.currentPlayer = 2
             console.log("newAIPosition", newAIPosition);
-            gameNamespace.emit("positionAI", newAIPosition, currentplayer);
-
-            // on met à jour la position de l'IA
+            const cellId = newAIPosition[0] + "-" + newAIPosition[1]+"~cell";
+            gameNamespace.emit("positionAI", cellId,game.currentPlayer,playerPosition);
             game.playerPosition.player2 = newAIPosition;
 
             // on verifie si la partie est finie
@@ -91,7 +89,7 @@ function createSocket(server) {
                 possibleMoves = game.getPossibleMoves(playerPosition.player1);
             }
 
-            conspole.log("possibleMoves", possibleMoves);
+            console.log("possibleMoves", possibleMoves);
             console.log("playerPosition", playerPosition);
             gameNamespace.emit("updateRound",
                 possibleMoves, numberTour,
