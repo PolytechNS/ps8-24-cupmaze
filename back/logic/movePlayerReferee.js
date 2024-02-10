@@ -6,7 +6,8 @@ function beginningPositionIsValid(currentPlayer, position) {
 
 function getPossibleMoves(playerPosition, elements) {
     const possibleMoves = [];
-    const [line, column] = playerPosition;
+    const line= parseInt(playerPosition[0]);
+    const column= parseInt(playerPosition[2]);
 
     function checkMove(newLine, newColumn, possibleMoves, direction) {
         if (newLine < 0 || newLine > 8 || newColumn < 0 || newColumn > 8) {
@@ -14,19 +15,19 @@ function getPossibleMoves(playerPosition, elements) {
         }
 
         const wall = (newLine === line) ?
-            utils.findWall(newLine, Math.min(column, newColumn), "vertical", elements) :
-            utils.findWall(Math.min(line, newLine), column, "horizontal", elements);
+            utils.findWall(newLine, Math.min(column, newColumn), "vertical",elements) :
+            utils.findWall(Math.min(line, newLine), column, "horizontal",elements);
 
         const cell = utils.findCase(newLine, newColumn, elements);
 
         if (!wall || !wall.isLaid) {
-            if (cell.isOccupied) {
+            if (cell.isOccupied!==false) {
                 const jumpCell = findJumpCell(newLine, newColumn, direction, elements);
                 if (jumpCell) {
-                    possibleMoves.push(jumpCell);
+                    possibleMoves.push(jumpCell.getCellID());
                 }
             } else {
-                possibleMoves.push(cell);
+                possibleMoves.push(cell.getCellID());
             }
         }
     }
