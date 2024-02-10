@@ -24,6 +24,12 @@ function createSocket(server) {
         socket.on("disconnect", () => {
             console.log("user disconnected");
         });
+
+        socket.on("isGameOver", () => {
+            console.log("On demande à l'IA si la partie est terminée");
+            let answer = game.isGameOver();
+            gameNamespace.emit("gameOver", answer[0], answer[1]);
+        });
     });
 }
 

@@ -37,6 +37,23 @@ class Game {
     getPossibleMoves(playerPosition) {
         const possibleMoves = getPossibleMoves(playerPosition, this.elements);
     }
+
+    isGameOver() {
+        if(this.playerPosition[0]===null || this.playerPosition[1]===null){
+            console.error("ATTENTION UNE DES DEUX POSITIONS EST NULL DANS LE BACK");
+            return [false, -1];
+        }
+        if(this.playerPosition[0].getPos_x()===8 && this.playerPosition[1].getPos_x() === 0){
+            return [true, 0];
+        }
+        if(this.playerPosition[0].getPos_x()===8 && this.playerPosition[1].getPos_x() !==0){
+            return [true, 1];
+        }
+        if(this.playerPosition[0].getPos_x()!==8 && this.playerPosition[1].getPos_x() ===0){
+            return [true, 2];
+        }
+        return [false, -1];
+    }
 }
 
 module.exports = { Game };

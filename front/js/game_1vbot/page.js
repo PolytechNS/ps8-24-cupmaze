@@ -158,21 +158,17 @@ function validateRound() {
  * @returns {boolean}
  */
 function isGameOver(){
-    if(currentPlayer === 2){
-        if((playerPositions["player1"] && playerPositions["player1"][0] === "8") && (!playerPositions["player2"] || playerPositions["player2"][0] !== "0")){
-            victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
+    socket.emit("isGameOver", null);
+    socket.on("gameOver", function(isGameOver, numberWinner){
+        if(isGameOver){
+            if(numberWinner === 1) victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
+            else if(numberWinner === 2) victoryAnswer = "Victoire du joueur 2 !! Félicitations ! ";
+            else victoryAnswer = "Egalité entre les deux joueurs !";
             return true;
         }
-        if((playerPositions["player1"] && playerPositions["player1"][0] === "8") && (playerPositions["player2"] && playerPositions["player2"][0] === "0")){
-            victoryAnswer = "Egalité entre les deux joueurs !";
-            return true;
-        }
-        if((playerPositions["player2"] && playerPositions["player2"][0] === "0") && (!playerPositions["player1"] || playerPositions["player1"][0] !== "8")){
-            victoryAnswer = "Victoire du joueur 2 !! Félicitations ! ";
-            return true;
-        }
-    }
-    return false;
+        socket.off("gameOver");
+        return false;
+    });
 }
 
 /** #############################################  WALL LAYING METHODS  ############################################# **/
