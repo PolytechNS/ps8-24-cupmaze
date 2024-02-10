@@ -29,10 +29,25 @@ function createSocket(server) {
         socket.on("choosePositionToBegin", (cellId) => {
             console.log("choosePositionToBegin", cellId);
             const x = parseInt(cellId.split("-")[0]);
-
+            const y = parseInt(cellId.split("-")[1]);
+            const action = game.actionsToDo;
+            const currentPlayer = game.currentPlayer;
+            console.log("action", x);
             var res = beginningPositionIsValid(game.currentPlayer, x);
             console.log("res", res);
             gameNamespace.emit("beginningPositionIsValid", res);
+
+            if (action === 0) {
+                gameNamespace.emit("checkAction", true);
+            }
+
+            game.playerPosition.player1 = [x, y];
+            gameNamespace.emit("currentPlayer", currentPlayer, game.playerPosition.player1);
+            game.actionsToDo--;
+            game.lastActionType = "position"
+
+            gameNamespace.emit
+
         });
 
         socket.on("validateRound", (msg) => {

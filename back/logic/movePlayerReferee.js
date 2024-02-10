@@ -1,7 +1,7 @@
 const utils = require("./utils");
 
 function beginningPositionIsValid(currentPlayer, position) {
-    return (currentPlayer === 1) ? position === "0" : position === "8";
+    return (currentPlayer === 1) ? position === 0 : position === 8;
 }
 
 function getPossibleMoves(playerPosition, elements) {

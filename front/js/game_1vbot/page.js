@@ -327,48 +327,43 @@ function wallLaid(event) {
 function choosePositionToBegin(event) {
 
 
-    console.log("choosePositionToBegin");
-    console.log(event.target);
     socket.emit("choosePositionToBegin", event.target.id);
-    socket.on("choosePositionToBegin", () => {
-
+    console.log("choosePositionToBegin", event.target.id);
+    console.log("choosePositionToBegin");
+    socket.on("beginningPositionIsValid", (res) => {
+        console.log("beginningPositionIsValid");
+        if (!res) {
+            alert("Vous devez commencez par la première ligne");
+            return;
+        }
+        socket.off("beginningPositionIsValid");
     });
-
-    const clickedCell = event.target;
-    console.log(clickedCell);
-    if(!beginningPositionIsValid(currentPlayer,clickedCell.id[0])){
-        alert("Vous devez commencez par la première ligne")
-        return;
-    }
-
-    //On vérifie si le joueur possède assez d'actions
-    if(actionsToDo===0){
-        alert("Vous n'avez plus d'actions disponibles");
-        return;
-    }
-
-    clickedCell.classList.add("occupied");
-    playerPositions[`player${currentPlayer}`] = clickedCell.id;
-    addPlayerCircle(clickedCell, currentPlayer);
-
-    if (playerPositions.player1) {
-        const cells = document.querySelectorAll(".cell");
-        cells.forEach(cell => {
-            cell.removeEventListener("click", choosePositionToBegin);
-            cell.addEventListener("click", movePlayer);
-        });
-
-        const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-        walls.forEach(wall=>{
-            wall.addEventListener("mouseenter",wallListener);
-            wall.addEventListener("click",wallLaid);
-        })
-
-    }
-    //On enlève l'action réalisée au compteur
+    socket.on("checkAction", (res) => {
+        if (res) {
+            alert("Vous n'avez plus d'actions disponibles");
+            return;
+        }
+        socket.off("checkAction");
+    });
+    event.target.classList.add("occupied");
+    socket.on("currentPlayer", (currentPlayer, playerposition) => {
+        console.log("currentPlayer");
+        addPlayerCircle(event.target, currentPlayer);
+        if (playerposition) {
+            const cells = document.querySelectorAll(".cell");
+            cells.forEach(cell => {
+                cell.removeEventListener("click", choosePositionToBegin);
+                cell.addEventListener("click", movePlayer);
+            });
+            const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+            walls.forEach(wall => {
+                wall.addEventListener("mouseenter", wallListener);
+                wall.addEventListener("click", wallLaid);
+            })
+        }
+        socket.off("currentPlayer");
+    });
     updateDueToAction();
-    //On sauvegarde la dernière action
-    lastActionType = "position";
 }
 
 function movePlayer(event) {

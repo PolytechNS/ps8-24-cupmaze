@@ -17,6 +17,7 @@ class Game {
         };
         this.lastPlayerPosition = [null, null];
         this.elements = [];
+        this.lastActionType = "";
         this.init();
     }
 
