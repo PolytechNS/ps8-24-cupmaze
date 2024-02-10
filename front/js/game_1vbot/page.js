@@ -163,7 +163,7 @@ function validateRound() {
         }
         socket.off("numberTourAfter");
     });
-    socket.on("updateRound", (numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
+    socket.on("updateRound", (possibleMoves, numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
         console.log("updateRound", numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
         setVisionForPlayer(currentPlayer, playerPosition);
         setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
