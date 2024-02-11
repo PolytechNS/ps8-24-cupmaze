@@ -1,7 +1,7 @@
 const AIEasy = require("../logic/ai.js");
 const { Server } = require("socket.io");
 const { Game } = require("../logic/Game.js");
-const { getGame, createGame} = require("../database/mongo");
+const { getGame, createGame, clearGames} = require("../database/mongo");
 
 /**
  * Cette fonction va servir pour pouvoir créer le socket qui correspond à quand on va vouloir initialiser une partie entre le bot et un joueur en local
@@ -27,11 +27,35 @@ function createSocket(server) {
                 if (savedGame) {
                     // TODO si l'utilisateur a déjà une partie sauvegardée il faut voir s'il veut l'écraser ou pas
                 }
-                game.setUserEmail(msg);
-                console.log("userEmail received was : "+msg)
-                createGame(JSON.parse(JSON.stringify(game.toJSON()))).then(() => {
-                    socket.emit("goBackToMenu",true);
-                });
+                else {
+                    game.setUserEmail(msg);
+                    console.log("userEmail received was : " + msg)
+                    createGame(JSON.parse(JSON.stringify(game.toJSON()))).then(() => {
+                        socket.emit("goBackToMenu", true);
+                    });
+                }
+            });
+        });
+
+        socket.on("clearGames", (msg) => {
+            console.log("deleting all games for user "+msg);
+            clearGames(msg).then(()=>{
+                console.log("cleared all games");
+            })
+        });
+
+        socket.on("retrieveGame", (msg)=>{
+            getGame(msg).then((savedGame) => {
+                if (!savedGame) {
+                    console.log("No game found");
+                    // TODO si l'utilisateur n'a aucune une partie sauvegardée
+                }
+                else {
+                    console.log("Game was succesfully retrieved");
+                    game.assignGameContext(JSON.parse(JSON.stringify(savedGame)));
+                    console.log("Game was succesfully assigned to current game");
+                    socket.emit("launchSavedGame",true);
+                }
             });
         });
 
