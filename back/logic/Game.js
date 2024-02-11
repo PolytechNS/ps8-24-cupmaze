@@ -6,6 +6,7 @@ const { getPossibleMoves } = require('./movePlayerReferee.js');
 
 class Game {
     constructor() {
+        this.userEmail = "";
         this.currentPlayer = 1;
         this.nbWallsPlayer1 = 10;
         this.nbWallsPlayer2 = 10;
@@ -36,6 +37,24 @@ class Game {
 
     getPossibleMoves(playerPosition) {
         const possibleMoves = getPossibleMoves(playerPosition, this.elements);
+    }
+
+    setUserEmail(userEmail){
+        this.userEmail=userEmail;
+    }
+
+    toJSON() {
+        return {
+            userEmail: this.userEmail,
+            currentPlayer: this.currentPlayer,
+            nbWallsPlayer1: this.nbWallsPlayer1,
+            nbWallsPlayer2: this.nbWallsPlayer2,
+            actionsToDo: this.actionsToDo,
+            numberTour: this.numberTour,
+            playerPosition: this.playerPosition,
+            lastPlayerPosition: this.lastPlayerPosition,
+            elements: this.elements
+        };
     }
 }
 
