@@ -199,16 +199,35 @@ function isGameOver(){
  fonction pour gerer le survol des murs
  */
 function wallListener(event) {
+
+
     const firstWallToColor = event.target;
     firstWallToColor.classList.add("wall-hovered");
 
     // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
+    console.log("wallType", wallType);
 
+    socket.emit("wallListener", firstWallToColor, wallType, wallPosition);
+    socket.on("highlightElements",(adjacentWall, space, adjacentWallId, adjacentSpaceId) => {
+        console.log("highlightElements", adjacentWallId, adjacentSpaceId);
+        console.log("spaceId", adjacentSpaceId);
+        console.log("wallId", adjacentWallId);
+        const wallToColor = document.getElementById(adjacentWallId);
+        console.log("wall", wallToColor);
+        const spaceToColor = document.getElementById(adjacentSpaceId);
+        console.log("space", spaceToColor);
+        highlightElements(firstWallToColor, wallToColor, spaceToColor);
+        firstWallToColor.addEventListener("mouseleave", () => {
+            removeHighlight(firstWallToColor, wallToColor, spaceToColor);
+        });
+        socket.off("highlightElements");
+    });
+    /*
     // la on va chercher les mur a colorier et l'espace entre les murs a colorier
-    const secondWallToColor = findAdjacentWall(wallType, wallPosition);
-    const spaceToColor = findAdjacentSpace(wallPosition);
+    //const secondWallToColor = findAdjacentWall(wallType, wallPosition);
+    //const spaceToColor = findAdjacentSpace(wallPosition);
 
     if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
         removeHighlight(firstWallToColor, secondWallToColor, spaceToColor)
@@ -221,6 +240,7 @@ function wallListener(event) {
     firstWallToColor.addEventListener("mouseleave", () => {
         removeHighlight(firstWallToColor, secondWallToColor, spaceToColor);
     });
+     */
 }
 
 /**
