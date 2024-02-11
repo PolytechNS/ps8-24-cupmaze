@@ -10,7 +10,9 @@ function removePlayerCircle(oldPosition,currentPlayer) {
     const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
     //check if they are child and remove it
     console.log(playerCircle.children);
-    if(playerCircle) oldCell.removeChild(playerCircle);
+    if (playerCircle && oldCell.contains(playerCircle)) {
+        oldCell.removeChild(playerCircle);
+    }
 }
 
 function addPlayerCircle(cellTarget,currentPlayer) {

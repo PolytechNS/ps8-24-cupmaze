@@ -81,17 +81,21 @@ function createSocket(server) {
             const nbWallsPlayer2 = game.nbWallsPlayer2;
 
             gameNamespace.emit("numberTour", numberTour, possibleMoves);
-
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
             console.log("newAIPosition", newAIPosition);
             if (newAIPosition instanceof Case) {
                 newAIPosition = [newAIPosition.getPos_x(), newAIPosition.getPos_y()]
             }
             game.currentPlayer = 2
+            game.actionsToDo = 1;
             const cellId = newAIPosition[0] + "-" + newAIPosition[1] + "~cell";
             console.log("cellId", cellId);
-            gameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
-            game.playerPosition.player2 = newAIPosition;
+            if(game.actionsToDo === 1){
+                console.log("actionsBot", game.actionsToDo);
+                gameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
+                game.playerPosition.player2 = newAIPosition;
+                game.actionsToDo=0;
+            }
 
             // on verifie si la partie est finie
             const winner = game.isGameOver(game.playerPosition);
@@ -104,7 +108,7 @@ function createSocket(server) {
             game.numberTour++;
             game.actionsToDo = 1;
 
-            console.log("numberTour", numberTour);
+            console.log("#####CHANGEMENT DE TOUR#####");
             gameNamespace.emit("numberTourAfter", numberTour);
 
             game.lastPlayerPosition = game.playerPosition;
