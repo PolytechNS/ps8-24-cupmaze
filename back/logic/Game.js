@@ -18,6 +18,18 @@ class Game {
         this.init();
     }
 
+    assignGameContext({userEmail,currentPlayer,nbWallsPlayer1, nbWallsPlayer2, actionsToDo, numberTour, playerPosition, lastPlayerPosition, elements}) {
+        this.userEmail = userEmail;
+        this.currentPlayer = currentPlayer;
+        this.nbWallsPlayer1 = nbWallsPlayer1;
+        this.nbWallsPlayer2 = nbWallsPlayer2;
+        this.actionsToDo = actionsToDo;
+        this.numberTour = numberTour;
+        this.playerPosition = playerPosition;
+        this.lastPlayerPosition = lastPlayerPosition;
+        this.elements = elements;
+    }
+
     init() {
         for (let i = 0; i < 9; i++) {
             for (let j = 0; j < 9; j++) {
