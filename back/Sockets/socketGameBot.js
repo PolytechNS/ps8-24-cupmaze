@@ -49,6 +49,17 @@ function createSocket(server) {
             }
         });
 
+        socket.on("undoMovePosition", () => {
+            let oldPositionHTML=game.playerPosition["player1"][0]+"-"+game.playerPosition["player1"][1]+"~cell";
+            let newPositionHtml="";
+            if(game.lastPlayerPosition["player1"]!==null){
+                newPositionHtml=game.lastPlayerPosition["player1"][0]+"-"+game.lastPlayerPosition["player1"][1]+"~cell";
+            }
+            game.playerPosition["player1"] = game.getPlayerLastPosition(1);
+            game.actionsToDo=1;
+            gameNamespace.emit("undoMove", oldPositionHTML, newPositionHtml, 1, game.numberTour);
+        });
+
         socket.on("choosePositionToBegin", (cellId) => {
             console.log("choosePositionToBegin", cellId);
             const x = parseInt(cellId.split("-")[0]);
@@ -108,7 +119,7 @@ function createSocket(server) {
             console.log("#####CHANGEMENT DE TOUR#####");
             gameNamespace.emit("numberTourAfter", numberTour);
 
-            game.lastPlayerPosition = game.playerPosition;
+            //game.lastPlayerPosition = game.playerPosition;
 
             if (numberTour > 1) {
                 console.log("playerPosition", playerPosition);
