@@ -76,7 +76,6 @@ function createSocket(server) {
 
         socket.on("validateRound", (msg) => {
             const playerPosition = game.playerPosition;
-
             let possibleMoves = game.getPossibleMoves(playerPosition.player2);
             const numberTour = game.numberTour;
             let currentplayer = game.currentPlayer;
@@ -125,11 +124,9 @@ function createSocket(server) {
         });
 
         socket.on("wallListener", (firstWallToColor, wallType, wallPosition) => {
-            console.log("wallListener", firstWallToColor, wallType, wallPosition);
             const x = parseInt(wallPosition[0]);
             const y = parseInt(wallPosition[1]);
             let wallInclinaison;
-            console.log("wallType", wallType);
             if (firstWallToColor === null) {
                 console.log("vide");
                 return;
@@ -137,11 +134,8 @@ function createSocket(server) {
             if (wallType === "wv") { wallInclinaison = "vertical"; }
             else { wallInclinaison = "horizontal"; }
             const wall = findWall(x,y, wallInclinaison, game.elements);
-            console.log("wall", wall);
             let adjacentWall = findAdjacentWall(wall, game.elements);
-            console.log("wall", adjacentWall);
             let adjacentSpace = findAdjacentSpace(wall, game.elements);
-            console.log("space", adjacentSpace);
 
             if (isWallPlacementValid(wallType, wallPosition, game.elements) === false) {
                 removeHighlight(firstWallToColor, adjacentWall, adjacentSpace);
@@ -150,10 +144,54 @@ function createSocket(server) {
             }
 
             //highlightElements(firstWallToColor, adjacentWall, space);
+            if (adjacentWall === undefined || adjacentSpace === undefined) {
+                gameNamespace.emit("highlightElements", null, null);
+            } else {
+                adjacentSpaceId = adjacentSpace.pos_x + "-" + adjacentSpace.pos_y + "-space";
+                adjacentWallId = wallType + "~" + adjacentWall.pos_x + "-" + adjacentWall.pos_y;
+                gameNamespace.emit("highlightElements", adjacentWall, adjacentSpace, adjacentWallId, adjacentSpaceId);
+            }
+        });
 
-            adjacentSpaceId = adjacentSpace.pos_x + "-" + adjacentSpace.pos_y + "-space";
-            adjacentWallId = wallType + "~" + adjacentWall.pos_x + "-" + adjacentWall.pos_y;
-            gameNamespace.emit("highlightElements", adjacentWall, adjacentSpace, adjacentWallId, adjacentSpaceId);
+        socket.on("wallLaid",(firstWallToColor, wallType, wallPosition) => {
+            console.log("wallLaid", firstWallToColor, wallType, wallPosition);
+            const x = parseInt(wallPosition[0]);
+            const y = parseInt(wallPosition[1]);
+            let wallInclinaison;
+            if (firstWallToColor === null) {
+                console.log("vide");
+                return;
+            }
+            if (wallType === "wv") { wallInclinaison = "vertical"; }
+            else { wallInclinaison = "horizontal"; }
+            const wall = findWall(x,y, wallInclinaison, game.elements);
+            let adjacentWall = findAdjacentWall(wall, game.elements);
+            let adjacentSpace = findAdjacentSpace(wall, game.elements);
+
+            if (isWallPlacementValid(wallType, wallPosition, game.elements) === false) {
+                gameNamespace.emit("laidWall", null, null, null);
+                return;
+            }
+
+            if (game.actionsToDo > 0 && ((game.currentPlayer === 1 && game.nbWallsPlayer1 > 0) || (game.currentPlayer === 2 && game.nbWallsPlayer2 > 0))) {
+                game.layWall(wallType, wallPosition, game.currentPlayer);
+                game.actionsToDo--;
+                game.lastActionType = "wall";
+                if (game.currentPlayer === 1) {
+                    game.nbWallsPlayer1--;
+                } else {
+                    game.nbWallsPlayer2--;
+                }
+                game.lastActionType = "wall";
+                console.log("adjacentWall", adjacentWall);
+                if (adjacentWall === undefined || adjacentSpace === undefined) {
+                    gameNamespace.emit("laidWall", null, null, null);
+                } else {
+                    adjacentWallId = wallType + "~" + adjacentWall.pos_x + "-" + adjacentWall.pos_y;
+                    adjacentSpaceId = adjacentSpace.pos_x + "-" + adjacentSpace.pos_y + "-space";
+                    gameNamespace.emit("laidWall", adjacentWallId, adjacentSpaceId, wallType, game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
+                }
+            }
         });
     });
 }

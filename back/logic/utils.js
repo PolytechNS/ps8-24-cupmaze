@@ -33,6 +33,7 @@ function findSpace(pos_x, pos_y, elements) {
 }
 
 function findAdjacentWall(wall, elements) {
+    if (wall === undefined) { return undefined; }
     const line = wall.pos_x;
     const column = wall.pos_y;
     const inclinaison = wall.inclinaison;
@@ -49,6 +50,7 @@ function findAdjacentWall(wall, elements) {
 }
 
 function findAdjacentSpace(wallPosition, elements) {
+    if (wallPosition === undefined) { return undefined; }
     const line = wallPosition.pos_x;
     const column = wallPosition.pos_y;
     if (line < 8 && column < 8) {

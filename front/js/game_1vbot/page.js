@@ -190,17 +190,14 @@ function wallListener(event) {
     // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
-    console.log("wallType", wallType);
 
     socket.emit("wallListener", firstWallToColor, wallType, wallPosition);
     socket.on("highlightElements",(adjacentWall, space, adjacentWallId, adjacentSpaceId) => {
-        console.log("highlightElements", adjacentWallId, adjacentSpaceId);
-        console.log("spaceId", adjacentSpaceId);
-        console.log("wallId", adjacentWallId);
+        if (adjacentWall === null) {
+            return;
+        }
         const wallToColor = document.getElementById(adjacentWallId);
-        console.log("wall", wallToColor);
         const spaceToColor = document.getElementById(adjacentSpaceId);
-        console.log("space", spaceToColor);
         highlightElements(firstWallToColor, wallToColor, spaceToColor);
         firstWallToColor.addEventListener("mouseleave", () => {
             removeHighlight(firstWallToColor, wallToColor, spaceToColor);
@@ -245,6 +242,27 @@ function wallLaid(event) {
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
 
+    socket.emit("wallLaid", firstWallToColor, wallType, wallPosition);
+    socket.on("laidWall", (secondWallToColor, spaceToColor, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
+        if (secondWallToColor === null) {
+            return;
+        }
+        const htmlSecondWallToColor = document.getElementById(secondWallToColor);
+        const htmlSpaceToColor = document.getElementById(spaceToColor);
+        htmlSecondWallToColor.classList.add("wall-laid", "laidBy" + currentPlayer);
+        htmlSecondWallToColor.removeEventListener("mouseenter", wallListener);
+        htmlSecondWallToColor.removeEventListener("click", wallLaid);
+
+        htmlSpaceToColor.classList.add("wall-laid", "laidBy" + currentPlayer);
+
+        firstWallToColor.classList.add("wall-laid", "laidBy" + currentPlayer);
+        firstWallToColor.removeEventListener("mouseenter", wallListener);
+        firstWallToColor.removeEventListener("click", wallLaid);
+        showButtonVisible();
+        updateNumberWallsDisplay(currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
+        socket.off("laidWall");
+    });
+    /*
     // la on va chercher les mur a colorier et l'espace entre les murs a colorier
     const secondWallToColor = findAdjacentWall(wallType, wallPosition);
     const spaceToColor = findAdjacentSpace(wallPosition);
@@ -255,7 +273,7 @@ function wallLaid(event) {
 
     /**
      * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
-     */
+
     if(actionsToDo>0 && ((currentPlayer===1 && nbWallsPlayer1>0) || (currentPlayer===2 && nbWallsPlayer2>0))) {
         secondWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
         secondWallToColor.removeEventListener("mouseenter",wallListener);
@@ -278,6 +296,7 @@ function wallLaid(event) {
     else{
         alert("Insufficent number of actions and/or walls");
     }
+    */
 }
 
 /** #############################################  MOVE PLAYER METHODS  ############################################# **/

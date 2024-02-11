@@ -92,6 +92,25 @@ class Game {
         if (playersPositions.player2[0] === 0) return 2;
         return 0;
     }
+
+    layWall(firstCase, secondCase, space) {
+        // on chercher les mur et le space dans les elements
+        for (let i = 0; i < this.elements.length; i++) {
+            if (this.elements[i] instanceof Wall) {
+                if (this.elements[i].equals(firstCase) || this.elements[i].equals(secondCase)) {
+                    this.elements[i].setIsOccupied(true);
+                    console.log("MUR TROUVE");
+                }
+            }
+            if (this.elements[i] instanceof Space) {
+                if (this.elements[i].equals(space)) {
+                    this.elements[i].setIsOccupied(true);
+                    console.log("SPACE TROUVE");
+                }
+            }
+        }
+
+    }
 }
 
 module.exports = { Game };
