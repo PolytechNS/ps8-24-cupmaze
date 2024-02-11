@@ -217,7 +217,8 @@ function saveGame() {
         socket.on("goBackToMenu",(isWentWell)=>{
             alert("Partie sauvegardée avec succès !");
             window.location.href = "http://localhost:8000/mainMenu.html";
-        })
+            socket.off("goBackToMenu");
+        });
     }
 }
 
