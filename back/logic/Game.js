@@ -28,16 +28,18 @@ class Game {
         this.lastWallLaidsIDHtml = [];
     }
 
-    assignGameContext({userEmail,currentPlayer,nbWallsPlayer1, nbWallsPlayer2, actionsToDo, numberTour, playerPosition, lastPlayerPosition, elements}) {
-        this.userEmail = userEmail;
-        this.currentPlayer = currentPlayer;
-        this.nbWallsPlayer1 = nbWallsPlayer1;
-        this.nbWallsPlayer2 = nbWallsPlayer2;
-        this.actionsToDo = actionsToDo;
-        this.numberTour = numberTour;
-        this.playerPosition = playerPosition;
-        this.lastPlayerPosition = lastPlayerPosition;
-        this.elements = elements;
+    assignGameContext(savedGame) {
+        this.userEmail = savedGame.userEmail;
+        this.currentPlayer = savedGame.currentPlayer;
+        this.nbWallsPlayer1 = savedGame.nbWallsPlayer1;
+        this.nbWallsPlayer2 = savedGame.nbWallsPlayer2;
+        this.actionsToDo = savedGame.actionsToDo;
+        this.numberTour = savedGame.numberTour;
+        this.playerPosition = savedGame.playerPosition;
+        this.lastPlayerPosition = savedGame.lastPlayerPosition;
+        this.elements = savedGame.elements;
+        this.lastWallsLaid = savedGame.lastWallsLaid;
+        this.lastWallLaidsIDHtml = savedGame.lastWallLaidsIDHtml;
     }
 
     init() {
@@ -46,7 +48,7 @@ class Game {
                 //ajoute case, mur et à la fin on doit juste finir sur case
                 this.elements.push(new Case(i, j, false));
                 if(j<8) {
-                    console.log("wall vertical", i, j);
+                    //console.log("wall vertical", i, j);
                     this.elements.push(new Wall(i, j, false, "vertical"));
                 }
             }
@@ -164,7 +166,10 @@ class Game {
             numberTour: this.numberTour,
             playerPosition: this.playerPosition,
             lastPlayerPosition: this.lastPlayerPosition,
-            elements: this.elements
+            elements: this.elements,
+            lastActionType: this.lastActionType,
+            lastWallsLaid: this.lastWallsLaid,
+            lastWallLaidsIDHtml: this.lastWallLaidsIDHtml
         };
     }
     undoWalls(){

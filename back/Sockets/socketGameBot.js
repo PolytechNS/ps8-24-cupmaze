@@ -30,6 +30,10 @@ function createSocket(server) {
         socket.on("saveGame", (msg)=>{
             getGame(msg).then((savedGame) => {
                 if (savedGame) {
+                    console.log("Already have a saved game");
+                    createGame("error already has game saved").then(() => {
+                        socket.emit("goBackToMenu", false);
+                    });
                     // TODO si l'utilisateur a déjà une partie sauvegardée il faut voir s'il veut l'écraser ou pas
                 }
                 else {
@@ -49,19 +53,25 @@ function createSocket(server) {
             })
         });
 
-        socket.on("retrieveGame", (msg)=>{
-            getGame(msg).then((savedGame) => {
-                if (!savedGame) {
-                    console.log("No game found");
-                    // TODO si l'utilisateur n'a aucune une partie sauvegardée
-                }
-                else {
-                    console.log("Game was succesfully retrieved");
-                    game.assignGameContext(JSON.parse(JSON.stringify(savedGame)));
-                    console.log("Game was succesfully assigned to current game");
-                    socket.emit("launchSavedGame",true);
-                }
-            });
+        socket.on("retrieveGame", async (msg) => {
+            let savedGame = await getGame(msg);
+            if (!savedGame) {
+                console.log("No game found");
+                // TODO si l'utilisateur n'a aucune une partie sauvegardée
+            }
+            else {
+                let savedGameObject = JSON.parse(JSON.stringify(savedGame));
+                //console.log(savedGameObject);
+                console.log("Game was succesfully retrieved");
+                game.assignGameContext(savedGameObject);
+                console.log("Game was succesfully assigned to current game");
+                console.log(game);
+                socket.emit("launchSavedGame", true);
+            }
+        });
+
+        socket.on("loadGame", () => {
+            socket.emit("data", game.toJSON());
         });
 
         socket.on("disconnect", () => {

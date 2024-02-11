@@ -15,7 +15,7 @@
     <script>
         let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
         let socket=io("/api/game");
-        //if(username==="saveGame")socket.emit("clearGames",username);
+        //socket.emit("clearGames",username);
         document.getElementById('button-launch-botGame').addEventListener('click', function() {
             window.location.href = 'http://localhost:8000/botgame.html';
         });
@@ -23,14 +23,7 @@
             window.location.href = 'http://localhost:8000/index.html'; //Changer le nom de index.html
         });
         document.getElementById('button-retrieveGame').addEventListener('click', function() {
-            socket.emit("retrieveGame",username);
-            socket.on("launchSavedGame",(msg)=>{
-                if(msg!==true)alert("sorry no game found");
-                else alert("retrieving game");
-                console.log("Move to new page");
-                window.location.href = 'http://localhost:8000/botgame.html';
-                socket.off("launchSavedGame");
-            })
+            window.location.href = 'http://localhost:8000/botgame.html?intent=retrieveGame'; //Changer le nom de index.html
         });
         console.log(username);
         document.getElementById('nameCurrentPlayer').innerText = "Bienvenue "+username+" :";
