@@ -193,7 +193,9 @@ function wallListener(event) {
 
     socket.emit("wallListener", firstWallToColor, wallType, wallPosition);
     socket.on("highlightElements",(adjacentWall, space, adjacentWallId, adjacentSpaceId) => {
-        if (adjacentWall === null) {
+        if (adjacentWall === null ) {
+            console.log("adjacentWall is null");
+            removeHighlight(firstWallToColor, adjacentWall, space)
             return;
         }
         const wallToColor = document.getElementById(adjacentWallId);

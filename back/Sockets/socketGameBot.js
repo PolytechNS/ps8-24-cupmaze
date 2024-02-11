@@ -150,8 +150,8 @@ function createSocket(server) {
             let adjacentWall = findAdjacentWall(wall, game.elements);
             let adjacentSpace = findAdjacentSpace(wall, game.elements);
 
-            if (isWallPlacementValid(wallType, wallPosition, game.elements) === false) {
-                removeHighlight(firstWallToColor, adjacentWall, adjacentSpace);
+            if (isWallPlacementValid(wall, adjacentWall, adjacentSpace) === false) {
+                //removeHighlight(firstWallToColor, adjacentWall, adjacentSpace);
                 gameNamespace.emit("highlightElements", null, null);
                 return;
             }
@@ -181,7 +181,7 @@ function createSocket(server) {
             let adjacentWall = findAdjacentWall(wall, game.elements);
             let adjacentSpace = findAdjacentSpace(wall, game.elements);
 
-            if (isWallPlacementValid(wallType, wallPosition, game.elements) === false) {
+            if (isWallPlacementValid(wall,adjacentWall, adjacentSpace) === false) {
                 gameNamespace.emit("laidWall", null, null, null);
                 return;
             }
