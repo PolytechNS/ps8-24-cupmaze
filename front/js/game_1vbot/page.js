@@ -124,13 +124,15 @@ function validateRound() {
     socket.on("positionAI", (AIPosition, currentplayer,playerPosition) => {
         console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
         if (playerPosition["player2"] !== null){
-            console.log(playerPosition["player2"]);
             const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
+            console.log("htmlOldPosition", htmlOldPosition);
             removePlayerCircle(htmlOldPosition, currentplayer);
         }
-        //console.log("AI POSITION", AIPosition);
+        console.log("AIPosition", AIPosition);
         let circle_bot = document.getElementById(AIPosition);
+        console.log("circle_bot", circle_bot);
         addPlayerCircle(circle_bot, currentplayer);
+        console.log("fin socket");
         socket.off("newAIPosition");
     });
     socket.on("gameOver", (winner) => {

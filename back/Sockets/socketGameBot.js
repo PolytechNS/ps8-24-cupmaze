@@ -1,6 +1,7 @@
 const AIEasy = require("../logic/ai.js");
 const { Server } = require("socket.io");
 const { Game } = require("../logic/Game.js");
+const { Case } = require("../logic/Case.js");
 const {beginningPositionIsValid} = require("../logic/movePlayerReferee");
 
 /**
@@ -34,15 +35,17 @@ function createSocket(server) {
 
         socket.on("newMoveHumanIsPossible", async (positionY, positionX) => {
             let possibleMoves = await game.getPossibleMoves(game.getPlayerCurrentPosition(1));
+            console.log("possibleMoves", possibleMoves);
             let caseWanted = await game.getCase(positionY, positionX);
+            console.log("caseWanted", caseWanted);
             let isPossible = possibleMoves.includes(caseWanted);
             if (isPossible) {
                 let saveOldPosition = game.getPlayerCurrentPosition(1);
-                let htmlOldPosition=saveOldPosition[1]+"-"+saveOldPosition[0]+"~cell";
-                let htmlNewPosition=caseWanted.getPos_y()+"-"+caseWanted.getPos_x()+"~cell";
+                let htmlOldPosition=saveOldPosition[0]+"-"+saveOldPosition[1]+"~cell";
+                let htmlNewPosition=caseWanted.getPos_x()+"-"+caseWanted.getPos_y()+"~cell";
                 game.movePlayer(1, caseWanted, game.getPlayerCurrentPosition(1));
                 if (saveOldPosition !== null) gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
-                else gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, null, htmlNewPosition);
+                else gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
             }
         });
 
@@ -81,10 +84,12 @@ function createSocket(server) {
 
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
             console.log("newAIPosition", newAIPosition);
-
+            if (newAIPosition instanceof Case) {
+                newAIPosition = [newAIPosition.getPos_x(), newAIPosition.getPos_y()]
+            }
             game.currentPlayer = 2
             const cellId = newAIPosition[0] + "-" + newAIPosition[1] + "~cell";
-
+            console.log("cellId", cellId);
             gameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
             game.playerPosition.player2 = newAIPosition;
 

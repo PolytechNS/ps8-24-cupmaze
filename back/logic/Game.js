@@ -29,7 +29,7 @@ class Game {
                 if(i<8) this.elements.push(new Wall(i, j, false, "vertical"));
             }
             for(let j = 0; j < 9; j++){
-                this.elements.push(new Wall(i, j, true, "horizontal"));
+                this.elements.push(new Wall(i, j, false, "horizontal"));
                 // on rajoute un space entre chaque mur
                 if (j < 8) {
                     this.elements.push(new Space(i, j, true));

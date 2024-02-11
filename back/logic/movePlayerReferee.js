@@ -6,8 +6,8 @@ function beginningPositionIsValid(currentPlayer, position) {
 
 function getPossibleMoves(playerPosition, elements) {
     const possibleMoves = [];
-    const column = playerPosition[0];
-    const line = playerPosition[1];
+    const column = playerPosition[1];
+    const line = playerPosition[0];
     if (playerPosition === null) { return null; }
 
     function checkMove(newLine, newColumn, possibleMoves, direction) {
@@ -28,10 +28,12 @@ function getPossibleMoves(playerPosition, elements) {
                     possibleMoves.push(jumpCell);
                 }
             } else {
+                console.log("cell", cell);
                 possibleMoves.push(cell);
             }
         }
     }
+
 
     checkMove(line - 1, column, possibleMoves, "A");
     checkMove(line + 1, column, possibleMoves, "B");
