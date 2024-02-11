@@ -40,7 +40,7 @@ async function getUser(email) {
 
 async function createGame(game) {
   const db = await getDb();
-  console.log(game);
+  //console.log(game);
   if (db) {
     console.log("La base de données 'test' a été retrouvée avec succès.");
   } else {
