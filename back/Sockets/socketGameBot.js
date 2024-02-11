@@ -37,10 +37,10 @@ function createSocket(server) {
         });
 
         socket.on("newMoveHumanIsPossible", async (positionY, positionX) => {
-            let possibleMoves = await game.getPossibleMoves(game.getPlayerCurrentPosition(1));
+            console.log("CACACACACA", game.playerPosition["player1"]);
+            let possibleMoves = await game.getPossibleMoves(game.playerPosition["player1"]);
             console.log("possibleMoves", possibleMoves);
             let caseWanted = await game.getCase(positionY, positionX);
-            console.log("caseWanted", caseWanted);
             let isPossible = possibleMoves.includes(caseWanted);
             if (isPossible) {
                 let saveOldPosition = game.getPlayerCurrentPosition(1);
@@ -49,6 +49,8 @@ function createSocket(server) {
                 game.movePlayer(1, caseWanted, game.getPlayerCurrentPosition(1));
                 if (saveOldPosition !== null) gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
                 else gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
+            }else{
+                gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, null, null);
             }
         });
 
@@ -58,7 +60,7 @@ function createSocket(server) {
             if(game.lastPlayerPosition["player1"]!==null){
                 newPositionHtml=game.lastPlayerPosition["player1"][0]+"-"+game.lastPlayerPosition["player1"][1]+"~cell";
             }
-            game.playerPosition["player1"] = game.getPlayerLastPosition(1);
+            game.playerPosition["player1"] = game.lastPlayerPosition["player1"]
             game.actionsToDo=1;
             gameNamespace.emit("undoMove", oldPositionHTML, newPositionHtml, 1, game.numberTour);
         });

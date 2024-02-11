@@ -6,6 +6,7 @@ function beginningPositionIsValid(currentPlayer, position) {
 
 function getPossibleMoves(playerPosition, elements) {
     const possibleMoves = [];
+    console.log("playerPosition", playerPosition);
     const column = playerPosition[1];
     const line = playerPosition[0];
     if (playerPosition === null) { return null; }
