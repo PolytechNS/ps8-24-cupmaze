@@ -205,6 +205,7 @@ function createSocket(server) {
                     gameNamespace.emit("laidWall", adjacentWallId, adjacentSpaceId, wallType, game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
                 }
             }
+            game.actionsToDo = 1;
         });
     });
 }
