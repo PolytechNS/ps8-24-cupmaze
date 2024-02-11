@@ -111,6 +111,7 @@ function validateRound() {
   
     // on envoie un message au serveur pour lui dire de valider le round
     socket.emit("validateRound");
+    console.log("validateRound");
     socket.on("numberTour", (numberTour) => {
         console.log("numberTour", numberTour);
         if (numberTour > 1) {
@@ -132,7 +133,7 @@ function validateRound() {
         let circle_bot = document.getElementById(AIPosition);
         console.log("circle_bot", circle_bot);
         addPlayerCircle(circle_bot, currentplayer);
-        socket.off("newAIPosition");
+        socket.off("positionAI");
     });
     socket.on("gameOver", (winner) => {
         if (winner !== null) {
