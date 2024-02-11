@@ -1,31 +1,29 @@
-# PS8
+# PS8 - CupMaze
 
-The code of this repo is split in 2 folders:
-* api/ manages the server. It contains a server which differentiate REST requests from HTTP file requests, and so
-return either files or REST responses accordingly.
-* front/ contains static files that should be returned by the HTTP server mentioned earlier.
+Ce dépôt contient le projet CupMaze réalisé dans le cadre du cours Ps8-FullStack de Polytech Nice Sophia.
 
-Both folders contain a README with more details.
-
+L'équipe est constituée de :
+- DUMANOIS Arnaud
+- HALMI Sayf Eddine
+- BEUREL Simon
 ---
 
 ## Requirements to run the project
 
-* [Node.js](https://nodejs.org/) should be installed.
-* The repo should have been cloned.
+* [Node.js](https://nodejs.org/) doit être installé sur votre machine.
+* Ce dépôt doit être cloné.
+* Docker doit être installé sur votre machine.
 
 ---
 
-## First launch
+## Installation (si vous ne souhaitez pas utiliser Docker)
 
-Not much in there, just launch `npm install` to install the dependencies for the server.
-
-Note that this command should be run again every time you install / delete a package.
+Nous vous conseillons dans lancer la commande `npm install` pour installer les dépendances nécessaires au bon fonctionnement du projet si vous souhaitez lancer ce dernier sans utiliser Docker
 
 ---
 
-## All runs
+## Lancement avec Docker
 
-Simplement faire `docker compose up -d` pour lancer le projet.
+Pour lancer le projet, vous devez simplement utiliser la commande `docker compose up -d --build` pour lancer le projet.
 Le site sera accessible à l'adresse `http://localhost:8000/`.
-Et `docker compose down` pour l'arrêter.
+Pour arrêter les container en cours, vous devez exécuter la commande `docker compose down`.
