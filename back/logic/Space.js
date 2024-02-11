@@ -22,7 +22,7 @@ class Space {
     }
 
     equals(space){
-        return this.pos_x === space.getPos_x() && this.pos_y === space.getPos_y();
+        return this.pos_x === space.pos_x && this.pos_y === space.pos_y;
     }
 }
 
