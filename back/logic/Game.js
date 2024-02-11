@@ -106,16 +106,17 @@ class Game {
 
     layWall(firstCase, secondCase, space) {
         // on chercher les mur et le space dans les elements
+        console.log("firstCase", firstCase);
         for (let i = 0; i < this.elements.length; i++) {
             if (this.elements[i] instanceof Wall) {
                 if (this.elements[i].equals(firstCase) || this.elements[i].equals(secondCase)) {
-                    this.elements[i].setIsOccupied(true);
+                    this.elements[i].setIsLaid(true);
                     console.log("MUR TROUVE");
                 }
             }
             if (this.elements[i] instanceof Space) {
                 if (this.elements[i].equals(space)) {
-                    this.elements[i].setIsOccupied(true);
+                    this.elements[i].setIsLaid(true);
                     console.log("SPACE TROUVE");
                 }
             }

@@ -187,7 +187,8 @@ function createSocket(server) {
             }
 
             if (game.actionsToDo > 0 && ((game.currentPlayer === 1 && game.nbWallsPlayer1 > 0) || (game.currentPlayer === 2 && game.nbWallsPlayer2 > 0))) {
-                game.layWall(wallType, wallPosition, game.currentPlayer);
+                console.log("AVANT layWall");
+                game.layWall(wall,adjacentWall,adjacentSpace);
                 game.actionsToDo--;
                 game.lastActionType = "wall";
                 if (game.currentPlayer === 1) {
