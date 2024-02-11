@@ -116,6 +116,8 @@ class Game {
         console.log("ancientV2", this.lastPlayerPosition[`player${number}`])
         console.log("movePlayerV2", this.playerPosition[`player${number}`])
 
+        this.actionsToDo=0;
+
         //return getPossibleMoves(playerPosition, this.elements);
     }
 
