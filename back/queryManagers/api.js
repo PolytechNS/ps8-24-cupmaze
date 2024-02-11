@@ -1,5 +1,6 @@
 const { createUser, getUser, createGame, getGame } = require('../database/mongo');
 
+
 const jwt = require('jsonwebtoken');
 
 // Main method, exported at the end of the file. It's the one that will be called when a REST request is received.
@@ -7,6 +8,7 @@ function manageRequest(request, response) {
     let url = new URL(request.url, `http://localhost:8000`);
     // on split le pathname pour récupérer le premier élément qui est l'endpoint
     // par exemple dans http://localhost:8000/users, on récupère "users"
+
     let endpoint = url.pathname.split('/')[2];
 
     // quand on a recupéré l'endpoint, on appelle la méthode correspondante, par exemple:
@@ -89,6 +91,7 @@ function login(request, response) {
             }
 
             // generate token
+
             let token = jwt.sign({ email: user.email}, 'secret', { expiresIn: '2h' });
             console.log(token);
             token = JSON.stringify(token);
@@ -120,8 +123,6 @@ function saveGame(request, response) {
         savingGame(body.game, response);
     })
 }
-
-
 /*----------------------------------------*/
 
 // methode pour parser le body de la requete ca sera plus simple pour le traitement
@@ -151,8 +152,16 @@ function creationOfUser(email, username, password, response) {
 
         // on cree l'utilisateur
         createUser({ email, username, password }).then(() => {
-            response.statusCode = 201;
-            response.end('Utilisateur créé');
+            if (user) {
+                response.statusCode = 201;
+                response.end('Utilisateur créé');
+                return;
+            }
+
+            if (!user) {
+                response.statusCode = 500;
+                response.end('Erreur serveur');
+            }
         });
     });
 }
