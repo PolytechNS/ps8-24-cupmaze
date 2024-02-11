@@ -253,7 +253,6 @@ function wallLaid(event) {
     }
 }
 
-
 /** #############################################  MOVE PLAYER METHODS  ############################################# **/
 
 /**
@@ -266,10 +265,7 @@ function wallLaid(event) {
 function choosePositionToBegin(event) {
 
     socket.emit("choosePositionToBegin", event.target.id);
-    console.log("choosePositionToBegin", event.target.id);
-    console.log("choosePositionToBegin");
     socket.on("beginningPositionIsValid", (res) => {
-        console.log("beginningPositionIsValid");
         if (!res) {
             alert("Vous devez commencez par la première ligne");
             return;
@@ -369,6 +365,7 @@ function movePlayer(event) {
         }else{
             alert("Mouvement non autorisé");
         }
+        socket.off("isNewMoveHumanIsPossible");
     });
 
     /*if (clickedCell.classList.contains("possible-move") && actionsToDo===1) {

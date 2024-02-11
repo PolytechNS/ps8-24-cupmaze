@@ -8,7 +8,6 @@ function getPossibleMoves(playerPosition, elements) {
     const possibleMoves = [];
     const column = playerPosition[1];
     const line = playerPosition[0];
-    console.log("playerPosition", playerPosition);
     if (playerPosition === null) { return null; }
 
     function checkMove(newLine, newColumn, possibleMoves, direction) {
@@ -21,7 +20,6 @@ function getPossibleMoves(playerPosition, elements) {
             utils.findWall(Math.min(line, newLine), column, "horizontal", elements);
 
         const cell = utils.findCase(newLine, newColumn, elements);
-        console.log("cell", cell);
         if (!wall || !wall.isLaid) {
             if (cell.isOccupied) {
                 const jumpCell = findJumpCell(newLine, newColumn, direction, elements);

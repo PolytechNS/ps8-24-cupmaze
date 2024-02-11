@@ -82,16 +82,13 @@ function createSocket(server) {
 
             gameNamespace.emit("numberTour", numberTour, possibleMoves);
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
-            console.log("newAIPosition", newAIPosition);
             if (newAIPosition instanceof Case) {
                 newAIPosition = [newAIPosition.getPos_x(), newAIPosition.getPos_y()]
             }
             game.currentPlayer = 2
             game.actionsToDo = 1;
             const cellId = newAIPosition[0] + "-" + newAIPosition[1] + "~cell";
-            console.log("cellId", cellId);
             if(game.actionsToDo === 1){
-                console.log("actionsBot", game.actionsToDo);
                 gameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
                 game.playerPosition.player2 = newAIPosition;
                 game.actionsToDo=0;
