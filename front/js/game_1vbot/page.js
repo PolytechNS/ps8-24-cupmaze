@@ -1,33 +1,13 @@
-import { extractWallInfo, findAdjacentWall, findAdjacentSpace, highlightElements, removeHighlight, updateNumberAction } from "../game_local_1v1/utils.js";
-import {beginningPositionIsValid,getPossibleMoves} from "../game_local_1v1/movePlayerReferee.js";
+import { extractWallInfo, highlightElements, removeHighlight} from "../game_local_1v1/utils.js";
+import {beginningPositionIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
-import {isWallPlacementValid,updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
+import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
 
 let socket;
-
-let currentPlayer = 1;
-let nbWallsPlayer1 = 10;
-let nbWallsPlayer2 = 10;
-let actionsToDo = 1;
-
 let lastActionType = "";
-
-let numberTour = 1;
-
 let victoryAnswer = "";
-
-const playerPositions = {
-    player1: null,
-    player2: null
-};
-
-let lastPlayerPositions = {
-    player1 : null,
-    player2 : null
-}
-
 let board;
 let possibleMoves=[];
 document.addEventListener("DOMContentLoaded", main);
@@ -53,9 +33,9 @@ function main() {
     initializeTable();
 
     //Mettre le brouillard de guerre
-    setVisionForPlayer(currentPlayer,playerPositions);
+    setVisionForPlayer(1, {player1: null, player2: null});
     //On setup les différents textes nécessaires
-    setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
+    setUpNewRound(1,10,10,1);
 }
 
 /*
@@ -452,7 +432,7 @@ function movePlayer(event) {
     socket.on("isNewMoveHumanIsPossible", (isPossible, lastPosition, newPosition) => {
         if(isPossible){
             console.log("move valid");
-            if(lastPosition!==null) removePlayerCircle(lastPosition, currentPlayer);
+            if(lastPosition!==null) removePlayerCircle(lastPosition, 1);
             console.log("allo");
             addPlayerCircle(target, 1);
             lastActionType = "position";
@@ -535,27 +515,6 @@ function undoAction(){
         });
     }
 }
-
-function undoLayingWall(wall){
-    let firstWall=document.getElementById(wall[1]);
-    let space=document.getElementById(wall[2]);
-    let secondWall=document.getElementById(wall[3]);
-
-    //Remove classes used for coloring
-    firstWall.classList.remove("wall-laid","laidBy"+currentPlayer);
-    space.classList.remove("wall-laid","laidBy"+currentPlayer);
-    secondWall.classList.remove("wall-laid","laidBy"+currentPlayer);
-
-    //Add back eventListeners
-    firstWall.addEventListener("mouseenter",wallListener);
-    firstWall.addEventListener("click",wallLaid);
-
-    secondWall.addEventListener("mouseenter",wallListener);
-    secondWall.addEventListener("click",wallLaid);
-}
-
-
-
 /**UTILS **/
 function showButtonVisible(){
     document.getElementById("button-validate-action").style.display = "flex";
