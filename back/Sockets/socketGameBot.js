@@ -21,6 +21,10 @@ function createSocket(server) {
             gameNamespace.emit("updatedBoard", newPosition);
         });
 
+        socket.on("saveGame", (msg)=>{
+
+        })
+
         socket.on("disconnect", () => {
             console.log("user disconnected");
         });
