@@ -1,5 +1,6 @@
 const { createUser, getUser, createGame, getGame } = require('../database/mongo');
 
+
 const jwt = require('jsonwebtoken');
 
 // Main method, exported at the end of the file. It's the one that will be called when a REST request is received.
@@ -7,7 +8,8 @@ function manageRequest(request, response) {
     let url = new URL(request.url, `http://localhost:8000`);
     // on split le pathname pour récupérer le premier élément qui est l'endpoint
     // par exemple dans http://localhost:8000/users, on récupère "users"
-    let endpoint = url.pathname.split('/')[1];
+
+    let endpoint = url.pathname.split('/')[2];
 
     // quand on a recupéré l'endpoint, on appelle la méthode correspondante, par exemple:
     // quand tu veut t'inscrire tu te rend a https://localhost:8000/signup
@@ -89,11 +91,16 @@ function login(request, response) {
             }
 
             // generate token
-            let token = jwt.sign({ email: user.email}, 'secret');
+
+            let token = jwt.sign({ email: user.email}, 'secret', { expiresIn: '2h' });
+            console.log(token);
+            token = JSON.stringify(token);
+            response.setHeader('Set-Cookie', token);
+            response.setHeader("Nameaccount", user.username);
 
             // on envoie un token
-            response.statusCode = 200;
-            response.end('Token');
+            response.writeHead(200, {'Content-Type': 'text/plain'});
+            response.end('Token envoyé et sauvegardé dans le cookie.');
         });
     });
 }
@@ -116,8 +123,6 @@ function saveGame(request, response) {
         savingGame(body.game, response);
     })
 }
-
-
 /*----------------------------------------*/
 
 // methode pour parser le body de la requete ca sera plus simple pour le traitement
