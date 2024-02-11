@@ -15,7 +15,10 @@ class Game {
             player1: null,
             player2: null
         };
-        this.lastPlayerPosition = [null, null];
+        this.lastPlayerPosition = {
+            player1: null,
+            player2: null
+        };
         this.elements = [];
         this.lastActionType = "";
         this.init();
@@ -81,9 +84,17 @@ class Game {
     }
 
     movePlayer(number, caseWanted, playerCurrentPosition) {
+
+        console.log("ancientV1", this.lastPlayerPosition[`player${number}`])
+        console.log("movePlayerV1", this.playerPosition[`player${number}`])
+
         const coordinates = [caseWanted.getPos_x(), caseWanted.getPos_y()];
-        this.lastPlayerPosition[number - 1] = playerCurrentPosition;
+        this.lastPlayerPosition[`player${number}`] = this.playerPosition[`player${number}`];
         this.playerPosition[`player${number}`] = coordinates
+
+        console.log("ancientV2", this.lastPlayerPosition[`player${number}`])
+        console.log("movePlayerV2", this.playerPosition[`player${number}`])
+
         //return getPossibleMoves(playerPosition, this.elements);
     }
 

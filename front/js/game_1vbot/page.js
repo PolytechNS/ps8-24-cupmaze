@@ -329,6 +329,7 @@ function choosePositionToBegin(event) {
     socket.on("currentPlayer", (currentPlayer, playerposition) => {
         console.log("currentPlayer");
         addPlayerCircle(event.target, currentPlayer);
+        lastActionType = "position";
         if (playerposition) {
             const cells = document.querySelectorAll(".cell");
             cells.forEach(cell => {
@@ -435,35 +436,37 @@ function movePlayer(event) {
  * Si la dernière action est la mouvement d'un pion, alors on va regarder dans les données sauvegardées au début du tour pour replacer le pion correctement
  */
 function undoAction(){
-    //On remet le nombre d'actions à 1
-    actionsToDo=1;
-    updateNumberAction(1);
-
     //On re-cache les boutons
     document.getElementById("button-validate-action").style.display = "none";
     document.getElementById("button-undo-action").style.display = "none";
 
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
-        document.getElementById(playerPositions["player"+currentPlayer]).innerHTML = "";
-        document.getElementById(playerPositions["player"+currentPlayer]).classList.remove("occupied");
-        playerPositions["player"+currentPlayer] = lastPlayerPositions["player"+currentPlayer];
-        if(numberTour===1){
-            const cells = document.querySelectorAll(".cell");
-            cells.forEach(cell => {
-                cell.removeEventListener("click", movePlayer);
-                cell.addEventListener("click", choosePositionToBegin);
-            });
+        socket.emit("undoMovePosition");
+        socket.on("undoMove", (oldPosition, newPosition, currentPlayer, numberTourGame) => {
+            console.log("undoMove", oldPosition, newPosition, currentPlayer, numberTourGame);
+            removePlayerCircle(oldPosition, currentPlayer);
+            if(newPosition!==""){
+                let cell = document.getElementById(newPosition);
+                addPlayerCircle(cell, currentPlayer);
+            }
+            if(numberTourGame===1){
+                const cells = document.querySelectorAll(".cell");
+                cells.forEach(cell => {
+                    cell.removeEventListener("click", movePlayer);
+                    cell.addEventListener("click", choosePositionToBegin);
+                });
 
-            const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-            walls.forEach(wall=>{
-                wall.removeEventListener("mouseenter",wallListener);
-                wall.removeEventListener("click",wallLaid);
-            })
+                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+                walls.forEach(wall=>{
+                    wall.removeEventListener("mouseenter",wallListener);
+                    wall.removeEventListener("click",wallLaid);
+                })
 
-        }else{ //Si on est pas dans le premier tour
-            addPlayerCircle(document.getElementById(lastPlayerPositions["player"+currentPlayer]),currentPlayer);
-        }
+            }
+            socket.off("undoMove");
+        });
+
     }else{ //Si la dernière action la placement d'un mur
         if(currentPlayer === 1) nbWallsPlayer1++;
         else nbWallsPlayer2++;
