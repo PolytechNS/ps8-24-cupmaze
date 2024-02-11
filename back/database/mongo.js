@@ -32,6 +32,9 @@ async function createUser(user) {
 async function getUser(email) {
   const db = await getDb();
   const users = db.collection('users');
+  users.countDocuments().then((count) => {
+    console.log(`Il y a ${count} utilisateurs dans la collection 'users'.`);
+  });
   return users.findOne({ email: email });
 }
 
@@ -63,7 +66,30 @@ async function getGame(userEmail) {
   return games.findOne({ userEmail: userEmail });
 }
 
+async function clearGames(userEmail){
+  const db = await getDb();
+  console.log(userEmail);
+  if (db) {
+    console.log("La base de données 'test' a été retrouvée avec succès.");
+  } else {
+    console.log("Erreur: La base de données 'test' n'a pas été retrouvée.");
+  }
+  const games = db.collection('games');
+  if (games) {
+    console.log("La collection 'games' a été retrouvée avec succès.");
+  }
+  games.countDocuments().then((count) => {
+    console.log(`Il y a ${count} parties dans la collection 'games'.`);
+  });
+  await games.deleteMany({userEmail: userEmail });
+  games.countDocuments().then((count) => {
+    console.log(`Il y a ${count} parties dans la collection 'games'.`);
+  });
+  return userEmail;
+}
+
 exports.createUser = createUser;
 exports.getUser = getUser;
 exports.createGame = createGame;
 exports.getGame = getGame;
+exports.clearGames = clearGames;
