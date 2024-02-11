@@ -81,8 +81,9 @@ class Game {
     }
 
     movePlayer(number, caseWanted, playerCurrentPosition) {
-        this.playerPosition[number - 1] = caseWanted;
+        const coordinates = [caseWanted.getPos_x(), caseWanted.getPos_y()];
         this.lastPlayerPosition[number - 1] = playerCurrentPosition;
+        this.playerPosition[`player${number}`] = coordinates
         //return getPossibleMoves(playerPosition, this.elements);
     }
 

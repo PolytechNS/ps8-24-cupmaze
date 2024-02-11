@@ -114,9 +114,10 @@ function createSocket(server) {
             game.lastPlayerPosition = game.playerPosition;
 
             if (numberTour > 1) {
+                console.log("playerPosition", playerPosition);
                 possibleMoves = game.getPossibleMoves(playerPosition.player1);
             }
-
+            console.log("updateRound");
             gameNamespace.emit("updateRound",
                 possibleMoves, numberTour,
                 playerPosition, currentplayer,
