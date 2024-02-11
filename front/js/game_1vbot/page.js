@@ -50,7 +50,7 @@ function main() {
     //On ajoute un event listener pour enregistrer une partie
     document.getElementById("button-save-game").addEventListener("click",saveGame);
 
-    board_Info = initializeTable();
+    initializeTable();
 
     //Mettre le brouillard de guerre
     setVisionForPlayer(currentPlayer,playerPositions);
