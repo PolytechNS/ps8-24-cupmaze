@@ -120,8 +120,8 @@ function validateRound() {
         }
         socket.off("numberTour");
     });
-    console.log("validateRound");
     socket.on("positionAI", (AIPosition, currentplayer,playerPosition) => {
+        console.log("debug positionAI");
         console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
         if (playerPosition["player2"] !== null){
             const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
@@ -132,7 +132,6 @@ function validateRound() {
         let circle_bot = document.getElementById(AIPosition);
         console.log("circle_bot", circle_bot);
         addPlayerCircle(circle_bot, currentplayer);
-        console.log("fin socket");
         socket.off("newAIPosition");
     });
     socket.on("gameOver", (winner) => {
