@@ -6,6 +6,10 @@ const { findWall, findAdjacentWall, findAdjacentSpace,  removeHighlight } = requ
 const { isWallPlacementValid } = require("../logic/wallLayingUtils.js");
 const { Wall } = require("../logic/Wall");
 const {beginningPositionIsValid} = require("../logic/movePlayerReferee");
+const {isWallPlacementValid} = require("../logic/wallLayingUtils");
+const {Wall} = require("../logic/Wall");
+const {findWall, findSpace, findAdjacentWall, highlightElements} = require("../logic/utils");
+const {removeHighlight, findAdjacentSpace} = require("../logic/utils");
 
 /**
  * Cette fonction va servir pour pouvoir créer le socket qui correspond à quand on va vouloir initialiser une partie entre le bot et un joueur en local
@@ -130,6 +134,9 @@ function createSocket(server) {
                 possibleMoves = game.getPossibleMoves(playerPosition.player1);
             }
             console.log("updateRound");
+            console.log("possibleMoves", possibleMoves);
+            console.log("playerPosition", playerPosition);
+            console.log("action", game.actionsToDo);
             gameNamespace.emit("updateRound",
                 possibleMoves, numberTour,
                 playerPosition, currentplayer,
@@ -137,9 +144,12 @@ function createSocket(server) {
         });
 
         socket.on("wallListener", (firstWallToColor, wallType, wallPosition) => {
+            console.log("wallListener", firstWallToColor, wallType, wallPosition);
             const x = parseInt(wallPosition[0]);
             const y = parseInt(wallPosition[1]);
             let wallInclinaison;
+            console.log("wallType", wallType);
+          
             if (firstWallToColor === null) {
                 console.log("vide");
                 return;
@@ -147,6 +157,7 @@ function createSocket(server) {
             if (wallType === "wv") { wallInclinaison = "vertical"; }
             else { wallInclinaison = "horizontal"; }
             const wall = findWall(x,y, wallInclinaison, game.elements);
+
             let adjacentWall = findAdjacentWall(wall, game.elements);
             let adjacentSpace = findAdjacentSpace(wall, game.elements);
             console.log("wall", wall);
@@ -222,6 +233,7 @@ function createSocket(server) {
             socket.emit("idWallToUndo", game.lastWallLaidsIDHtml, 1, game.nbWallsPlayer1);
             game.undoWalls();
         });
+
     });
 }
 
