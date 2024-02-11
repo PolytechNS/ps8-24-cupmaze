@@ -6,6 +6,7 @@ const { getPossibleMoves } = require('./movePlayerReferee.js');
 
 class Game {
     constructor() {
+        this.userEmail = "";
         this.currentPlayer = 1;
         this.nbWallsPlayer1 = 10;
         this.nbWallsPlayer2 = 10;
@@ -25,6 +26,18 @@ class Game {
 
         this.lastWallsLaid = [];
         this.lastWallLaidsIDHtml = [];
+    }
+
+    assignGameContext({userEmail,currentPlayer,nbWallsPlayer1, nbWallsPlayer2, actionsToDo, numberTour, playerPosition, lastPlayerPosition, elements}) {
+        this.userEmail = userEmail;
+        this.currentPlayer = currentPlayer;
+        this.nbWallsPlayer1 = nbWallsPlayer1;
+        this.nbWallsPlayer2 = nbWallsPlayer2;
+        this.actionsToDo = actionsToDo;
+        this.numberTour = numberTour;
+        this.playerPosition = playerPosition;
+        this.lastPlayerPosition = lastPlayerPosition;
+        this.elements = elements;
     }
 
     init() {
@@ -135,6 +148,23 @@ class Game {
         this.lastWallLaidsIDHtml = [];
     }
 
+    setUserEmail(userEmail){
+        this.userEmail=userEmail;
+    }
+
+    toJSON() {
+        return {
+            userEmail: this.userEmail,
+            currentPlayer: this.currentPlayer,
+            nbWallsPlayer1: this.nbWallsPlayer1,
+            nbWallsPlayer2: this.nbWallsPlayer2,
+            actionsToDo: this.actionsToDo,
+            numberTour: this.numberTour,
+            playerPosition: this.playerPosition,
+            lastPlayerPosition: this.lastPlayerPosition,
+            elements: this.elements
+        };
+    }
     undoWalls(){
         for(let i=0; i!==this.lastWallsLaid.length; i++){
             this.lastWallsLaid[i].setIsLaid(false);

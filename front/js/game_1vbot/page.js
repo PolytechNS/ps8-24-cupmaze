@@ -47,7 +47,10 @@ function main() {
     //On ajoute un event listener pour undo l'action
     document.getElementById("button-undo-action").addEventListener("click",undoAction);
 
-    initializeTable();
+    //On ajoute un event listener pour enregistrer une partie
+    document.getElementById("button-save-game").addEventListener("click",saveGame);
+
+    board_Info = initializeTable();
 
     //Mettre le brouillard de guerre
     setVisionForPlayer(currentPlayer,playerPositions);
@@ -175,6 +178,31 @@ function isGameOver(){
         socket.off("gameOver");
         return false;
     });
+}
+
+function saveGame() {
+    let userEmail="";
+
+    // Récupérer tous les cookies
+    const cookies = document.cookie;
+
+    // Diviser les cookies en tableau de paires clé-valeur
+    const cookieArray = cookies.split('; ');
+
+    // Parcourir chaque paire clé-valeur pour obtenir les informations souhaitées
+    cookieArray.forEach(cookie => {
+        const [key, value] = cookie.split('=');
+        if(key==='Nameaccount') userEmail=value;
+        console.log(`Clé: ${key}, Valeur: ${value}`);
+    });
+    if(userEmail!=="") {
+        socket.emit("saveGame",userEmail);
+        socket.on("goBackToMenu",(isWentWell)=>{
+            alert("Partie sauvegardée avec succès !");
+            window.location.href = "http://localhost:8000/mainMenu.html";
+            socket.off("goBackToMenu");
+        });
+    }
 }
 
 /** #############################################  WALL LAYING METHODS  ############################################# **/
@@ -459,6 +487,8 @@ function undoAction(){
     //On re-cache les boutons
     document.getElementById("button-validate-action").style.display = "none";
     document.getElementById("button-undo-action").style.display = "none";
+    //On re-donne la possiblité de sauvegarder
+    document.getElementById("button-save-game").style.display = "flex";
 
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
@@ -530,4 +560,5 @@ function undoLayingWall(wall){
 function showButtonVisible(){
     document.getElementById("button-validate-action").style.display = "flex";
     document.getElementById("button-undo-action").style.display = "flex";
+    document.getElementById("button-save-game").style.display = "none";
 }

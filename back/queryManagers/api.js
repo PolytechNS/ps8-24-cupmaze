@@ -1,4 +1,4 @@
-const { createUser, getUser } = require('../database/mongo');
+const { createUser, getUser, createGame, getGame } = require('../database/mongo');
 
 const jwt = require('jsonwebtoken');
 
@@ -18,6 +18,9 @@ function manageRequest(request, response) {
             break;
         case 'login':
             login(request, response);
+            break;
+        case 'saveGame':
+            saveGame(request, response);
             break;
         default:
             response.statusCode = 404;

@@ -1,6 +1,7 @@
 const AIEasy = require("../logic/ai.js");
 const { Server } = require("socket.io");
 const { Game } = require("../logic/Game.js");
+const { getGame, createGame, clearGames} = require("../database/mongo");
 const { Case } = require("../logic/Case.js");
 const { findWall, findAdjacentWall, findAdjacentSpace,  removeHighlight } = require("../logic/utils");
 const { isWallPlacementValid } = require("../logic/wallLayingUtils.js");
@@ -24,6 +25,43 @@ function createSocket(server) {
             console.log("On demande à l'IA de jouer maintenant");
             let newPosition = AIEasy.computeMove(msg);
             gameNamespace.emit("updatedBoard", newPosition);
+        });
+
+        socket.on("saveGame", (msg)=>{
+            getGame(msg).then((savedGame) => {
+                if (savedGame) {
+                    // TODO si l'utilisateur a déjà une partie sauvegardée il faut voir s'il veut l'écraser ou pas
+                }
+                else {
+                    game.setUserEmail(msg);
+                    console.log("userEmail received was : " + msg)
+                    createGame(JSON.parse(JSON.stringify(game.toJSON()))).then(() => {
+                        socket.emit("goBackToMenu", true);
+                    });
+                }
+            });
+        });
+
+        socket.on("clearGames", (msg) => {
+            console.log("deleting all games for user "+msg);
+            clearGames(msg).then(()=>{
+                console.log("cleared all games");
+            })
+        });
+
+        socket.on("retrieveGame", (msg)=>{
+            getGame(msg).then((savedGame) => {
+                if (!savedGame) {
+                    console.log("No game found");
+                    // TODO si l'utilisateur n'a aucune une partie sauvegardée
+                }
+                else {
+                    console.log("Game was succesfully retrieved");
+                    game.assignGameContext(JSON.parse(JSON.stringify(savedGame)));
+                    console.log("Game was succesfully assigned to current game");
+                    socket.emit("launchSavedGame",true);
+                }
+            });
         });
 
         socket.on("disconnect", () => {
