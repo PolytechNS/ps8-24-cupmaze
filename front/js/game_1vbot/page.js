@@ -42,7 +42,6 @@ function main(isLoadGame) {
             socket.emit("loadGame");
         })
         socket.on("data",(data)=>{
-            console.log(data);
             let dataObject=JSON.parse(JSON.stringify(data));
             console.log(dataObject);
             initializeLoadTable(dataObject);
@@ -121,8 +120,6 @@ function initializeLoadTable(data) {
                 cell.classList.add("cell");
                 cell.addEventListener("click", choosePositionToBegin);
                 board.appendChild(cell);
-                if(element.isOccupied===true) cell.classList.add("occupied");
-                console.log(element);
                 break;
             case "wall":
                 if(element.inclinaison==="vertical") {
@@ -131,7 +128,6 @@ function initializeLoadTable(data) {
                     wall.classList.add("wall-vertical")
                     board.appendChild(wall);
                     if(element.isLaid) wall.classList.add("wall-laid");
-                    console.log(element);
                 }
                 else{
                     const wall = document.createElement("div");
@@ -139,7 +135,6 @@ function initializeLoadTable(data) {
                     wall.classList.add("wall-horizontal");
                     board.appendChild(wall);
                     if(element.isLaid) wall.classList.add("wall-laid");
-                    console.log(element);
                 }
                 break;
             case "space":
@@ -149,18 +144,33 @@ function initializeLoadTable(data) {
                 space.classList.add("space");
                 board.appendChild(space);
                 if(element.isLaid) space.classList.add("wall-laid");
-                console.log(element);
                 break;
             default:
                 console.log("Unexpected Element");
         }
     })
+    let playerCell= data.playerPosition.player1!==null?
+        document.getElementById(data.playerPosition.player1[0]+"-"+data.playerPosition.player1[1]+"~cell"):null;
+    console.log(playerCell);
+    if(playerCell) {
+        {
+            addPlayerCircle(playerCell, 1);
+            playerCell.classList.add("occupied");
+        }
+    }
+    let botCell= data.playerPosition.player2!==null?
+        document.getElementById(data.playerPosition.player2[0]+"-"+data.playerPosition.player2[1]+"~cell"):null;
+    console.log(botCell)
+    if(botCell && parseInt(botCell.visibility)<=0) {
+        addPlayerCircle(botCell, 1);
+        botCell.classList.add("occupied");
+    }
 }
 
 function getNatureOfElement(element){
-    if(element.isOccupied!==null) return "case";
-    if(element.isLaid!=null){
-        if (element.inclinaison!==null) return "wall";
+    if(element.hasOwnProperty("isOccupied")) return "case";
+    if(element.hasOwnProperty("isLaid")){
+        if (element.hasOwnProperty("inclinaison")) return "wall";
         return "space";
     }
 }
