@@ -149,7 +149,9 @@ function createSocket(server) {
             const wall = findWall(x,y, wallInclinaison, game.elements);
             let adjacentWall = findAdjacentWall(wall, game.elements);
             let adjacentSpace = findAdjacentSpace(wall, game.elements);
-
+            console.log("wall", wall);
+            console.log("adjacentSpace", adjacentSpace);
+            console.log("adjacentWall", adjacentWall);
             if (isWallPlacementValid(wall, adjacentWall, adjacentSpace) === false) {
                 //removeHighlight(firstWallToColor, adjacentWall, adjacentSpace);
                 gameNamespace.emit("highlightElements", null, null);
