@@ -22,6 +22,9 @@ class Game {
         this.elements = [];
         this.lastActionType = "";
         this.init();
+
+        this.lastWallsLaid = [];
+        this.lastWallLaidsIDHtml = [];
     }
 
     init() {
@@ -121,8 +124,21 @@ class Game {
                 }
             }
         }
-
+        this.lastWallsLaid = [firstCase, secondCase, space];
     }
+
+    clearWallsAfterRoundEnd(){
+        this.lastWallsLaid = [];
+        this.lastWallLaidsIDHtml = [];
+    }
+
+    undoWalls(){
+        for(let i=0; i!==this.lastWallsLaid.length; i++){
+            this.lastWallsLaid[i].setIsLaid(false);
+        }
+    }
+
+
 }
 
 module.exports = { Game };

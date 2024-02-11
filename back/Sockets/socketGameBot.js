@@ -166,8 +166,12 @@ function createSocket(server) {
             }
         });
 
-        socket.on("wallLaid",(firstWallToColor, wallType, wallPosition) => {
+        socket.on("wallLaid",(firstWallToColor, wallType, wallPosition, wallId) => {
             console.log("wallLaid", firstWallToColor, wallType, wallPosition);
+
+            let adjacentWallId = null;
+            let adjacentSpaceId = null;
+
             const x = parseInt(wallPosition[0]);
             const y = parseInt(wallPosition[1]);
             let wallInclinaison;
@@ -206,7 +210,15 @@ function createSocket(server) {
                     gameNamespace.emit("laidWall", adjacentWallId, adjacentSpaceId, wallType, game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
                 }
             }
-            game.actionsToDo = 1;
+            game.actionsToDo=1;
+            game.lastWallLaidsIDHtml = [wallId, adjacentWallId, adjacentSpaceId];
+        });
+
+        socket.on("undoWall", () => {
+            game.actionsToDo=1;
+            game.nbWallsPlayer1++;
+            socket.emit("idWallToUndo", game.lastWallLaidsIDHtml, 1, game.nbWallsPlayer1);
+            game.undoWalls();
         });
     });
 }

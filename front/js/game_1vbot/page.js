@@ -244,7 +244,7 @@ function wallLaid(event) {
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
 
-    socket.emit("wallLaid", firstWallToColor, wallType, wallPosition);
+    socket.emit("wallLaid", firstWallToColor, wallType, wallPosition, wallId);
     socket.on("laidWall", (secondWallToColor, spaceToColor, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
         if (secondWallToColor === null) {
             return;
@@ -263,6 +263,7 @@ function wallLaid(event) {
         showButtonVisible();
         updateNumberWallsDisplay(currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
         socket.off("laidWall");
+        lastActionType="wall";
     });
     /*
     // la on va chercher les mur a colorier et l'espace entre les murs a colorier
@@ -470,14 +471,21 @@ function undoAction(){
         });
 
     }else{ //Si la dernière action la placement d'un mur
-        if(currentPlayer === 1) nbWallsPlayer1++;
-        else nbWallsPlayer2++;
+        socket.emit("undoWall");
+        socket.on("idWallToUndo", (tabIDHTML, player, numberWall) => {
+            document.getElementById(tabIDHTML[0]).classList.remove("wall-laid","laidBy"+player);
+            document.getElementById(tabIDHTML[0]).addEventListener("mouseenter",wallListener);
+            document.getElementById(tabIDHTML[0]).addEventListener("click",wallLaid);
 
-        //On parle la string pour récupérer les id des 3 murs que l'on va devoir remettre en "normal"
-        undoLayingWall(lastActionType.split(" "));
+            document.getElementById(tabIDHTML[1]).classList.remove("wall-laid","laidBy"+player);
+            document.getElementById(tabIDHTML[1]).addEventListener("mouseenter",wallListener);
+            document.getElementById(tabIDHTML[1]).addEventListener("click",wallLaid);
 
-        //On update la phrase affichée sur le site
-        updateNumberWallsDisplay(currentPlayer,nbWallsPlayer1,nbWallsPlayer2);
+            document.getElementById(tabIDHTML[2]).classList.remove("wall-laid","laidBy"+player);
+
+            updateNumberWallsDisplay(1, numberWall, null)
+            socket.off("undoLayingWall");
+        });
     }
 }
 
