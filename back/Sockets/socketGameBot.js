@@ -2,6 +2,9 @@ const AIEasy = require("../logic/ai.js");
 const { Server } = require("socket.io");
 const { Game } = require("../logic/Game.js");
 const { Case } = require("../logic/Case.js");
+const { findWall, findAdjacentWall, findAdjacentSpace,  removeHighlight } = require("../logic/utils");
+const { isWallPlacementValid } = require("../logic/wallLayingUtils.js");
+const { Wall } = require("../logic/Wall");
 const {beginningPositionIsValid} = require("../logic/movePlayerReferee");
 
 /**
@@ -130,6 +133,38 @@ function createSocket(server) {
                 possibleMoves, numberTour,
                 playerPosition, currentplayer,
                 nbWallsPlayer1, nbWallsPlayer2);
+        });
+
+        socket.on("wallListener", (firstWallToColor, wallType, wallPosition) => {
+            console.log("wallListener", firstWallToColor, wallType, wallPosition);
+            const x = parseInt(wallPosition[0]);
+            const y = parseInt(wallPosition[1]);
+            let wallInclinaison;
+            console.log("wallType", wallType);
+            if (firstWallToColor === null) {
+                console.log("vide");
+                return;
+            }
+            if (wallType === "wv") { wallInclinaison = "vertical"; }
+            else { wallInclinaison = "horizontal"; }
+            const wall = findWall(x,y, wallInclinaison, game.elements);
+            console.log("wall", wall);
+            let adjacentWall = findAdjacentWall(wall, game.elements);
+            console.log("wall", adjacentWall);
+            let adjacentSpace = findAdjacentSpace(wall, game.elements);
+            console.log("space", adjacentSpace);
+
+            if (isWallPlacementValid(wallType, wallPosition, game.elements) === false) {
+                removeHighlight(firstWallToColor, adjacentWall, adjacentSpace);
+                gameNamespace.emit("highlightElements", null, null);
+                return;
+            }
+
+            //highlightElements(firstWallToColor, adjacentWall, space);
+
+            adjacentSpaceId = adjacentSpace.pos_x + "-" + adjacentSpace.pos_y + "-space";
+            adjacentWallId = wallType + "~" + adjacentWall.pos_x + "-" + adjacentWall.pos_y;
+            gameNamespace.emit("highlightElements", adjacentWall, adjacentSpace, adjacentWallId, adjacentSpaceId);
         });
     });
 }
