@@ -11,17 +11,27 @@
     <button id="button-launch-localGame">Lancer une partie locale</button>
     <button id="button-retrieveGame">Récupérer la dernière partie sauvegardée</button>
 
+    <script src="./js/socket.io.js"></script>
     <script>
+        let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+        let socket=io("/api/game");
+        //if(username==="saveGame")socket.emit("clearGames",username);
         document.getElementById('button-launch-botGame').addEventListener('click', function() {
             window.location.href = 'http://localhost:8000/botgame.html';
         });
         document.getElementById('button-launch-localGame').addEventListener('click', function() {
             window.location.href = 'http://localhost:8000/index.html'; //Changer le nom de index.html
         });
-        /*document.getElementById('button-retrieveGame').addEventListener('click', function() {
-            window.location.href = 'http://localhost:8000/retrievegame.html';
-        });*/
-        let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+        document.getElementById('button-retrieveGame').addEventListener('click', function() {
+            socket.emit("retrieveGame",username);
+            socket.on("launchSavedGame",(msg)=>{
+                if(msg!==true)alert("sorry no game found");
+                else alert("retrieving game");
+                console.log("Move to new page");
+                window.location.href = 'http://localhost:8000/botgame.html';
+                socket.off("launchSavedGame");
+            })
+        });
         console.log(username);
         document.getElementById('nameCurrentPlayer').innerText = "Bienvenue "+username+" :";
     </script>
