@@ -27,8 +27,8 @@ class Wall{
     }
 
     equals(wall){
-        return this.pos_x === wall.getPos_x() && this.pos_y === wall.getPos_y() && this.inclinaison === wall.getInclinaison();
+        return this.pos_x === wall.pos_x && this.pos_y === wall.pos_y && this.inclinaison === wall.inclinaison;
     }
 }
 
-module.exports = { Wall };
+module.exports = { Wall};
