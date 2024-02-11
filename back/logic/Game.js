@@ -29,7 +29,10 @@ class Game {
             for (let j = 0; j < 9; j++) {
                 //ajoute case, mur et à la fin on doit juste finir sur case
                 this.elements.push(new Case(i, j, false));
-                if(i<8) this.elements.push(new Wall(i, j, false, "vertical"));
+                if(j<8) {
+                    console.log("wall vertical", i, j);
+                    this.elements.push(new Wall(i, j, false, "vertical"));
+                }
             }
             for(let j = 0; j < 9; j++){
                 this.elements.push(new Wall(i, j, false, "horizontal"));
