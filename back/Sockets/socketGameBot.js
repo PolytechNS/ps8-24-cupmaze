@@ -6,10 +6,6 @@ const { findWall, findAdjacentWall, findAdjacentSpace,  removeHighlight } = requ
 const { isWallPlacementValid } = require("../logic/wallLayingUtils.js");
 const { Wall } = require("../logic/Wall");
 const {beginningPositionIsValid} = require("../logic/movePlayerReferee");
-const {isWallPlacementValid} = require("../logic/wallLayingUtils");
-const {Wall} = require("../logic/Wall");
-const {findWall, findSpace, findAdjacentWall, highlightElements} = require("../logic/utils");
-const {removeHighlight, findAdjacentSpace} = require("../logic/utils");
 
 /**
  * Cette fonction va servir pour pouvoir créer le socket qui correspond à quand on va vouloir initialiser une partie entre le bot et un joueur en local
