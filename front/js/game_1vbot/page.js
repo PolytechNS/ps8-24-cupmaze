@@ -30,10 +30,13 @@ let lastPlayerPositions = {
 
 let board;
 let possibleMoves=[];
-document.addEventListener("DOMContentLoaded", main);
+const intent = window.location.search.split("=")[1];
+console.log(intent);
+document.addEventListener("DOMContentLoaded", main(intent));
 
 
-function main() {
+
+function main(isLoadGame) {
     socket = io("/api/game");
 
     board = document.getElementById("grid");
@@ -50,12 +53,33 @@ function main() {
     //On ajoute un event listener pour enregistrer une partie
     document.getElementById("button-save-game").addEventListener("click",saveGame);
 
-    initializeTable();
-
-    //Mettre le brouillard de guerre
-    setVisionForPlayer(currentPlayer,playerPositions);
-    //On setup les différents textes nécessaires
-    setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
+    if(isLoadGame){
+        let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+        socket.emit("retrieveGame",username);
+        socket.on("launchSavedGame",(msg)=>{
+            if(msg!==true)alert("sorry no game found");
+            else alert("retrieving game");
+            socket.emit("loadGame");
+        })
+        socket.on("data",(data)=>{
+            console.log(data);
+            let dataObject=JSON.parse(JSON.stringify(data));
+            console.log(dataObject);
+            initializeLoadTable(dataObject);
+            //Mettre le brouillard de guerre
+            setVisionForPlayer(dataObject.currentPlayer,dataObject.playerPosition);
+            //On setup les différents textes nécessaires
+            setUpNewRound(dataObject.currentPlayer,dataObject.nbWallsPlayer1,dataObject.nbWallsPlayer2,dataObject.numberTour);
+            socket.off("data");
+        })
+    }
+    else{
+        initializeTable();
+        //Mettre le brouillard de guerre
+        setVisionForPlayer(currentPlayer,playerPositions);
+        //On setup les différents textes nécessaires
+        setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour);
+    }
 }
 
 /*
@@ -101,6 +125,62 @@ function initializeTable() {
                 board.appendChild(space);
             }
         }
+    }
+}
+
+function initializeLoadTable(data) {
+    data.elements.forEach((element)=>{
+        let i=element.pos_x;
+        let j=element.pos_y;
+        switch (getNatureOfElement(element)){
+            case "case":
+                const cellId = i + "-" + j;
+                const cell = document.createElement("div");
+                cell.id = cellId+"~cell";
+                cell.classList.add("cell");
+                cell.addEventListener("click", choosePositionToBegin);
+                board.appendChild(cell);
+                if(element.isOccupied===true) cell.classList.add("occupied");
+                console.log(element);
+                break;
+            case "wall":
+                if(element.inclinaison==="vertical") {
+                    const wall = document.createElement("div");
+                    wall.id = "wv~" + i + "-" + j;
+                    wall.classList.add("wall-vertical")
+                    board.appendChild(wall);
+                    if(element.isLaid) wall.classList.add("wall-laid");
+                    console.log(element);
+                }
+                else{
+                    const wall = document.createElement("div");
+                    wall.id = "wh~" + i + "-" + j;
+                    wall.classList.add("wall-horizontal");
+                    board.appendChild(wall);
+                    if(element.isLaid) wall.classList.add("wall-laid");
+                    console.log(element);
+                }
+                break;
+            case "space":
+                const spaceId = i + "-" + j;
+                const space = document.createElement("div");
+                space.id = spaceId+"-space";
+                space.classList.add("space");
+                board.appendChild(space);
+                if(element.isLaid) space.classList.add("wall-laid");
+                console.log(element);
+                break;
+            default:
+                console.log("Unexpected Element");
+        }
+    })
+}
+
+function getNatureOfElement(element){
+    if(element.isOccupied!==null) return "case";
+    if(element.isLaid!=null){
+        if (element.inclinaison!==null) return "wall";
+        return "space";
     }
 }
 
@@ -196,11 +276,17 @@ function saveGame() {
         console.log(`Clé: ${key}, Valeur: ${value}`);
     });
     if(userEmail!=="") {
+        console.log("Saving game for "+userEmail);
         socket.emit("saveGame",userEmail);
         socket.on("goBackToMenu",(isWentWell)=>{
-            alert("Partie sauvegardée avec succès !");
-            window.location.href = "http://localhost:8000/mainMenu.html";
-            socket.off("goBackToMenu");
+            if(isWentWell!==true){
+                alert("Sth went wrong");
+            }
+            else{
+                alert("Partie sauvegardée avec succès !");
+                window.location.href = "http://localhost:8000/mainMenu.html";
+                socket.off("goBackToMenu");
+            }
         });
     }
 }
