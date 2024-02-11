@@ -2,7 +2,6 @@ export {removePlayerCircle, addPlayerCircle};
 
 // fonction pour effacer l'anncienne position du joueur
 function removePlayerCircle(oldPosition,currentPlayer) {
-    console.log("caca");
     const oldCell = document.getElementById(oldPosition);
     oldCell.classList.remove("occupied");
     // ne pas mettre firstChild car je veut juste retirer
@@ -12,12 +11,12 @@ function removePlayerCircle(oldPosition,currentPlayer) {
     if(playerCircle) oldCell.removeChild(playerCircle);
 }
 
-function addPlayerCircle(newPosition,currentPlayer) {
-    console.log(newPosition);
+function addPlayerCircle(cellTarget,currentPlayer) {
+    console.log(cellTarget.id);
     const circle = document.createElement("div");
     circle.classList.add("player" + currentPlayer + "-circle");
     circle.id="player" + currentPlayer + "-circle";
-    const cell = document.getElementById(newPosition);
-    cell.classList.add("occupied");
-    cell.appendChild(circle);
+    //const cell = document.getElementById(newPosition);
+    cellTarget.classList.add("occupied");
+    cellTarget.appendChild(circle);
 }

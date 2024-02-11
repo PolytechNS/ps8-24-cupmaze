@@ -123,7 +123,7 @@ function validateRound() {
     console.log("validateRound");
     socket.on("positionAI", (AIPosition, currentplayer,playerPosition) => {
         console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
-        if (AIPosition !== null) removePlayerCircle(playerPosition, currentplayer);
+        if (playerPosition["player2"] !== null) removePlayerCircle(playerPosition, currentplayer);
         let circle_bot = document.getElementById(AIPosition);
         addPlayerCircle(circle_bot, currentplayer);
         socket.off("newAIPosition");
@@ -259,7 +259,6 @@ function wallLaid(event) {
  */
 function choosePositionToBegin(event) {
 
-
     socket.emit("choosePositionToBegin", event.target.id);
     console.log("choosePositionToBegin", event.target.id);
     console.log("choosePositionToBegin");
@@ -296,7 +295,7 @@ function choosePositionToBegin(event) {
         }
         socket.off("currentPlayer");
     });
-    updateDueToAction();
+    showButtonVisible();
 }
 /*
     const clickedCell = event.target;

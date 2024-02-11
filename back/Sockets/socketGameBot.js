@@ -36,13 +36,14 @@ function createSocket(server) {
             let possibleMoves = await game.getPossibleMoves(game.getPlayerCurrentPosition(1));
             let caseWanted = await game.getCase(positionY, positionX);
             let isPossible = possibleMoves.includes(caseWanted);
-            if (isPossible){
+            if (isPossible) {
                 let saveOldPosition = game.getPlayerCurrentPosition(1);
                 game.movePlayer(1, caseWanted, game.getPlayerCurrentPosition(1));
                 if (saveOldPosition !== null) gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, saveOldPosition.translateHTMLCase(), game.getPlayerCurrentPosition(1).translateHTMLCase());
                 else gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, null, game.getPlayerCurrentPosition(1).translateHTMLCase());
             }
-          
+        });
+
         socket.on("choosePositionToBegin", (cellId) => {
             console.log("choosePositionToBegin", cellId);
             const x = parseInt(cellId.split("-")[0]);
@@ -82,8 +83,8 @@ function createSocket(server) {
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
             game.currentPlayer = 2
             console.log("newAIPosition", newAIPosition);
-            const cellId = newAIPosition[0] + "-" + newAIPosition[1]+"~cell";
-            gameNamespace.emit("positionAI", cellId,game.currentPlayer,playerPosition);
+            const cellId = newAIPosition[0] + "-" + newAIPosition[1] + "~cell";
+            gameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
             game.playerPosition.player2 = newAIPosition;
 
             // on verifie si la partie est finie

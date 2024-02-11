@@ -9,7 +9,6 @@ function getPossibleMoves(playerPosition, elements) {
     const line = playerPosition.getPos_x();
     const column = playerPosition.getPos_y();
     if (playerPosition === null) { return null; }
-    const [line, column] = playerPosition;
 
     function checkMove(newLine, newColumn, possibleMoves, direction) {
         if (newLine < 0 || newLine > 8 || newColumn < 0 || newColumn > 8) {
