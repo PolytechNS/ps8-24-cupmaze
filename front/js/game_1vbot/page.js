@@ -48,6 +48,10 @@ function main() {
     //On ajoute un event listener pour undo l'action
     document.getElementById("button-undo-action").addEventListener("click",undoAction);
 
+    //On ajoute un event listener pour enregistrer une partie
+    document.getElementById("button-save-game").addEventListener("click",saveGame);
+
+
     board_Info = initializeTable();
 
     //Mettre le brouillard de guerre
@@ -192,6 +196,10 @@ function isGameOver(){
         }
     }
     return false;
+}
+
+function saveGame() {
+    socket.emit("saveGame",)
 }
 
 /** #############################################  WALL LAYING METHODS  ############################################# **/
@@ -363,6 +371,10 @@ function undoAction(){
     document.getElementById("button-validate-action").style.display = "none";
     document.getElementById("button-undo-action").style.display = "none";
 
+    //On re-donne la possiblité de sauvegarder
+    document.getElementById("button-save-game").style.display = "flex";
+
+
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
         document.getElementById(playerPositions["player"+currentPlayer]).innerHTML = "";
@@ -421,5 +433,7 @@ function updateDueToAction(){
     actionsToDo--;
     document.getElementById("button-validate-action").style.display = "flex";
     document.getElementById("button-undo-action").style.display = "flex";
+    document.getElementById("button-save-game").style.display = "flex";
+
     updateNumberAction(0);
 }
