@@ -36,10 +36,6 @@ class Game {
                 }
             }
         }
-
-        //TODO: A SUPPRIMER IMPERATIVEMENT APRES CEST UN MOCK EN ATTENDANT QUARNAUD FASSE CHOOSEPOSITIONTO BEGIN
-        this.playerPosition[0] = this.elements[0];
-        this.lastPlayerPosition[0] = this.elements[0];
     }
 
     getPossibleMoves(playerPosition) {
@@ -76,8 +72,9 @@ class Game {
     }
 
     getPlayerCurrentPosition(index) {
-        return this.playerPosition[index - 1];
+        return this.playerPosition[`player${index}`];
     }
+
 
     getPlayerLastPosition(index) {
         return this.lastPlayerPosition[index - 1];
@@ -86,7 +83,7 @@ class Game {
     movePlayer(number, caseWanted, playerCurrentPosition) {
         this.playerPosition[number - 1] = caseWanted;
         this.lastPlayerPosition[number - 1] = playerCurrentPosition;
-        return getPossibleMoves(playerPosition, this.elements);
+        //return getPossibleMoves(playerPosition, this.elements);
     }
 
     isGameOver(playersPositions) {

@@ -38,9 +38,11 @@ function createSocket(server) {
             let isPossible = possibleMoves.includes(caseWanted);
             if (isPossible) {
                 let saveOldPosition = game.getPlayerCurrentPosition(1);
+                let htmlOldPosition=saveOldPosition[1]+"-"+saveOldPosition[0]+"~cell";
+                let htmlNewPosition=caseWanted.getPos_y()+"-"+caseWanted.getPos_x()+"~cell";
                 game.movePlayer(1, caseWanted, game.getPlayerCurrentPosition(1));
-                if (saveOldPosition !== null) gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, saveOldPosition.translateHTMLCase(), game.getPlayerCurrentPosition(1).translateHTMLCase());
-                else gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, null, game.getPlayerCurrentPosition(1).translateHTMLCase());
+                if (saveOldPosition !== null) gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
+                else gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, null, htmlNewPosition);
             }
         });
 
@@ -68,22 +70,21 @@ function createSocket(server) {
 
         socket.on("validateRound", (msg) => {
             const playerPosition = game.playerPosition;
-            console.log("playerPosition", playerPosition.player2);
+
             let possibleMoves = game.getPossibleMoves(playerPosition.player2);
             const numberTour = game.numberTour;
             let currentplayer = game.currentPlayer;
             const nbWallsPlayer1 = game.nbWallsPlayer1;
             const nbWallsPlayer2 = game.nbWallsPlayer2;
 
-            console.log("validateRound", msg);
             gameNamespace.emit("numberTour", numberTour, possibleMoves);
 
-            // on demande à l'IA de jouer
-            console.log("possibleMoves", possibleMoves);
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
-            game.currentPlayer = 2
             console.log("newAIPosition", newAIPosition);
+
+            game.currentPlayer = 2
             const cellId = newAIPosition[0] + "-" + newAIPosition[1] + "~cell";
+
             gameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
             game.playerPosition.player2 = newAIPosition;
 
@@ -107,8 +108,6 @@ function createSocket(server) {
                 possibleMoves = game.getPossibleMoves(playerPosition.player1);
             }
 
-            console.log("possibleMoves", possibleMoves);
-            console.log("playerPosition", playerPosition);
             gameNamespace.emit("updateRound",
                 possibleMoves, numberTour,
                 playerPosition, currentplayer,

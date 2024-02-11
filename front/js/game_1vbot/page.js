@@ -123,7 +123,12 @@ function validateRound() {
     console.log("validateRound");
     socket.on("positionAI", (AIPosition, currentplayer,playerPosition) => {
         console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
-        if (playerPosition["player2"] !== null) removePlayerCircle(playerPosition, currentplayer);
+        if (playerPosition["player2"] !== null){
+            console.log(playerPosition["player2"]);
+            const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
+            removePlayerCircle(htmlOldPosition, currentplayer);
+        }
+        //console.log("AI POSITION", AIPosition);
         let circle_bot = document.getElementById(AIPosition);
         addPlayerCircle(circle_bot, currentplayer);
         socket.off("newAIPosition");
@@ -357,7 +362,7 @@ function movePlayer(event) {
             console.log("move valid");
             if(lastPosition!==null) removePlayerCircle(lastPosition, currentPlayer);
             console.log("allo");
-            addPlayerCircle(newPosition, 1);
+            addPlayerCircle(target, 1);
             lastActionType = "position";
             showButtonVisible();
         }else{
