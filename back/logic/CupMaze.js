@@ -7,17 +7,39 @@ let gameStates = {
     ownWalls: [],
     //a list containing 9 lists of length 9, for which board[i][j] represents the content of the cell (i+1, j+1) as defined in the rules. The value for each cell can be : -1 if you do not see the cell, 0 if you see the cell but it is empty, 1 if you are in the cell, 2 if your opponent is in the cell
     board: [],
-}
+};
 
-let position= ""
+let position= "";
+let lastPosition= "";
+
+let lastKnownOpponentPosition = "";
+
+let lastPerformedAction = "";
 
 let Move = {
     action: "",
     value: ""
-}
+};
 
+let expectedFog = [];
+
+/** -----------------------------METHODES DEMANDEES--------------------------- **/
+
+/*
+    setup(AIplay) which takes 1 argument whose value is 1 if your AI is the first player, or 2 if it should play second.
+    This function has to return a Promise that is resolved into a position string (see below), indicating its placement,
+    in less than 1000ms.
+*/
 function setup(AIplay){
     console.log("AIPLAY");
+    for(let i=1;i<=9;i++){
+        let row=[];
+        for(let j=1;i<=9;i++){
+            if((i<=5 && AIplay===1) || (i>=5 && AIplay===2))row.push(0);
+            else row.push(-1);
+        }
+        expectedFog.push(row);
+    }
     //return a Promise that is resolved into a position string
     //The position string is composed of 2 digits representing a cell exactly as stated in the rules.
 }
@@ -46,6 +68,8 @@ function updateBoard(gameState){
     //return a Promise resolved into the boolean true in 50ms maximum.
 }
 
+/** -----------------------------METHODES NON DEMANDEES MAIS UTILES AU JEU--------------------------- **/
+
 function getPossibleMoves(position, gameState) {
     const possibleMoves = [];
     // "12" => ["column", "line"]
@@ -69,6 +93,64 @@ function getPossibleMoves(position, gameState) {
     checkMove(column + 1, line);
     checkMove(column, line - 1);
     checkMove(column, line + 1);
+}
+
+function isPlayerVisible(gameState){
+    gameState.board.forEach((cellValue)=>{
+        if(cellValue===2) return true;
+    })
+}
+
+function setExpectedFog(Move){
+    switch(Move.action){
+        case "move":
+            // get position before move
+            // remove fog created by old position
+            // create fog around new Position
+            // note that newPosition is the string Move.value
+            break;
+        case "wall":
+            let wallPosition = {pos_x: Move.value[0][0], pos_y: Move.value[0][1]};
+            let cellsUpByTwo = [
+                wallPosition.pos_x+wallPosition.pos_y,
+                wallPosition.pos_x+(parseInt(wallPosition.pos_y)-1),
+                (parseInt(wallPosition.pos_x)+1)+wallPosition.pos_y,
+                ""+(parseInt(wallPosition.pos_x)+1)+(parseInt(wallPosition.pos_y)-1)
+            ];
+            let cellsUpByOne= [
+                wallPosition.pos_x+(parseInt(wallPosition.pos_y)+1),
+                ""+(parseInt(wallPosition.pos_x)+1)+(parseInt(wallPosition.pos_y)-1),
+                (parseInt(wallPosition.pos_x)+1)+wallPosition.pos_y,
+                ""+(parseInt(wallPosition.pos_x)-1)+(parseInt(wallPosition.pos_y)),
+                ""+(parseInt(wallPosition.pos_x)+2)+(parseInt(wallPosition.pos_y)),
+                ""+(parseInt(wallPosition.pos_x)+2)+(parseInt(wallPosition.pos_y)-1),
+                ""+(parseInt(wallPosition.pos_x))+(parseInt(wallPosition.pos_y)-2),
+                ""+(parseInt(wallPosition.pos_x)+1)+(parseInt(wallPosition.pos_y)-2)
+            ];
+            cellsUpByOne.forEach((element)=>{
+                let x= parseInt(element[0]);
+                let y= parseInt(element[1]);
+                if(x<=9 && y<=9){
+                    expectedFog[x][y]+=1;
+                }
+            })
+            cellsUpByTwo.forEach((element)=>{
+                let x= parseInt(element[0]);
+                let y= parseInt(element[1]);
+                if(x<=9 && y<=9){
+                    expectedFog[x][y]+=2;
+                }
+            })
+            break;
+        case "idle":
+            break;
+        default:
+            console.log("Unexpected Move")
+    }
+}
+
+function calculatePositionWithFog(gameState){
+
 }
 
 initGame();
