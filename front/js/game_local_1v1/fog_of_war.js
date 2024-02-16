@@ -64,6 +64,13 @@ function calculateVisibility(playerPositions) {
         wallVision(wall,1);
     });
 
+    for(let i=0; i!==8; i++){
+        for(let j=0; j!==8; j++){
+            let cell = document.getElementById(j+"-"+i+"~cell");
+            console.log(cell.visibility);
+        }
+    }
+
 }
 
 function wallVision(wall,visionSign){

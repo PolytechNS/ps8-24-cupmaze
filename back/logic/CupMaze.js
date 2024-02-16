@@ -1,4 +1,3 @@
-
 let gameStates = {
     // a list containing each of your opponent's walls (for each wall, the value is a list containing 2 elements --> a position string representing the top-left square that the wall is in contact with, and 0 if the wall is placed horizontally or1 if it is vertical).
     opponentWalls: [],
@@ -14,10 +13,21 @@ let Move = {
     value: ""
 }
 
+
+let numberPlayer;
+
 function setup(AIplay){
-    console.log("AIPLAY");
-    //return a Promise that is resolved into a position string
-    //The position string is composed of 2 digits representing a cell exactly as stated in the rules.
+    numberPlayer = AIplay;
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if(AIplay === 1){
+                //Dans le cas où on commence en bas du plateau
+                resolve("81");
+            }else{
+                resolve("89");
+            }
+        }, 1000); // Resolving within 1000ms
+    });
 }
 
 function nextMove(gameState){
