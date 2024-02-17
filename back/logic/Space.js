@@ -3,6 +3,7 @@ class Space {
         this.pos_x = x;
         this.pos_y = y;
         this.isLaid = false;
+        this.player = 0;
     }
 
     getPos_x(){

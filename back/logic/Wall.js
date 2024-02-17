@@ -4,6 +4,7 @@ class Wall{
         this.pos_y = pos_y;
         this.isLaid = isLaid;
         this.inclinaison = inclinaison;
+        this.player = 0;
     }
 
     getPos_x(){
