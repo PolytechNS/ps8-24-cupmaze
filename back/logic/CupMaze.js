@@ -180,9 +180,10 @@ function getPossibleMoves(position, gameState) {
 }
 
 function isPlayerVisible(gameState){
-    for(let i=0;i<9;i++){
-        for(let j=0;j<9;j++){
-            if (gameState.board[i][j]===2) return ""+(9-j)+(1+i);
+    for (let j = 8; j >= 0; j--) {
+        let line = "";
+        for (let i = 0; i < 9; i++) {
+            if (gameState.board[i][j]===2) return ""+i+j;
         }
     }
     return undefined;
