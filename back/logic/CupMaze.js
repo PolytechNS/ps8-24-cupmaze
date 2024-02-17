@@ -100,10 +100,18 @@ function nextMove(gameState){
             else Move.value = player===1? ["78",0]:["73",0];
         }
         else{
+
+            function wallPlacementValid(wallAbove) {
+                return !gameState.opponentWalls.includes([wallAbove, 0]) && !gameState.opponentWalls.includes([wallAbove, 1]) &&
+                    !gameState.ownWalls.includes([wallAbove, 0]) && !gameState.ownWalls.includes([wallAbove, 1]);
+            }
+
             Move.action = "wall";
-            let x = player===1? parseInt(lastKnownOpponentPosition[1][0])-1:parseInt(lastKnownOpponentPosition[1][0])+1;
-            let y = lastKnownOpponentPosition[1][1];
-            Move.value = ""+x+y;
+            let x = player===1? (parseInt(lastKnownOpponentPosition[1][0])-1):(parseInt(lastKnownOpponentPosition[1][0])+1);
+            let y = parseInt(lastKnownOpponentPosition[1][1]);
+            if(wallPlacementValid(""+x+y)) Move.value = [""+x+y,0];
+            x+= player===1? -1:1;
+            if(wallPlacementValid(""+x+y)) Move.value = [""+x+y,0];
         }
     }
     setExpectedFog(Move);
