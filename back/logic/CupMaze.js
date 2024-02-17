@@ -1,6 +1,6 @@
 const utils = require("./utils");
 
-let gameStates = {
+let botGameState = {
     // a list containing each of your opponent's walls (for each wall, the value is a list containing 2 elements --> a position string representing the top-left square that the wall is in contact with, and 0 if the wall is placed horizontally or1 if it is vertical).
     opponentWalls: [],
     // a list containing each of your walls (for each wall, the value is a list containing 2 elements --> a position string representing the top-left square that the wall is in contact with, and 0 if the wall is placed horizontally or1 if it is vertical).
@@ -12,7 +12,7 @@ let gameStates = {
 let position= "";
 let lastPosition= "";
 
-let lastKnownOpponentPosition = "";
+let lastKnownOpponentPosition = [false,""];
 
 let lastPerformedAction = "";
 
@@ -22,6 +22,10 @@ let Move = {
 };
 
 let expectedFog = [];
+let expectedVision = [];
+
+let player;
+let roundNumber=1;
 
 /** -----------------------------METHODES DEMANDEES--------------------------- **/
 
@@ -32,6 +36,7 @@ let expectedFog = [];
 */
 function setup(AIplay){
     console.log("AIPLAY");
+    player=AIplay;
     for(let i=1;i<=9;i++){
         let row=[];
         for(let j=1;i<=9;i++){
@@ -40,6 +45,14 @@ function setup(AIplay){
         }
         expectedFog.push(row);
     }
+    roundNumber++;
+    expectedVision=expectedFog;
+    position = player===1? "11":"19";
+    lastPosition = position;
+
+    return new Promise((resolve, reject)=>{
+        resolve(position);
+    });
     //return a Promise that is resolved into a position string
     //The position string is composed of 2 digits representing a cell exactly as stated in the rules.
 }
@@ -50,12 +63,55 @@ function setup(AIplay){
     fonction qui qui prend 1 argument qui est un objet gameState (voir ci-dessous) représentant l'état du jeu
     après l'action de votre adversaire. Cette fonction a 200 ms pour renvoyer une promesse qui est résolue en
     un objet move représentant le prochain mouvement de votre IA.
- */
-function nextMove(gameState){
+
+
     console.log("gameState");
     const simulation = 1000;
     const possibleMoves = getPossibleMoves(gameState);
     const moveResults = [];
+ */
+function nextMove(gameState){
+    const Move={action:"",value: ""};
+    if(roundNumber===2) {
+        Move.action = "wall";
+        Move.value = player===1? ["39",0]:["32",0];
+    }
+    else{
+        const opponentActionType = getOpponentActionType(gameState);
+        if(opponentActionType==="wall")
+            setExpectedFog({action:"wall",value:gameState.opponentWalls[gameState.opponentWalls.length-1]});
+        else {
+            let oppPlayerPos = isPlayerVisible(gameState);
+            if(oppPlayerPos!==undefined) {
+                lastKnownOpponentPosition[0]=true;
+                lastKnownOpponentPosition[1] = oppPlayerPos;
+            }
+            else {
+                lastKnownOpponentPosition[0]=false;
+            }
+        }
+
+        if(lastKnownOpponentPosition[0]) {
+            //move arnaud
+        }
+        else if(roundNumber===3){
+            Move.action = "wall";
+            if(opponentActionType==="wall") Move.value = player===1? ["79",0]:["72",0];
+            else Move.value = player===1? ["78",0]:["73",0];
+        }
+        else{
+            Move.action = "wall";
+            let x = player===1? parseInt(lastKnownOpponentPosition[1][0])-1:parseInt(lastKnownOpponentPosition[1][0])+1;
+            let y = lastKnownOpponentPosition[1][1];
+            Move.value = ""+x+y;
+        }
+    }
+    setExpectedFog(Move);
+    lastPerformedAction=Move;
+    roundNumber++;
+    return new Promise((resolve, reject)=>{
+        resolve(Move);
+    });
 }
 
 function correction(rightMove){
@@ -64,7 +120,27 @@ function correction(rightMove){
 }
 
 function updateBoard(gameState){
-    console.log("updateBoard");
+    if(roundNumber===2) {
+        // if player is visible then remember their position
+        let oppPlayerPos = isPlayerVisible(gameState);
+        if(oppPlayerPos!==undefined) lastKnownOpponentPosition=oppPlayerPos;
+        // otherwise check to see if we can pinpoint him using the fog
+        else {
+            let cellsToCheck = player === 1 ? ["29", "59"] : ["21", "51"];
+            if(gameState.board[parseInt(cellsToCheck[0][1])][parseInt(cellsToCheck[0][0])]===-1) {
+                lastKnownOpponentPosition[0]=true;
+                lastKnownOpponentPosition[1]=""+(parseInt(cellsToCheck[0][0]) - 1) + cellsToCheck[0][1];
+            }
+            else if(gameState.board[parseInt(cellsToCheck[1][1])][parseInt(cellsToCheck[1][0])]===-1) {
+                lastKnownOpponentPosition[0]=true;
+                lastKnownOpponentPosition[1] = "" + (parseInt(cellsToCheck[1][0]) + 1) + cellsToCheck[1][1];
+            }
+        }
+    }
+    else {
+        let oppPlayerPos = isPlayerVisible(gameState);
+        if(oppPlayerPos!==undefined) lastKnownOpponentPosition=[true,oppPlayerPos];
+    }
     //return a Promise resolved into the boolean true in 50ms maximum.
 }
 
@@ -96,9 +172,25 @@ function getPossibleMoves(position, gameState) {
 }
 
 function isPlayerVisible(gameState){
-    gameState.board.forEach((cellValue)=>{
-        if(cellValue===2) return true;
-    })
+    for(let i=0;i<9;i++){
+        for(let j=0;j<9;j++){
+            if (gameState.board[i][j]===2) return ""+(9-j)+(1+i);
+        }
+    }
+    return undefined;
+}
+
+function getOpponentActionType(newGameState){
+    return newGameState.opponentWalls!==botGameState.opponentWalls? "wall":"move";
+}
+
+function getCellsAround(x,y){
+    return [
+        x+(parseInt(y)+1),
+        x+(parseInt(y)-1),
+        (parseInt(x)-1)+y,
+        (parseInt(x)+1)+y,
+    ]
 }
 
 function setExpectedFog(Move){
@@ -106,8 +198,19 @@ function setExpectedFog(Move){
         case "move":
             // get position before move
             // remove fog created by old position
+            let x=lastPosition[0];
+            let y=lastPosition[1];
+            let cellsAroundLastPosition=getCellsAround(x,y);
+            cellsAroundLastPosition.push(lastPosition);
+            cellsAroundLastPosition.forEach((element)=> addVisibilityToElement(element,-1));
+
             // create fog around new Position
             // note that newPosition is the string Move.value
+            x=position[0];
+            y=position[1];
+            let cellsAroundNewPosition=getCellsAround(x,y);
+            cellsAroundNewPosition.push(position);
+            cellsAroundNewPosition.forEach((element)=> addVisibilityToElement(element,1));
             break;
         case "wall":
             let wallPosition = {pos_x: Move.value[0][0], pos_y: Move.value[0][1]};
@@ -127,20 +230,8 @@ function setExpectedFog(Move){
                 ""+(parseInt(wallPosition.pos_x))+(parseInt(wallPosition.pos_y)-2),
                 ""+(parseInt(wallPosition.pos_x)+1)+(parseInt(wallPosition.pos_y)-2)
             ];
-            cellsUpByOne.forEach((element)=>{
-                let x= parseInt(element[0]);
-                let y= parseInt(element[1]);
-                if(x<=9 && y<=9){
-                    expectedFog[x][y]+=1;
-                }
-            })
-            cellsUpByTwo.forEach((element)=>{
-                let x= parseInt(element[0]);
-                let y= parseInt(element[1]);
-                if(x<=9 && y<=9){
-                    expectedFog[x][y]+=2;
-                }
-            })
+            cellsUpByOne.forEach((element)=> addVisibilityToElement(element,1));
+            cellsUpByTwo.forEach((element)=> addVisibilityToElement(element,2));
             break;
         case "idle":
             break;
@@ -149,12 +240,62 @@ function setExpectedFog(Move){
     }
 }
 
-function calculatePositionWithFog(gameState){
-
+function addVisibilityToElement(element,visibility){
+    let x= parseInt(element[0]);
+    let y= parseInt(element[1]);
+    if(x<=9 && y<=9){
+        expectedFog[x][y]+=visibility;
+    }
 }
 
-initGame();
-getPossibleMoves("48", gameStates);
+function setVisionFromFog(){
+    for (let i=0;i<9;i++){
+        for (let j=0;j<9;j++){
+            expectedVision[i][j]=expectedFog[i][j]<0? -1:0;
+            if(""+i+j===position) expectedVision[i][j]=1;
+        }
+    }
+}
+
+function calculateNextWallPosWithFog(gameState){
+    let actualVision=gameState.board;
+    let visionAnomalies=[];
+    for(let i=0;i<9;i++){
+        for (let j=0;j<9;j++){
+            if(actualVision[i][j]!==expectedVision[i][j]) visionAnomalies.push(""+i+j);
+        }
+    }
+
+    function wallPlacementValid(wallAbove) {
+        return !gameState.opponentWalls.includes([wallAbove, 0]) && !gameState.opponentWalls.includes([wallAbove, 1]) &&
+            !gameState.ownWalls.includes([wallAbove, 0]) && !gameState.ownWalls.includes([wallAbove, 1]);
+    }
+
+    if(visionAnomalies.length===1) {
+        let anomalyX = parseInt(visionAnomalies[0][0]);
+        let anomalyY = parseInt(visionAnomalies[0][1]);
+        let wallAbove = "" + anomalyX + (anomalyY + 1);
+        if (anomalyY < 9 && wallPlacementValid(wallAbove)) return wallAbove;
+        wallAbove = "" + (anomalyX - 1) + (anomalyY + 1);
+        if (anomalyY < 9 && anomalyX > 1 && wallPlacementValid(wallAbove)) return [wallAbove,0];
+    }
+    else if(visionAnomalies.length===2) {
+            let anomaly1X = parseInt(visionAnomalies[0][0]);
+            let anomaly1Y = parseInt(visionAnomalies[0][1]);
+
+            let anomaly2X = parseInt(visionAnomalies[1][0]);
+            let anomaly2Y = parseInt(visionAnomalies[1][1]);
+
+            if(anomaly1X===anomaly2X){
+
+            }
+            let wallAbove = ""+Math.min(anomaly1X,anomaly2X)+Math.max(anomaly1Y+1,anomaly2Y+1);
+    }
+    else console.log("Unexpected vision anomaly")
+}
+
+//initGame();
+//getPossibleMoves("48", botGameState);
 
 /*
 
@@ -218,30 +359,37 @@ function findJumpCell(line, column, direction, elements) {
 
 /*-----------fonction non utile pour le jeu mais pour l'affichage du plateau-----------*/
 
-function initGame(){
+/*function initGame(){
     // fill the board with -1
     for (let i = 0; i < 9; i++) {
-        gameStates.board.push([]);
+        botGameState.board.push([]);
         for (let j = 0; j < 9; j++) {
-            gameStates.board[i].push(`${i+1}${j+1}`);
+            botGameState.board[i].push(`${i+1}${j+1}`);
         }
     }
-    gameStates.opponentWalls = [];
-    gameStates.ownWalls = [];
+    botGameState.opponentWalls = [];
+    botGameState.ownWalls = [];
 }
 function displayBoard(board) {
-    // Parcourir chaque ligne de la grille
-    for (let i = 0; i < board.length; i++) {
-        let row = ''; // Initialiser une chaîne vide pour stocker la ligne actuelle
-
-        // Parcourir chaque cellule de la ligne
-        for (let j = 0; j < board[i].length; j++) {
-            row += board[i][j] + ' '; // Ajouter la valeur de la cellule avec un espace à la fin
+    for (let j = 8; j >= 0; j--) {
+        let line = "";
+        for (let i = 0; i < 9; i++) {
+            line += board[i][j] + " ";
         }
+        console.log(line);
+    }
+}
 
-        console.log(row); // Afficher la ligne complète
+function displayBoardWall(board) {
+    let line = "";
+    for (let i = 0; i < board.length; i++) {
+        if (i % 9 === 0) {
+            console.log(line);
+            line = "";
+        }
+        line += board[i] + " ";
     }
 }
 
 initGame();
-displayBoard(gameStates.board);
+displayBoard(botGameState.board);*/

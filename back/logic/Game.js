@@ -26,6 +26,13 @@ class Game {
 
         this.lastWallsLaid = [];
         this.lastWallLaidsIDHtml = [];
+        this.casePosition = [];
+        this.wallPossible = [];
+        this.gameState = {
+            opponentWalls: [],
+            ownWalls: [],
+            board: []
+        }
     }
 
     assignGameContext(savedGame) {
