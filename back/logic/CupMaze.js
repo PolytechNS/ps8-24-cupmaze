@@ -287,7 +287,7 @@ class Graph {
         return possibleMoves;
     }
 
-    isvalidWallPlacement(colonne, ligne, orientation, playerPosition, opponentPosition) {
+    isValidWallPlacement(colonne, ligne, orientation, playerPosition, opponentPosition) {
         // there always has to be a path from each player's position to their goal
         const playerNode = this.getNode(parseInt(playerPosition[0]) - 1, parseInt(playerPosition[1]) - 1);
         const ennemyFinishLine = (playerNode.state === 1) ? 8 : 0;
@@ -333,8 +333,10 @@ class Graph {
                 return false;
             }
         }
+
         // horizontal wall
         if (orientation === 0) {
+            //console.log("wall placed at", `(${colonne+1},${ligne+1})`, orientation);
             this.removeEdge(colonne, ligne, colonne, ligne - 1);
             this.removeEdge(colonne + 1, ligne, colonne + 1, ligne - 1);
             this.removeWall(colonne, ligne);
@@ -376,13 +378,12 @@ class Graph {
         const goalNode = this.getNode(parseInt(goalPosition[0]) - 1, parseInt(goalPosition[1]) - 1);
         const distance = this.Dijkstra(startNode);
         if (distance[goalNode.index] !== undefined) {
-            //console.log("distance to goal", distance[goalNode.index]);
             return distance[goalNode.index];
         } else {
-            //console.log("distance to goal2", distance[goalNode.index]);
             return Infinity;
         }
     }
+
 
     Dijkstra(startNode) {
         const distance = new Array(this.nodes.size).fill(Infinity);
@@ -414,12 +415,9 @@ class Graph {
         for (let i = 0; i < 9; i++) {
             if (this.getNode(i, goalLine).isGoal(player)){
                 const distance = this.distanceBetween(playerPosition, `${i+1}${goalLine+1}`);
-                //console.log("distance", distance);
                 minDistances = Math.min(minDistances, distance);
-                //console.log("mindistance", minDistances);
             }
         }
-        //console.log("minDistances", minDistances);
         return minDistances;
     }
 }
@@ -431,16 +429,14 @@ console.log("graph", graph.getNodeState(0, 0));
 console.log("51 ", graph.getNeighbors(4, 0).map(node => node.toString()));
 console.log("possibleMovesWithJump at 51", graph.possibleMovesWithJump(4, 0).map(node => node.toString()));
 
-/*
-graph.placeWall(7,8, 0);
- */
+graph.placeWall(4,1, 0);
+console.log("possibleMovesWithJump at 51", graph.possibleMovesWithJump(4, 0).map(node => node.toString()));
+
+
 
 
 let ai;
-
-
 let position= ""
-
 let move = {
     action: "",
     value: ""
@@ -463,7 +459,7 @@ class IA {
         this.playerPosition = position;
         this.previousPlayerPosition = position;
         // on dira que l'adversaire est a 59
-        this.adversaryPosition = (AIplay === 1) ? "59" : "51";
+        this.adversaryPosition = (AIplay === 1) ? "59" : "51"
         this.graph.updateNodeState(parseInt(this.adversaryPosition[0]) - 1, parseInt(this.adversaryPosition[1]) - 1, 2);
         return position;
     }
@@ -508,33 +504,33 @@ class IA {
             for (const move of moves) {
                 this.simulateMove(move, gameState);
                 const evaluation = this.minimax(gameState, depth - 1, false, alpha, beta);
-                this.undoMove(move, gameState);
+                //this.undoMove(move, gameState);
                 maxEval = Math.max(maxEval, evaluation);
                 alpha = Math.max(alpha, maxEval);
                 if (beta <= alpha) {
                     break;
                 }
             }
-            return [maxEval]
+            return maxEval;
         } else {
             let minEval = Number.POSITIVE_INFINITY;
             const moves = this.generateMoves();
             for (const move of moves) {
                 this.simulateMove(move, gameState);
                 const evaluation = this.minimax(gameState, depth - 1, true, alpha, beta);
-                this.undoMove(move, gameState);
+                //this.undoMove(move, gameState);
                 minEval = Math.min(minEval, evaluation);
                 beta = Math.min(beta, minEval);
                 if (beta <= alpha) {
                     break;
                 }
             }
-            return [minEval]
+            return minEval;
         }
     }
     nextMove(gameState) {
         const startTime = performance.now();
-        const bestMove = this.minimaxInit(gameState,4);
+        const bestMove = this.minimaxInit(gameState,3);
         const endTime = performance.now();
         console.log("time", endTime - startTime);
         console.log("bestMove", bestMove);
@@ -542,7 +538,7 @@ class IA {
     }
     generateMoves() {
         //console.log("this.graph.wallPossible()", this.graph.walls);
-        const wallPossible = this.graph.wallPossible(this.playerPosition, this.adversaryPosition);
+        const wallPossible = this.graph.wallPossible();
         const possibleMoves = this.graph.possibleMovesWithJump(parseInt(this.playerPosition[0]) - 1, parseInt(this.playerPosition[1]) - 1);
         //console.log("possibleMoves", possibleMoves.map(node => node.toString()));
         const moves = [];
@@ -558,6 +554,7 @@ class IA {
                 value: wall
             });
         }
+
         return moves;
     }
     simulateMove(move, gameStates) {
@@ -573,7 +570,6 @@ class IA {
         } else if (move.action === "wall") {
             //console.log("wall placed column", move.value[0][0], "ligne", move.value[0][1], "orientation", move.value[1]);
             this.graph.placeWall(parseInt(move.value[0][0]) - 1, parseInt(move.value[0][1]) - 1, move.value[1]);
-
             // update du gameStates
             gameStates.ownWalls.push(move.value);
         }
@@ -600,21 +596,15 @@ class IA {
 
     evaluate(gameStates) {
         let score = 0;
-        //console.log("player in evaluate", this.player);
+
         const distanceToGoal = this.graph.distanceToGoal(this.player, this.playerPosition);
-        //console.log("distanceToGoal", distanceToGoal);
-        score -= distanceToGoal;
+        console.log("distanceToGoal", distanceToGoal);
+        score += 100 / Math.exp(distanceToGoal);
 
         // distance to the player's goal for the adversary
-        //console.log("opponent in evaluate", this.opponent);
         const distanceToAdversaryGoal = this.graph.distanceToGoal(2, this.adversaryPosition);
-        score += distanceToAdversaryGoal;
+        score -= 100 / Math.min(distanceToAdversaryGoal * 5, 100);
 
-        // wall placed
-        const ownWalls = gameStates.ownWalls;
-        const adversaryWalls = gameStates.opponentWalls;
-        score += ownWalls.length;
-        score -= adversaryWalls.length;
         //console.log("score", score);
         return score;
     }
@@ -634,6 +624,12 @@ class IA {
         }
         for (let i = 0; i < 9; i++) {
             for (let j = 0; j < 9; j++) {
+                if (board[i][j] === 1) {
+                    this.playerPosition = `${i+1}${j+1}`;
+                }
+                if (board[i][j] === 2) {
+                    this.adversaryPosition = `${i+1}${j+1}`;
+                }
                 this.graph.updateNodeState(i, j, board[i][j]);
             }
         }
