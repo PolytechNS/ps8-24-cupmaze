@@ -264,7 +264,7 @@ class Graph {
         const allNeighbors = this.getNeighbors(colonne, ligne);
         const possibleMoves = [];
         for (const neighbor of allNeighbors) {
-            console.log("neighbor", neighbor.toString());
+            //console.log("neighbor", neighbor.toString());
             if (neighbor.state === 0 || neighbor.state === -1) {
                 possibleMoves.push(neighbor);
             } else if (neighbor.state === 2) {
@@ -411,6 +411,7 @@ class Graph {
 
     distanceToGoal(player, playerPosition) {
         // return the distance to the goal for a player (1 or 2)
+        if (playerPosition === "") { return 100; }
         const goalLine = (player === 1) ? 8 : 0;
         let minDistances = Infinity;
         for (let i = 0; i < 9; i++) {
@@ -462,7 +463,7 @@ class IA {
         this.playerPosition = position;
         this.previousPlayerPosition = position;
         // on dira que l'adversaire est a 59
-        this.adversaryPosition = (AIplay === 1) ? "59" : "51"
+        this.adversaryPosition = (AIplay === 1) ? "" : "51"
         this.graph.updateNodeState(parseInt(this.adversaryPosition[0]) - 1, parseInt(this.adversaryPosition[1]) - 1, 2);
         return position;
     }
@@ -602,7 +603,7 @@ class IA {
         } else if (distanceToAdversaryGoal === 1) {
             score -= 1000;
         }
-        console.log("score", score);
+        //console.log("score", score);
         return score;
     }
     isTerminalState() {
