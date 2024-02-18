@@ -264,7 +264,8 @@ class Graph {
         const allNeighbors = this.getNeighbors(colonne, ligne);
         const possibleMoves = [];
         for (const neighbor of allNeighbors) {
-            if (neighbor.state === 0) {
+            console.log("neighbor", neighbor.toString());
+            if (neighbor.state === 0 || neighbor.state === -1) {
                 possibleMoves.push(neighbor);
             } else if (neighbor.state === 2) {
                 const direction = (neighbor.colonne === colonne)
@@ -279,7 +280,7 @@ class Graph {
                             (direction === "S") ? neighbor.ligne - 1 :
                                 neighbor.ligne;
                 const behindNeighborState = this.getNodeState(behindNeighborColonne, behindNeighborLigne);
-                if (behindNeighborState === -1 && this.hasEdge(neighbor.colonne, neighbor.ligne, behindNeighborColonne, behindNeighborLigne)) {
+                if (behindNeighborState === -1 || behindNeighborState === 0 && this.hasEdge(neighbor.colonne, neighbor.ligne, behindNeighborColonne, behindNeighborLigne)) {
                     possibleMoves.push(this.getNode(behindNeighborColonne, behindNeighborLigne));
                 }
             }
@@ -414,6 +415,7 @@ class Graph {
         let minDistances = Infinity;
         for (let i = 0; i < 9; i++) {
             if (this.getNode(i, goalLine).isGoal(player)){
+                //console.log("node is goal", this.getNode(i, goalLine).toString());
                 const distance = this.distanceBetween(playerPosition, `${i+1}${goalLine+1}`);
                 minDistances = Math.min(minDistances, distance);
             }
@@ -423,14 +425,15 @@ class Graph {
 }
 
 const graph = new Graph(9, 9);
-console.log("wall possible", graph.wallPossible());
+//console.log("wall possible", graph.wallPossible());
 
 console.log("graph", graph.getNodeState(0, 0));
 console.log("51 ", graph.getNeighbors(4, 0).map(node => node.toString()));
-console.log("possibleMovesWithJump at 51", graph.possibleMovesWithJump(4, 0).map(node => node.toString()));
+console.log("58", graph.getNeighbors(4, 7).map(node => node.toString()));
+console.log("possibleMovesWithJump at 58", graph.possibleMovesWithJump(4, 7).map(node => node.toString()));
 
-graph.placeWall(4,1, 0);
-console.log("possibleMovesWithJump at 51", graph.possibleMovesWithJump(4, 0).map(node => node.toString()));
+//graph.placeWall(4,1, 0);
+//console.log("possibleMovesWithJump at 51", graph.possibleMovesWithJump(4, 0).map(node => node.toString()));
 
 
 
@@ -469,7 +472,7 @@ class IA {
         let beta = Number.POSITIVE_INFINITY;
         let maxEval = Number.NEGATIVE_INFINITY;
         let bestMove = null;
-        console.log("move possible", this.generateMoves());
+        //console.log("move possible", this.generateMoves().filter(move => move.action === "move").map(move => move.value));
         for (const move of this.generateMoves()) {
             this.simulateMove(move, gameState);
             const evaluation = this.minimax(gameState, depth - 1, false, alpha, beta);
@@ -504,7 +507,7 @@ class IA {
             for (const move of moves) {
                 this.simulateMove(move, gameState);
                 const evaluation = this.minimax(gameState, depth - 1, false, alpha, beta);
-                //this.undoMove(move, gameState);
+                this.undoMove(move, gameState);
                 maxEval = Math.max(maxEval, evaluation);
                 alpha = Math.max(alpha, maxEval);
                 if (beta <= alpha) {
@@ -518,7 +521,7 @@ class IA {
             for (const move of moves) {
                 this.simulateMove(move, gameState);
                 const evaluation = this.minimax(gameState, depth - 1, true, alpha, beta);
-                //this.undoMove(move, gameState);
+                this.undoMove(move, gameState);
                 minEval = Math.min(minEval, evaluation);
                 beta = Math.min(beta, minEval);
                 if (beta <= alpha) {
@@ -530,17 +533,15 @@ class IA {
     }
     nextMove(gameState) {
         const startTime = performance.now();
-        const bestMove = this.minimaxInit(gameState,3);
+        const bestMove = this.minimaxInit(gameState,2);
         const endTime = performance.now();
         console.log("time", endTime - startTime);
         console.log("bestMove", bestMove);
         return bestMove;
     }
     generateMoves() {
-        //console.log("this.graph.wallPossible()", this.graph.walls);
         const wallPossible = this.graph.wallPossible();
         const possibleMoves = this.graph.possibleMovesWithJump(parseInt(this.playerPosition[0]) - 1, parseInt(this.playerPosition[1]) - 1);
-        //console.log("possibleMoves", possibleMoves.map(node => node.toString()));
         const moves = [];
         for (const possibleMove of possibleMoves) {
             moves.push({
@@ -562,15 +563,12 @@ class IA {
             this.graph.updateNodeState(parseInt(this.playerPosition[0]) - 1, parseInt(this.playerPosition[1]) - 1, 0);
             this.graph.updateNodeState(parseInt(move.value[0]) - 1, parseInt(move.value[1]) - 1, this.player);
 
-            // update du gameStates
             gameStates.board[parseInt(this.playerPosition[0]) - 1][parseInt(this.playerPosition[1]) - 1] = 0;
             gameStates.board[parseInt(move.value[0]) - 1][parseInt(move.value[1]) - 1] = this.player;
             this.previousPlayerPosition = this.playerPosition;
             this.playerPosition = move.value;
         } else if (move.action === "wall") {
-            //console.log("wall placed column", move.value[0][0], "ligne", move.value[0][1], "orientation", move.value[1]);
             this.graph.placeWall(parseInt(move.value[0][0]) - 1, parseInt(move.value[0][1]) - 1, move.value[1]);
-            // update du gameStates
             gameStates.ownWalls.push(move.value);
         }
     }
@@ -579,16 +577,12 @@ class IA {
         if (move.action === "move") {
             this.graph.updateNodeState(parseInt(this.previousPlayerPosition[0]) - 1, parseInt(this.previousPlayerPosition[1]) - 1, this.player);
             this.graph.updateNodeState(parseInt(move.value[0]) - 1, parseInt(move.value[1]) - 1, 0);
-
             // update du gameStates
             gameStates.board[parseInt(this.previousPlayerPosition[0]) - 1][parseInt(this.previousPlayerPosition[1]) - 1] = this.player;
             gameStates.board[parseInt(move.value[0]) - 1][parseInt(move.value[1]) - 1] = 0;
-
             this.playerPosition = this.previousPlayerPosition;
-
         } else if (move.action === "wall") {
             this.graph.removeWallPlacement(parseInt(move.value[0][0]) - 1, parseInt(move.value[0][1]) - 1, move.value[1]);
-            //this.graph.addWall(parseInt(move.value[0]) - 1, parseInt(move.value[1]) - 1, -1);
             // update du gameStates
             gameStates.ownWalls.pop();
         }
@@ -598,14 +592,17 @@ class IA {
         let score = 0;
 
         const distanceToGoal = this.graph.distanceToGoal(this.player, this.playerPosition);
-        console.log("distanceToGoal", distanceToGoal);
-        score += 100 / Math.exp(distanceToGoal);
-
+        score += 100 - distanceToGoal;
         // distance to the player's goal for the adversary
         const distanceToAdversaryGoal = this.graph.distanceToGoal(2, this.adversaryPosition);
-        score -= 100 / Math.min(distanceToAdversaryGoal * 5, 100);
+        score -= 100 - distanceToAdversaryGoal;
 
-        //console.log("score", score);
+        if (distanceToGoal === 1) {
+            score += 1000;
+        } else if (distanceToAdversaryGoal === 1) {
+            score -= 1000;
+        }
+        console.log("score", score);
         return score;
     }
     isTerminalState() {
@@ -613,6 +610,7 @@ class IA {
     }
     updateBoard(gameState){
         let ownWalls = gameState.ownWalls;
+        //console.log("ownWalls", ownWalls);
         let opponentWalls = gameState.opponentWalls;
         let walls = ownWalls.concat(opponentWalls);
         let board = gameState.board;
@@ -718,8 +716,6 @@ class GenerateGameStates {
 
 const generateGameStates = new GenerateGameStates();
 const gameState = generateGameStates.gameStates;
-//console.log("gameState", gameState.board);
-//displayBoard(gameState.board);
 
 
 function testAI() {
@@ -738,3 +734,4 @@ function testAI() {
 
 //console.log("this.wall", graph.getWalls().map(wall => wall.extractListRepresentation()).flat().filter(wall => wall[0] === "19"));
 testAI();
+//console.log("gameState", gameState);
