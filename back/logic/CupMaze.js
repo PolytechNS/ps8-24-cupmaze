@@ -674,6 +674,7 @@ function updateBoard(gameStates){
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             ai.updateBoard(gameStates);
+            resolve(true);
         }, 50);
     });
 }
