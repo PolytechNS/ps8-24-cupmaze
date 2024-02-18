@@ -48,7 +48,7 @@ function setup(AIplay){
 
 function nextMove(gameState){
 
-    /*
+    /*"
     gameState.board
     gameState.opponentWalls
     gameState.ownWalls
@@ -70,6 +70,7 @@ function nextMove(gameState){
         nombreWallAdversaire = 10 - gameState.opponentWalls.length;
         derniereActionJoueur = "wall";
     }
+
 
 
     return new Promise((resolve, reject) => {
@@ -108,6 +109,7 @@ function nextMove(gameState){
                     nombreWallMoi--;
                     resolve(move);
                 } else {
+                    console.log("CA NE DEVRAIT PAS ARRIVER LA NORMALEMENT");
                     //TODO : ALLER TOUT DROIT, SI NOTRE BOT BUG AU MOINS ON A UNE SOLUTION DE SECOURS
                 }
             } else if (monChiffre === 2){
@@ -185,12 +187,15 @@ function updateBoard(gameState){
         trackerAdversaire = isPlayerVisible(gameState.board)[1].toString() + isPlayerVisible(gameState.board)[2].toString();
         positionPotentiellesDuBot = [];
         positionPotentiellesDuBot.push(trackerAdversaire);
+        console.log("ON A VU LE JOUEUR");
     } else {
         if(onAPoseUnMur){
             let answer = isPlayerDetectedByOurWall(parseInt(coordoneesDernierMur[0]), parseInt(coordoneesDernierMur[1]), gameState.board);
             if(answer[0]){
+                console.log("PAS VU MAIS TROUVE");
                 trackerAdversaire = answer[1];
-            }else{
+            }else if(answer[1] !== null && answer[2] !== null) {
+                console.log("POTENTIELLEMENT");
                 positionPotentiellesDuBot.push(answer[1]);
                 positionPotentiellesDuBot.push(answer[2]);
             }
@@ -209,12 +214,16 @@ function updateBoard(gameState){
 
 
 function isPlayerDetectedByOurWall(positionMurX, positionMurY, board){
+    positionMurX = positionMurX - 1;
+    positionMurY = positionMurY - 1;
+
     let xToTest;
     let yToTest;
 
     //Premier case que l'on test
     xToTest = positionMurX;
     yToTest = positionMurY + 1;
+
     if(xToTest >=0 && xToTest<=8 && yToTest >=0 && yToTest<=8){
         if(board[xToTest][yToTest] === -1){
 
@@ -225,18 +234,18 @@ function isPlayerDetectedByOurWall(positionMurX, positionMurY, board){
             let yPotentiel2 = yToTest;
 
             if(yPotentiel1 > 8 || yPotentiel1 <0 || xPotentiel1 < 0 || xPotentiel1 > 8){ //case impossible donc on a plus qu'une case qui est bloquante et c'est le bloc
-                return [true, xPotentiel2.toString()+yPotentiel2.toString(), null];
+                return [true, (xPotentiel2+1).toString()+(yPotentiel2+1).toString(), null];
             } else if(yPotentiel2 > 8 || yPotentiel2 <0 || xPotentiel2 < 0 || xPotentiel2 > 8){
-                return [true, xPotentiel1.toString()+yPotentiel1.toString(), null];
+                return [true, (xPotentiel1+1).toString()+(yPotentiel1+1).toString(), null];
             } else {
-                return [false, xPotentiel1.toString()+yPotentiel1.toString(), xPotentiel2.toString()+yPotentiel2.toString()];
+                return [false, (xPotentiel1+1).toString()+(yPotentiel1+1).toString(), (xPotentiel2+1).toString()+(yPotentiel2+1).toString()];
             }
         }
     }
 
     //Deuxième case que l'on test
-    xToTest = positionMurX+1;
-    yToTest = positionMurY+1;
+    xToTest = positionMurX+1 -1;
+    yToTest = positionMurY+1 -1;
     if(xToTest >=0 && xToTest<=8 && yToTest >=0 && yToTest<=8){
         if(board[xToTest][yToTest] === -1){
 
@@ -246,11 +255,11 @@ function isPlayerDetectedByOurWall(positionMurX, positionMurY, board){
             let xPotentiel2 = xToTest+1;
             let yPotentiel2 = yToTest;
             if(yPotentiel1 > 8 || yPotentiel1 <0 || xPotentiel1 < 0 || xPotentiel1 > 8){ //case impossible donc on a plus qu'une case qui est bloquante et c'est le bloc
-                return [true, xPotentiel2.toString()+yPotentiel2.toString(), null];
+                return [true, (xPotentiel2+1).toString()+(yPotentiel2+1).toString(), null];
             } else if(yPotentiel2 > 8 || yPotentiel2 <0 || xPotentiel2 < 0 || xPotentiel2 > 8){
-                return [true, xPotentiel1.toString()+yPotentiel1.toString(), null];
+                return [true, (xPotentiel1+1).toString()+(yPotentiel1+1).toString(), null];
             } else {
-                return [false, xPotentiel1.toString()+yPotentiel1.toString(), xPotentiel2.toString()+yPotentiel2.toString()];
+                return [false, (xPotentiel1+1).toString()+(yPotentiel1+1).toString(), (xPotentiel2+1).toString()+(yPotentiel2+1).toString()];
             }
         }
     }
@@ -361,7 +370,6 @@ function isPlayerDetectedByOurWall(positionMurX, positionMurY, board){
     }
 
     //Huitième case que l'on test
-    //Septième case que l'on test
     xToTest = positionMurX-1;
     yToTest = positionMurY;
     if(xToTest >=0 && xToTest<=8 && yToTest >=0 && yToTest<=8){
@@ -381,26 +389,8 @@ function isPlayerDetectedByOurWall(positionMurX, positionMurY, board){
             }
         }
     }
+    return [false, null, null];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /*-----------fonction non utile pour le jeu mais pour l'affichage du plateau-----------*/
@@ -441,5 +431,58 @@ function displayBoard() {
     }
 }
 
-initGame();
-displayBoard();
+//initGame();
+//displayBoard();
+
+
+
+/******************************* TEST1*******************************/
+/*monChiffre = 1;
+tourActuel = 2;
+let gameState = {
+    opponentWalls: [],
+    ownWalls: [],
+    board: [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+        [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    ]
+}
+
+console.log("TEST1");
+let move = nextMove(gameState);
+move.then((value) => {
+    console.log(value);
+});*/
+
+
+/*******************************TEST2*******************************/
+/*monChiffre = 1;
+tourActuel = 2;
+gameState2 = {
+    opponentWalls: [],
+    ownWalls: [],
+    board: [
+        [1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [-1, -1, -1, -1, -1, -1, 0, 0, -1],
+        [-1, -1, -1, -1, -1, 0, 0, 0, 0],
+        [-1, -1, -1, -1, -1, 0, 0, 0, 0],
+        [-1, -1, -1, -1, -1, -1, 0, 0, -1],
+    ]
+}
+
+console.log("TEST2");
+update = updateBoard(gameState2);
+update.then((value) => {
+    console.log(value);
+});*/
