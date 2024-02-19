@@ -1,77 +1,3 @@
-const {Case} = require("./Case");
-const {Wall} = require("./Wall");
-const {Space} = require("./Space");
-const {Game} = require("./Game");
-
-/*----------------------------------------------------------*/
-class dataAdapter {
-    constructor(game) {
-        this.game = game;
-        this.buildDataGame();
-    }
-    buildDataGame() {
-        this.game.casePosition = [];
-        this.game.wallPossible = [];
-        this.game.gameState = {
-            opponentWalls: [],
-            ownWalls: [],
-            board: []
-        }
-        const wallRow = [];
-        for (let y = 0; y < 9; y++) {
-            const row = [];
-            const boardRow = [];
-            for (let x = 0; x < 9; x++) {
-                row.push(`${y+1}${x+1}`);
-                if(x > 0 && y < 8) {
-                    this.game.wallPossible.push([`${y+1}${x+1}`, 0]);
-                }
-                if (x === 4) {
-                    boardRow.push(0);
-                } else if (x > 4) {
-                    boardRow.push(-1);
-                } else {
-                    boardRow.push(0);
-                }
-            }
-            this.game.casePosition.push(row);
-            this.game.gameState.board.push(boardRow);
-        }
-
-    }
-}
-
-function displayBoard(board) {
-    for (let j = 8; j >= 0; j--) {
-        let line = "";
-        for (let i = 0; i < 9; i++) {
-            line += board[i][j] + " ";
-        }
-        console.log(line);
-    }
-}
-
-function displayBoardWall(board) {
-    let line = "";
-    for (let i = 0; i < board.length; i++) {
-        if (i % 9 === 0) {
-            console.log(line);
-            line = "";
-        }
-        line += board[i] + " ";
-    }
-}
-
-
-
-const game = new Game();
-const adapter = new dataAdapter(game);
-//displayBoard(game.casePosition);
-colonne = 4;
-ligne = 8;
-//console.log(game.gameState.board[colonne-1][ligne-1]);
-
-
 class Node {
     constructor(colonne, ligne, state) {
         this.colonne = colonne;
@@ -212,7 +138,6 @@ class Graph {
     }
 
     removeWallPlacement(colonne, ligne, orientation) {
-        //console.log("wall removed at", `(${colonne+1},${ligne+1})`, orientation);
         if (orientation === 0) {
             this.addEdge(colonne, ligne, colonne, ligne - 1);
             this.addEdge(colonne + 1, ligne, colonne + 1, ligne - 1);
@@ -264,7 +189,6 @@ class Graph {
         const allNeighbors = this.getNeighbors(colonne, ligne);
         const possibleMoves = [];
         for (const neighbor of allNeighbors) {
-            //console.log("neighbor", neighbor.toString());
             if (neighbor.state === 0 || neighbor.state === -1) {
                 possibleMoves.push(neighbor);
             } else if (neighbor.state === 2) {
@@ -280,7 +204,7 @@ class Graph {
                             (direction === "S") ? neighbor.ligne - 1 :
                                 neighbor.ligne;
                 const behindNeighborState = this.getNodeState(behindNeighborColonne, behindNeighborLigne);
-                if (behindNeighborState === -1 || behindNeighborState === 0 && this.hasEdge(neighbor.colonne, neighbor.ligne, behindNeighborColonne, behindNeighborLigne)) {
+                if ((behindNeighborState === -1 || behindNeighborState === 0) && this.hasEdge(neighbor.colonne, neighbor.ligne, behindNeighborColonne, behindNeighborLigne)) {
                     possibleMoves.push(this.getNode(behindNeighborColonne, behindNeighborLigne));
                 }
             }
@@ -290,10 +214,15 @@ class Graph {
 
     isValidWallPlacement(colonne, ligne, orientation, playerPosition, opponentPosition) {
         // there always has to be a path from each player's position to their goal
+        if (playerPosition === "" || opponentPosition === "") {
+            return true;
+        }
         const playerNode = this.getNode(parseInt(playerPosition[0]) - 1, parseInt(playerPosition[1]) - 1);
         const ennemyFinishLine = (playerNode.state === 1) ? 8 : 0;
-        this.placeWall(colonne, ligne, orientation);
-
+        if (this.placeWall(colonne, ligne, orientation) === false) {
+            return false;
+        }
+        //this.placeWall(colonne, ligne, orientation);
         const visited = new Set();
         const queue = [];
         Object.keys(this.nodes).forEach(key => {
@@ -304,7 +233,7 @@ class Graph {
         while (queue.length > 0) {
             const currentNode = queue.shift();
             if (currentNode.ligne === ennemyFinishLine) {
-                this.removeWall(colonne, ligne, orientation);
+                //this.removeWall(colonne, ligne, orientation);
                 return true;
             }
             for (const neighbor of currentNode.neighbors) {
@@ -334,7 +263,6 @@ class Graph {
                 return false;
             }
         }
-
         // horizontal wall
         if (orientation === 0) {
             //console.log("wall placed at", `(${colonne+1},${ligne+1})`, orientation);
@@ -426,7 +354,9 @@ class Graph {
 }
 
 const graph = new Graph(9, 9);
-//console.log("wall possible", graph.wallPossible());
+/*
+console.log("wall possible", graph.wallPossible());
+
 
 console.log("graph", graph.getNodeState(0, 0));
 console.log("51 ", graph.getNeighbors(4, 0).map(node => node.toString()));
@@ -435,6 +365,7 @@ console.log("possibleMovesWithJump at 58", graph.possibleMovesWithJump(4, 7).map
 
 //graph.placeWall(4,1, 0);
 //console.log("possibleMovesWithJump at 51", graph.possibleMovesWithJump(4, 0).map(node => node.toString()));
+*/
 
 
 
@@ -457,13 +388,14 @@ class IA {
     setup(AIplay) {
         // define initial position based on player number
         this.player = AIplay;
+        this.ownWalls = 0;
         this.opponent = (AIplay === 1) ? 2 : 1;
         const position = (AIplay === 1) ? "51" : "59";
         this.graph.updateNodeState(parseInt(position[0]) - 1, parseInt(position[1]) - 1, 1);
         this.playerPosition = position;
         this.previousPlayerPosition = position;
         // on dira que l'adversaire est a 59
-        this.adversaryPosition = (AIplay === 1) ? "" : "51"
+        this.adversaryPosition = (AIplay === 1) ? "59" : "51"
         this.graph.updateNodeState(parseInt(this.adversaryPosition[0]) - 1, parseInt(this.adversaryPosition[1]) - 1, 2);
         return position;
     }
@@ -473,7 +405,6 @@ class IA {
         let beta = Number.POSITIVE_INFINITY;
         let maxEval = Number.NEGATIVE_INFINITY;
         let bestMove = null;
-        //console.log("move possible", this.generateMoves().filter(move => move.action === "move").map(move => move.value));
         for (const move of this.generateMoves()) {
             this.simulateMove(move, gameState);
             const evaluation = this.minimax(gameState, depth - 1, false, alpha, beta);
@@ -533,11 +464,32 @@ class IA {
         }
     }
     nextMove(gameState) {
+        let ownWalls = gameState.ownWalls;
+        let opponentWalls = gameState.opponentWalls;
+        let walls = ownWalls.concat(opponentWalls);
+        let board = gameState.board;
+        for (const wall of walls) {
+            let colonne = parseInt(wall[0][0]);
+            let ligne = parseInt(wall[0][1]);
+            let orientation = wall[1];
+            this.graph.placeWall(colonne, ligne, orientation);
+        }
+        for (let i = 0; i < 9; i++) {
+            for (let j = 0; j < 9; j++) {
+                if (board[i][j] === 1) {
+                    this.playerPosition = `${i+1}${j+1}`;
+                }
+                if (board[i][j] === 2) {
+                    this.adversaryPosition = `${i+1}${j+1}`;
+                }
+                this.graph.updateNodeState(i, j, board[i][j]);
+            }
+        }
         const startTime = performance.now();
         const bestMove = this.minimaxInit(gameState,2);
         const endTime = performance.now();
         console.log("time", endTime - startTime);
-        console.log("bestMove", bestMove);
+        //console.log("bestMove", bestMove);
         return bestMove;
     }
     generateMoves() {
@@ -550,25 +502,26 @@ class IA {
                 value: possibleMove.toString()}
             );
         }
-        for (const wall of wallPossible) {
-            moves.push({
-                action: "wall",
-                value: wall
-            });
+        if (this.ownWalls < 10) {
+            for (const wall of wallPossible) {
+                moves.push({
+                    action: "wall",
+                    value: wall
+                });
+            }
         }
-
         return moves;
     }
     simulateMove(move, gameStates) {
         if (move.action === "move") {
             this.graph.updateNodeState(parseInt(this.playerPosition[0]) - 1, parseInt(this.playerPosition[1]) - 1, 0);
             this.graph.updateNodeState(parseInt(move.value[0]) - 1, parseInt(move.value[1]) - 1, this.player);
-
             gameStates.board[parseInt(this.playerPosition[0]) - 1][parseInt(this.playerPosition[1]) - 1] = 0;
             gameStates.board[parseInt(move.value[0]) - 1][parseInt(move.value[1]) - 1] = this.player;
             this.previousPlayerPosition = this.playerPosition;
             this.playerPosition = move.value;
         } else if (move.action === "wall") {
+            this.graph.isValidWallPlacement(parseInt(move.value[0][0]) - 1, parseInt(move.value[0][1]) - 1, move.value[1],this.adversaryPosition,this.playerPosition);
             this.graph.placeWall(parseInt(move.value[0][0]) - 1, parseInt(move.value[0][1]) - 1, move.value[1]);
             gameStates.ownWalls.push(move.value);
         }
@@ -591,13 +544,11 @@ class IA {
 
     evaluate(gameStates) {
         let score = 0;
-
         const distanceToGoal = this.graph.distanceToGoal(this.player, this.playerPosition);
         score += 100 - distanceToGoal;
         // distance to the player's goal for the adversary
         const distanceToAdversaryGoal = this.graph.distanceToGoal(2, this.adversaryPosition);
         score -= 100 - distanceToAdversaryGoal;
-
         if (distanceToGoal === 1) {
             score += 1000;
         } else if (distanceToAdversaryGoal === 1) {
@@ -611,6 +562,7 @@ class IA {
     }
     updateBoard(gameState){
         let ownWalls = gameState.ownWalls;
+        this.ownWalls = ownWalls.count;
         //console.log("ownWalls", ownWalls);
         let opponentWalls = gameState.opponentWalls;
         let walls = ownWalls.concat(opponentWalls);
@@ -735,4 +687,7 @@ function testAI() {
 
 //console.log("this.wall", graph.getWalls().map(wall => wall.extractListRepresentation()).flat().filter(wall => wall[0] === "19"));
 testAI();
+
 //console.log("gameState", gameState);
+
+export {setup, nextMove, correction, updateBoard};
