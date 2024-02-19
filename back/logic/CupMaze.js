@@ -490,9 +490,9 @@ class IA {
     simulateMove(move, gameStates) {
         if (move.action === "move") {
             this.graph.updateNodeState(parseInt(this.playerPosition[0]) - 1, parseInt(this.playerPosition[1]) - 1, 0);
-            this.graph.updateNodeState(parseInt(move.value[0]) - 1, parseInt(move.value[1]) - 1, this.player);
+            this.graph.updateNodeState(parseInt(move.value[0]) - 1, parseInt(move.value[1]) - 1, 1);
             gameStates.board[parseInt(this.playerPosition[0]) - 1][parseInt(this.playerPosition[1]) - 1] = 0;
-            gameStates.board[parseInt(move.value[0]) - 1][parseInt(move.value[1]) - 1] = this.player;
+            gameStates.board[parseInt(move.value[0]) - 1][parseInt(move.value[1]) - 1] = 1;
             this.previousPlayerPosition = this.playerPosition;
             this.playerPosition = move.value;
         } else if (move.action === "wall") {
@@ -503,10 +503,10 @@ class IA {
     }
     undoMove(move, gameStates) {
         if (move.action === "move") {
-            this.graph.updateNodeState(parseInt(this.previousPlayerPosition[0]) - 1, parseInt(this.previousPlayerPosition[1]) - 1, this.player);
+            this.graph.updateNodeState(parseInt(this.previousPlayerPosition[0]) - 1, parseInt(this.previousPlayerPosition[1]) - 1, 1);
             this.graph.updateNodeState(parseInt(move.value[0]) - 1, parseInt(move.value[1]) - 1, 0);
             // update du gameStates
-            gameStates.board[parseInt(this.previousPlayerPosition[0]) - 1][parseInt(this.previousPlayerPosition[1]) - 1] = this.player;
+            gameStates.board[parseInt(this.previousPlayerPosition[0]) - 1][parseInt(this.previousPlayerPosition[1]) - 1] = 1;
             gameStates.board[parseInt(move.value[0]) - 1][parseInt(move.value[1]) - 1] = 0;
             this.playerPosition = this.previousPlayerPosition;
         } else if (move.action === "wall") {
@@ -520,7 +520,7 @@ class IA {
         const distanceToGoal = this.graph.distanceToGoal(this.player, this.playerPosition);
         score += 100 - distanceToGoal;
         // distance to the player's goal for the adversary
-        const distanceToAdversaryGoal = this.graph.distanceToGoal(2, this.adversaryPosition);
+        const distanceToAdversaryGoal = this.graph.distanceToGoal(this.opponent, this.adversaryPosition);
         score -= 100 - distanceToAdversaryGoal;
         if (distanceToGoal === 1) {
             score += 1000;
