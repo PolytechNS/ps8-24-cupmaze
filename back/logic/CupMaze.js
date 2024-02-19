@@ -463,7 +463,7 @@ class IA {
         const startTime = performance.now();
         const bestMove = this.minimaxInit(gameState,2);
         const endTime = performance.now();
-        console.log("time", endTime - startTime);
+        //console.log("time", endTime - startTime);
         //console.log("bestMove", bestMove);
         return bestMove;
     }
@@ -604,7 +604,7 @@ function isPlayerVisible(board){
 }
 
 
-function setup(AIplay) {
+exports.setup = function setup(AIplay) {
     tourActuel++;
     monChiffre = AIplay;
     return new Promise((resolve, reject) => {
@@ -616,7 +616,7 @@ function setup(AIplay) {
     });
 }
 
-function nextMove(gameState){
+exports.nextMove = function nextMove(gameState){
     const start = performance.now();
     const move = {
         action: "",
@@ -630,7 +630,7 @@ function nextMove(gameState){
     }
     return new Promise((resolve, reject) => {
         if(isPlayerVisible(gameState.board)[0] || (derniereActionJoueur === "wall" && trackerAdversaire !== "")){
-            console.log("isPlayerVisible");
+            //console.log("isPlayerVisible");
             const move = ai.nextMove(gameState);
             if (move.action === "wall" && move.value[1] === 0) {
                 nombreWallMoi--;
@@ -742,11 +742,11 @@ function nextMove(gameState){
             resolve(move);
         }
         const end = performance.now();
-        console.log("nextMove", end - start);
+        //console.log("nextMove", end - start);
     },200);
 }
-function correction(rightMove){
-    console.log("rightMove");
+exports.correction = function correction(rightMove){
+    //console.log("rightMove");
     //return a Promise that is resolved into the boolean true, indicating it is ready to continue
     return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -942,8 +942,8 @@ function isPlayerDetectedByOurWall(positionMurX, positionMurY, board){
     return [false, null, null];
 }
 
-function updateBoard(gameStates){
-    console.log("updateBoard");
+exports.updateBoard = function updateBoard(gameStates){
+    //console.log("updateBoard");
     //return a Promise resolved into the boolean true in 50ms maximum.
     return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -971,7 +971,7 @@ function updateBoard(gameStates){
             onAPoseUnMur = false;
             tourActuel++;
             const end = performance.now();
-            console.log("updateBoard", end - start);
+            //console.log("updateBoard", end - start);
             resolve(true);
         }, 50);
     });
@@ -1006,7 +1006,7 @@ class GenerateGameStates {
 }
 
 const generateGameStates = new GenerateGameStates();
-const gameState = {
+/*const gameState = {
     opponentWalls: [],
     ownWalls: [],
     board: [
@@ -1020,17 +1020,17 @@ const gameState = {
         [-1, -1, -1, -1, -1, 0, 0, 2, 0],
         [-1, -1, -1, -1, -1, -1, 0, 0, -1],
     ]
-}
+}*/
 
 
 function testAI() {
     setup(1).then((position) => {
         nextMove(gameState).then((move) => {
-            console.log("move", move);
+            //console.log("move", move);
             correction(true).then((rightMove) => {
                 console.log("rightMove", rightMove);
                 updateBoard(gameState).then((boardUpdated) => {
-                    console.log("boardUpdated", boardUpdated);
+                    //console.log("boardUpdated", boardUpdated);
                 });
             });
         });
@@ -1038,6 +1038,6 @@ function testAI() {
 }
 
 //console.log("this.wall", graph.getWalls().map(wall => wall.extractListRepresentation()).flat().filter(wall => wall[0] === "19"));
-testAI();
+//testAI();
 
 //console.log("gameState", gameState);
