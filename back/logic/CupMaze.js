@@ -941,12 +941,12 @@ function isPlayerDetectedByOurWall(positionMurX, positionMurY, board){
     return [false, null, null];
 }
 
-exports.updateBoard = function updateBoard(gameStates){
+exports.updateBoard = function updateBoard(gameState){
     //console.log("updateBoard");
     //return a Promise resolved into the boolean true in 50ms maximum.
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            ai.updateBoard(gameStates);
+            ai.updateBoard(gameState);
             if(isPlayerVisible(gameState.board)[0]){
                 trackerAdversaire = isPlayerVisible(gameState.board)[1].toString() + isPlayerVisible(gameState.board)[2].toString();
                 positionPotentiellesDuBot = [];
