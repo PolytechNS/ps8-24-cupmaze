@@ -353,29 +353,7 @@ class Graph {
     }
 }
 
-const graph = new Graph(9, 9);
-/*
-console.log("wall possible", graph.wallPossible());
 
-
-console.log("graph", graph.getNodeState(0, 0));
-console.log("51 ", graph.getNeighbors(4, 0).map(node => node.toString()));
-console.log("58", graph.getNeighbors(4, 7).map(node => node.toString()));
-console.log("possibleMovesWithJump at 58", graph.possibleMovesWithJump(4, 7).map(node => node.toString()));
-
-//graph.placeWall(4,1, 0);
-//console.log("possibleMovesWithJump at 51", graph.possibleMovesWithJump(4, 0).map(node => node.toString()));
-*/
-
-
-
-
-let ai;
-let position= ""
-let move = {
-    action: "",
-    value: ""
-}
 
 class IA {
     constructor(AIplay) {
@@ -390,16 +368,15 @@ class IA {
         this.player = AIplay;
         this.ownWalls = 0;
         this.opponent = (AIplay === 1) ? 2 : 1;
-        const position = (AIplay === 1) ? "51" : "59";
+        const position = (AIplay === 1) ? "81" : "89";
         this.graph.updateNodeState(parseInt(position[0]) - 1, parseInt(position[1]) - 1, 1);
         this.playerPosition = position;
         this.previousPlayerPosition = position;
-        // on dira que l'adversaire est a 59
-        this.adversaryPosition = (AIplay === 1) ? "59" : "51"
+        // on dira que l'adversaire est a 89
+        this.adversaryPosition = (AIplay === 1) ? "" : "";
         this.graph.updateNodeState(parseInt(this.adversaryPosition[0]) - 1, parseInt(this.adversaryPosition[1]) - 1, 2);
         return position;
     }
-
     minimaxInit(gameState, depth) {
         let alpha = Number.NEGATIVE_INFINITY;
         let beta = Number.POSITIVE_INFINITY;
@@ -420,8 +397,6 @@ class IA {
         }
         return bestMove;
     }
-
-
     minimax(gameState, depth, isMaximizing, alpha, beta) {
         if (this.isTerminalState()) {
             if (isMaximizing) {
@@ -526,7 +501,6 @@ class IA {
             gameStates.ownWalls.push(move.value);
         }
     }
-
     undoMove(move, gameStates) {
         if (move.action === "move") {
             this.graph.updateNodeState(parseInt(this.previousPlayerPosition[0]) - 1, parseInt(this.previousPlayerPosition[1]) - 1, this.player);
@@ -541,7 +515,6 @@ class IA {
             gameStates.ownWalls.pop();
         }
     }
-
     evaluate(gameStates) {
         let score = 0;
         const distanceToGoal = this.graph.distanceToGoal(this.player, this.playerPosition);
@@ -588,8 +561,51 @@ class IA {
     }
 }
 
+/*-------------------------------------------------------------------------------*/
+let ai;
+let position= ""
+let move = {
+    action: "",
+    value: ""
+}
+
+let monChiffre;
+let nombreWallMoi = 10;
+let nombreWallAdversaire = 10;
+let tourActuel = 1;
+let trackerAdversaire = "";
+let onAPoseUnMur = false;
+let coordoneesDernierMur = ""
+let positionPotentiellesDuBot = [];
+
+function isPlayerVisible(board){
+    if(monChiffre === 1){
+        for(let y = 8; y >= 0; y--){
+            for(let x = 0; x <= 8; x++){
+                if(board[y][x] === 2){
+                    trackerAdversaire = (x+1).toString() + (y+1).toString();
+                    return [true, x, y];
+                }
+            }
+        }
+        return [false, null, null];
+    } else {
+        for(let y = 0; y <= 8; y++){
+            for(let x = 0; x <= 8; x++){
+                if(board[y][x] === 2){
+                    trackerAdversaire = (x+1).toString() + (y+1).toString();
+                    return [true, x, y];
+                }
+            }
+        }
+    }
+    return [false, null, null];
+}
+
+
 function setup(AIplay) {
-    console.log("setup");
+    tourActuel++;
+    monChiffre = AIplay;
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             ai = new IA();
@@ -599,24 +615,298 @@ function setup(AIplay) {
     });
 }
 
-function nextMove(gameStates){
-    console.log("nextMove");
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            move = ai.nextMove(gameStates);
-            resolve(move);
-        }, 200);
-    });
-}
+function nextMove(gameState){
+    const start = performance.now();
+    const move = {
+        action: "",
+        value: ""
+    }
 
+    let derniereActionJoueur;
+    if(10 - gameState.opponentWalls.length !== nombreWallAdversaire){
+        nombreWallAdversaire = 10 - gameState.opponentWalls.length;
+        derniereActionJoueur = "wall";
+    }
+    return new Promise((resolve, reject) => {
+        if(isPlayerVisible(gameState.board)[0] || (derniereActionJoueur === "wall" && trackerAdversaire !== "")){
+            console.log("isPlayerVisible");
+            const move = ai.nextMove(gameState);
+            if (move.action === "wall" && move.value[1] === 0) {
+                nombreWallMoi--;
+                onAPoseUnMur = true;
+                coordoneesDernierMur = move.value[0];
+            }
+            resolve(move);
+        }else if(nombreWallMoi > 0){
+            if(monChiffre === 1) {
+                if(trackerAdversaire !== ""){
+                    move.action = "wall";
+                    let positionMur = trackerAdversaire[0] + (parseInt(trackerAdversaire[1])).toString();
+                    move.value = [positionMur, 0];
+                    onAPoseUnMur = true;
+                    coordoneesDernierMur = positionMur;
+                    nombreWallMoi--;
+                    resolve(move);
+                } else if(tourActuel === 2) {
+                    move.action = "wall";
+                    move.value = ["78", 0];
+                    onAPoseUnMur = true;
+                    coordoneesDernierMur = "78";
+                    nombreWallMoi--;
+                    resolve(move);
+                } else if (tourActuel === 3) {
+                    move.action = "wall";
+                    move.value = ["28", 0];
+                    onAPoseUnMur = true;
+                    coordoneesDernierMur = "28";
+                    nombreWallMoi--;
+                    resolve(move);
+                }else if(positionPotentiellesDuBot.length > 0){
+                    move.action = "wall";
+                    let positionMur = positionPotentiellesDuBot[0][0] + (parseInt(positionPotentiellesDuBot[0][1])).toString();
+                    move.value = [positionMur, 0];
+                    onAPoseUnMur = true;
+                    coordoneesDernierMur = positionMur;
+                    nombreWallMoi--;
+                    resolve(move);
+                } else {
+                    const move = ai.nextMove(gameState);
+                    resolve(move);
+                }
+            } else if (monChiffre === 2){
+                if(trackerAdversaire !== ""){
+                    move.action = "wall";
+                    let positionMur = trackerAdversaire[0] + (parseInt(trackerAdversaire[1]) + 1).toString();
+                    move.value = [positionMur, 0];
+                    onAPoseUnMur = true;
+                    coordoneesDernierMur = positionMur;
+                    nombreWallMoi--;
+                    resolve(move);
+                } else if(tourActuel === 2){
+                    move.action = "wall";
+                    move.value = ["73", 0];
+                    onAPoseUnMur = true;
+                    coordoneesDernierMur = "73";
+                    nombreWallMoi--;
+                    resolve(move);
+                } else if(tourActuel === 3) {
+                    move.action = "wall";
+                    move.value = ["23", 0];
+                    onAPoseUnMur = true;
+                    coordoneesDernierMur = "23";
+                    nombreWallMoi--;
+                    resolve(move);
+                }else if(positionPotentiellesDuBot.length > 0){
+                    move.action = "wall";
+                    let positionMur = positionPotentiellesDuBot[0][0] + (parseInt(positionPotentiellesDuBot[0][1]) + 1).toString();
+                    move.value = [positionMur, 0];
+                    onAPoseUnMur = true;
+                    coordoneesDernierMur = positionMur;
+                    nombreWallMoi--;
+                    resolve(move);
+                } else {
+                    const move = ai.nextMove(gameState);
+                    resolve(move);
+                }
+            }
+        }else{
+            const move = ai.nextMove(gameState);
+            resolve(move);
+        }
+        const end = performance.now();
+        console.log("nextMove", end - start);
+    },200);
+}
 function correction(rightMove){
     console.log("rightMove");
     //return a Promise that is resolved into the boolean true, indicating it is ready to continue
     return new Promise((resolve, reject) => {
         setTimeout(() => {
+            if(rightMove.action === "wall" && rightMove.value[1] === 0){
+                nombreWallMoi--;
+                onAPoseUnMur = true;
+                coordoneesDernierMur = rightMove.value[0];
+            }
             resolve(true);
         }, 50);
     });
+}
+
+function isPlayerDetectedByOurWall(positionMurX, positionMurY, board){
+    positionMurX = positionMurX - 1;
+    positionMurY = positionMurY - 1;
+    let xToTest;
+    let yToTest;
+    if(board[positionMurX][positionMurY+1] === -1 && board[positionMurX+1][positionMurY+1] === -1){
+        return [false, (positionMurX+1).toString()+(positionMurY+1+1).toString(), (positionMurX+1+1).toString()+(positionMurY+1+1).toString()];
+    }else if(board[positionMurX+2][positionMurY] === -1 && board[positionMurX+2][positionMurY-1] === -1){
+        return [false, (positionMurX+2+1).toString()+(positionMurY+1).toString(), (positionMurX+2+1).toString()+(positionMurY-1+1).toString()];
+    } else if (board[positionMurX][positionMurY-2] === -1 && board[positionMurX+1][positionMurY-2] === -1){
+        return [false, (positionMurX+1).toString()+(positionMurY-2+1).toString(), (positionMurX+1+1).toString()+(positionMurY-2+1).toString()];
+    }else if(board[positionMurX-1][positionMurY] === -1 && board[positionMurX-1][positionMurY-1] === -1){
+        return [false, (positionMurX-1+1).toString()+(positionMurY+1).toString(), (positionMurX-1+1).toString()+(positionMurY-1+1).toString()];
+    }
+    //Premier case que l'on test
+    xToTest = positionMurX;
+    yToTest = positionMurY + 1;
+    if(xToTest >=0 && xToTest<=8 && yToTest >=0 && yToTest<=8){
+        if(board[xToTest][yToTest] === -1){
+
+            let xPotentiel1 = xToTest;
+            let yPotentiel1 = yToTest + 1;
+
+            let xPotentiel2 = xToTest-1;
+            let yPotentiel2 = yToTest;
+
+            if(yPotentiel1 > 8 || yPotentiel1 <0 || xPotentiel1 < 0 || xPotentiel1 > 8){ //case impossible donc on a plus qu'une case qui est bloquante et c'est le bloc
+                return [true, (xPotentiel2+1).toString()+(yPotentiel2+1).toString(), null];
+            } else if(yPotentiel2 > 8 || yPotentiel2 <0 || xPotentiel2 < 0 || xPotentiel2 > 8){
+                return [true, (xPotentiel1+1).toString()+(yPotentiel1+1).toString(), null];
+            } else {
+                return [false, (xPotentiel1+1).toString()+(yPotentiel1+1).toString(), (xPotentiel2+1).toString()+(yPotentiel2+1).toString()];
+            }
+        }
+    }
+    //Deuxième case que l'on test
+    xToTest = positionMurX+1 ;
+    yToTest = positionMurY+1 ;
+    if(xToTest >=0 && xToTest<=8 && yToTest >=0 && yToTest<=8){
+        if(board[xToTest][yToTest] === -1){
+            let xPotentiel1 = xToTest;
+            let yPotentiel1 = yToTest +1;
+
+            let xPotentiel2 = xToTest+1;
+            let yPotentiel2 = yToTest;
+            if(yPotentiel1 > 8 || yPotentiel1 <0 || xPotentiel1 < 0 || xPotentiel1 > 8){ //case impossible donc on a plus qu'une case qui est bloquante et c'est le bloc
+                return [true, (xPotentiel2+1).toString()+(yPotentiel2+1).toString(), null];
+            } else if(yPotentiel2 > 8 || yPotentiel2 <0 || xPotentiel2 < 0 || xPotentiel2 > 8){
+                return [true, (xPotentiel1+1).toString()+(yPotentiel1+1).toString(), null];
+            } else {
+                return [false, (xPotentiel1+1).toString()+(yPotentiel1+1).toString(), (xPotentiel2+1).toString()+(yPotentiel2+1).toString()];
+            }
+        }
+    }
+    //Troisième case que l'on test
+    xToTest = positionMurX+2;
+    yToTest = positionMurY;
+    if(xToTest >=0 && xToTest<=8 && yToTest >=0 && yToTest<=8){
+        if(board[xToTest][yToTest] === -1){
+
+            let xPotentiel1 = xToTest;
+            let yPotentiel1 = yToTest +1;
+
+            let xPotentiel2 = xToTest+1;
+            let yPotentiel2 = yToTest;
+            if(yPotentiel1 > 8 || yPotentiel1 <0 || xPotentiel1 < 0 || xPotentiel1 > 8){ //case impossible donc on a plus qu'une case qui est bloquante et c'est le bloc
+                return [true, xPotentiel2.toString()+yPotentiel2.toString(), null];
+            } else if(yPotentiel2 > 8 || yPotentiel2 <0 || xPotentiel2 < 0 || xPotentiel2 > 8){
+                return [true, xPotentiel1.toString()+yPotentiel1.toString(), null];
+            } else {
+                return [false, xPotentiel1.toString()+yPotentiel1.toString(), xPotentiel2.toString()+yPotentiel2.toString()];
+            }
+        }
+    }
+    //Quatrième case que l'on test
+    xToTest = positionMurX+2;
+    yToTest = positionMurY-1;
+    if(xToTest >=0 && xToTest<=8 && yToTest >=0 && yToTest<=8){
+        if(board[xToTest][yToTest] === -1){
+
+            let xPotentiel1 = xToTest;
+            let yPotentiel1 = yToTest -1;
+
+            let xPotentiel2 = xToTest+1;
+            let yPotentiel2 = yToTest;
+            if(yPotentiel1 > 8 || yPotentiel1 <0 || xPotentiel1 < 0 || xPotentiel1 > 8){ //case impossible donc on a plus qu'une case qui est bloquante et c'est le bloc
+                return [true, xPotentiel2.toString()+yPotentiel2.toString(), null];
+            } else if(yPotentiel2 > 8 || yPotentiel2 <0 || xPotentiel2 < 0 || xPotentiel2 > 8){
+                return [true, xPotentiel1.toString()+yPotentiel1.toString(), null];
+            } else {
+                return [false, xPotentiel1.toString()+yPotentiel1.toString(), xPotentiel2.toString()+yPotentiel2.toString()];
+            }
+        }
+    }
+    //Cinquième case que l'on test
+    xToTest = positionMurX+1;
+    yToTest = positionMurY-2;
+    if(xToTest >=0 && xToTest<=8 && yToTest >=0 && yToTest<=8){
+        if(board[xToTest][yToTest] === -1){
+
+            let xPotentiel1 = xToTest+1;
+            let yPotentiel1 = yToTest;
+
+            let xPotentiel2 = xToTest;
+            let yPotentiel2 = yToTest-1;
+            if(yPotentiel1 > 8 || yPotentiel1 <0 || xPotentiel1 < 0 || xPotentiel1 > 8){ //case impossible donc on a plus qu'une case qui est bloquante et c'est le bloc
+                return [true, xPotentiel2.toString()+yPotentiel2.toString(), null];
+            } else if(yPotentiel2 > 8 || yPotentiel2 <0 || xPotentiel2 < 0 || xPotentiel2 > 8){
+                return [true, xPotentiel1.toString()+yPotentiel1.toString(), null];
+            } else {
+                return [false, xPotentiel1.toString()+yPotentiel1.toString(), xPotentiel2.toString()+yPotentiel2.toString()];
+            }
+        }
+    }
+    //Sixième case que l'on test
+    xToTest = positionMurX;
+    yToTest = positionMurY-2;
+    if(xToTest >=0 && xToTest<=8 && yToTest >=0 && yToTest<=8){
+        if(board[xToTest][yToTest] === -1){
+
+            let xPotentiel1 = xToTest-1;
+            let yPotentiel1 = yToTest;
+
+            let xPotentiel2 = xToTest;
+            let yPotentiel2 = yToTest-1;
+            if(yPotentiel1 > 8 || yPotentiel1 <0 || xPotentiel1 < 0 || xPotentiel1 > 8){ //case impossible donc on a plus qu'une case qui est bloquante et c'est le bloc
+                return [true, xPotentiel2.toString()+yPotentiel2.toString(), null];
+            } else if(yPotentiel2 > 8 || yPotentiel2 <0 || xPotentiel2 < 0 || xPotentiel2 > 8){
+                return [true, xPotentiel1.toString()+yPotentiel1.toString(), null];
+            } else {
+                return [false, xPotentiel1.toString()+yPotentiel1.toString(), xPotentiel2.toString()+yPotentiel2.toString()];
+            }
+        }
+    }
+    //Septième case que l'on test
+    xToTest = positionMurX-1;
+    yToTest = positionMurY-1;
+    if(xToTest >=0 && xToTest<=8 && yToTest >=0 && yToTest<=8){
+        if(board[xToTest][yToTest] === -1){
+
+            let xPotentiel1 = xToTest;
+            let yPotentiel1 = yToTest-1;
+
+            let xPotentiel2 = xToTest-1;
+            let yPotentiel2 = yToTest;
+            if(yPotentiel1 > 8 || yPotentiel1 <0 || xPotentiel1 < 0 || xPotentiel1 > 8){ //case impossible donc on a plus qu'une case qui est bloquante et c'est le bloc
+                return [true, xPotentiel2.toString()+yPotentiel2.toString(), null];
+            } else if(yPotentiel2 > 8 || yPotentiel2 <0 || xPotentiel2 < 0 || xPotentiel2 > 8){
+                return [true, xPotentiel1.toString()+yPotentiel1.toString(), null];
+            } else {
+                return [false, xPotentiel1.toString()+yPotentiel1.toString(), xPotentiel2.toString()+yPotentiel2.toString()];
+            }
+        }
+    }
+    //Huitième case que l'on test
+    xToTest = positionMurX-1;
+    yToTest = positionMurY;
+    if(xToTest >=0 && xToTest<=8 && yToTest >=0 && yToTest<=8){
+        if(board[xToTest][yToTest] === -1){
+
+            let xPotentiel1 = xToTest;
+            let yPotentiel1 = yToTest+1;
+
+            let xPotentiel2 = xToTest-1;
+            let yPotentiel2 = yToTest;
+            if(yPotentiel1 > 8 || yPotentiel1 <0 || xPotentiel1 < 0 || xPotentiel1 > 8){ //case impossible donc on a plus qu'une case qui est bloquante et c'est le bloc
+                return [true, xPotentiel2.toString()+yPotentiel2.toString(), null];
+            } else if(yPotentiel2 > 8 || yPotentiel2 <0 || xPotentiel2 < 0 || xPotentiel2 > 8){
+                return [true, xPotentiel1.toString()+yPotentiel1.toString(), null];
+            } else {
+                return [false, xPotentiel1.toString()+yPotentiel1.toString(), xPotentiel2.toString()+yPotentiel2.toString()];
+            }
+        }
+    }
+    return [false, null, null];
 }
 
 function updateBoard(gameStates){
@@ -624,22 +914,37 @@ function updateBoard(gameStates){
     //return a Promise resolved into the boolean true in 50ms maximum.
     return new Promise((resolve, reject) => {
         setTimeout(() => {
+            const start = performance.now();
             ai.updateBoard(gameStates);
+            if(isPlayerVisible(gameState.board)[0]){
+                trackerAdversaire = isPlayerVisible(gameState.board)[1].toString() + isPlayerVisible(gameState.board)[2].toString();
+                positionPotentiellesDuBot = [];
+                positionPotentiellesDuBot.push(trackerAdversaire);
+                //console.log("ON A VU LE JOUEUR");
+            } else {
+                if(onAPoseUnMur){
+                    let answer = isPlayerDetectedByOurWall(parseInt(coordoneesDernierMur[0]), parseInt(coordoneesDernierMur[1]), gameState.board);
+                    if(answer[0]){
+                        //console.log("PAS VU MAIS TROUVE");
+                        trackerAdversaire = answer[1][1] + answer[1][0];
+                    }else if(answer[1] !== null && answer[2] !== null) {
+                        //console.log("POTENTIELLEMENT");
+                        positionPotentiellesDuBot = [];
+                        positionPotentiellesDuBot.push(answer[1][1] + answer[1][0]);
+                        positionPotentiellesDuBot.push(answer[2][1] + answer[2][0]);
+                    }
+                }
+            }
+            onAPoseUnMur = false;
+            tourActuel++;
+            const end = performance.now();
+            console.log("updateBoard", end - start);
             resolve(true);
         }, 50);
     });
 }
 
 /*-------------------------------------------------------------------------------*/
-let gameStates = {
-    // a list containing each of your opponent's walls (for each wall, the value is a list containing 2 elements --> a position string representing the top-left square that the wall is in contact with, and 0 if the wall is placed horizontally or1 if it is vertical).
-    opponentWalls: [],
-    // a list containing each of your walls (for each wall, the value is a list containing 2 elements --> a position string representing the top-left square that the wall is in contact with, and 0 if the wall is placed horizontally or1 if it is vertical).
-    ownWalls: [],
-    //a list containing 9 lists of length 9, for which board[i][j] represents the content of the cell (i+1, j+1) as defined in the rules. The value for each cell can be : -1 if you do not see the cell, 0 if you see the cell but it is empty, 1 if you are in the cell, 2 if your opponent is in the cell
-    board: [],
-}
-
 
 class GenerateGameStates {
     constructor() {
@@ -668,7 +973,21 @@ class GenerateGameStates {
 }
 
 const generateGameStates = new GenerateGameStates();
-const gameState = generateGameStates.gameStates;
+const gameState = {
+    opponentWalls: [],
+    ownWalls: [],
+    board: [
+        [1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [-1, -1, -1, -1, -1, -1, 0, 0, -1],
+        [-1, -1, -1, -1, -1, 0, 0, 0, 0],
+        [-1, -1, -1, -1, -1, 0, 0, 2, 0],
+        [-1, -1, -1, -1, -1, -1, 0, 0, -1],
+    ]
+}
 
 
 function testAI() {
@@ -689,5 +1008,3 @@ function testAI() {
 testAI();
 
 //console.log("gameState", gameState);
-
-export {setup, nextMove, correction, updateBoard};
