@@ -617,7 +617,6 @@ exports.setup = function setup(AIplay) {
 }
 
 exports.nextMove = function nextMove(gameState){
-    const start = performance.now();
     const move = {
         action: "",
         value: ""
@@ -947,7 +946,6 @@ exports.updateBoard = function updateBoard(gameStates){
     //return a Promise resolved into the boolean true in 50ms maximum.
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            const start = performance.now();
             ai.updateBoard(gameStates);
             if(isPlayerVisible(gameState.board)[0]){
                 trackerAdversaire = isPlayerVisible(gameState.board)[1].toString() + isPlayerVisible(gameState.board)[2].toString();
@@ -970,74 +968,9 @@ exports.updateBoard = function updateBoard(gameStates){
             }
             onAPoseUnMur = false;
             tourActuel++;
-            const end = performance.now();
-            //console.log("updateBoard", end - start);
             resolve(true);
         }, 50);
     });
 }
 
 /*-------------------------------------------------------------------------------*/
-
-class GenerateGameStates {
-    constructor() {
-        this.gameStates = {
-            opponentWalls: [],
-            ownWalls: [],
-            board: []
-        }
-        this.createEmptyBoard();
-    }
-    createEmptyBoard() {
-        for (let i = 0; i < 9; i++) {
-            const row = [];
-            for (let j = 0; j < 9; j++) {
-                if (j === 4) {
-                    row.push(0);
-                } else if (j > 4) {
-                    row.push(-1);
-                } else {
-                    row.push(0);
-                }
-            }
-            this.gameStates.board.push(row);
-        }
-    }
-}
-
-const generateGameStates = new GenerateGameStates();
-/*const gameState = {
-    opponentWalls: [],
-    ownWalls: [],
-    board: [
-        [1, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [-1, -1, -1, -1, -1, -1, 0, 0, -1],
-        [-1, -1, -1, -1, -1, 0, 0, 0, 0],
-        [-1, -1, -1, -1, -1, 0, 0, 2, 0],
-        [-1, -1, -1, -1, -1, -1, 0, 0, -1],
-    ]
-}*/
-
-
-function testAI() {
-    setup(1).then((position) => {
-        nextMove(gameState).then((move) => {
-            //console.log("move", move);
-            correction(true).then((rightMove) => {
-                console.log("rightMove", rightMove);
-                updateBoard(gameState).then((boardUpdated) => {
-                    //console.log("boardUpdated", boardUpdated);
-                });
-            });
-        });
-    });
-}
-
-//console.log("this.wall", graph.getWalls().map(wall => wall.extractListRepresentation()).flat().filter(wall => wall[0] === "19"));
-//testAI();
-
-//console.log("gameState", gameState);
