@@ -575,8 +575,9 @@ let nombreWallAdversaire = 10;
 let tourActuel = 1;
 let trackerAdversaire = "";
 let onAPoseUnMur = false;
-let coordoneesDernierMur = ""
+let coordoneesDernierMur = "";
 let positionPotentiellesDuBot = [];
+let derniereActionMoi = "";
 
 function isPlayerVisible(board){
     if(monChiffre === 1){
@@ -634,6 +635,7 @@ function nextMove(gameState){
             if (move.action === "wall" && move.value[1] === 0) {
                 nombreWallMoi--;
                 onAPoseUnMur = true;
+                derniereActionMoi = "wall";
                 coordoneesDernierMur = move.value[0];
             }
             resolve(move);
@@ -646,6 +648,7 @@ function nextMove(gameState){
                     onAPoseUnMur = true;
                     coordoneesDernierMur = positionMur;
                     nombreWallMoi--;
+                    derniereActionMoi = "wall";
                     resolve(move);
                 } else if(tourActuel === 2) {
                     move.action = "wall";
@@ -653,6 +656,7 @@ function nextMove(gameState){
                     onAPoseUnMur = true;
                     coordoneesDernierMur = "78";
                     nombreWallMoi--;
+                    derniereActionMoi = "wall";
                     resolve(move);
                 } else if (tourActuel === 3) {
                     move.action = "wall";
@@ -660,6 +664,7 @@ function nextMove(gameState){
                     onAPoseUnMur = true;
                     coordoneesDernierMur = "28";
                     nombreWallMoi--;
+                    derniereActionMoi = "wall";
                     resolve(move);
                 }else if(positionPotentiellesDuBot.length > 0){
                     move.action = "wall";
@@ -668,9 +673,16 @@ function nextMove(gameState){
                     onAPoseUnMur = true;
                     coordoneesDernierMur = positionMur;
                     nombreWallMoi--;
+                    derniereActionMoi = "wall";
                     resolve(move);
                 } else {
                     const move = ai.nextMove(gameState);
+                    if (move.action === "wall" && move.value[1] === 0) {
+                        nombreWallMoi--;
+                        onAPoseUnMur = true;
+                        derniereActionMoi = "wall";
+                        coordoneesDernierMur = move.value[0];
+                    }
                     resolve(move);
                 }
             } else if (monChiffre === 2){
@@ -681,6 +693,7 @@ function nextMove(gameState){
                     onAPoseUnMur = true;
                     coordoneesDernierMur = positionMur;
                     nombreWallMoi--;
+                    derniereActionMoi = "wall";
                     resolve(move);
                 } else if(tourActuel === 2){
                     move.action = "wall";
@@ -688,6 +701,7 @@ function nextMove(gameState){
                     onAPoseUnMur = true;
                     coordoneesDernierMur = "73";
                     nombreWallMoi--;
+                    derniereActionMoi = "wall";
                     resolve(move);
                 } else if(tourActuel === 3) {
                     move.action = "wall";
@@ -695,6 +709,7 @@ function nextMove(gameState){
                     onAPoseUnMur = true;
                     coordoneesDernierMur = "23";
                     nombreWallMoi--;
+                    derniereActionMoi = "wall";
                     resolve(move);
                 }else if(positionPotentiellesDuBot.length > 0){
                     move.action = "wall";
@@ -703,14 +718,27 @@ function nextMove(gameState){
                     onAPoseUnMur = true;
                     coordoneesDernierMur = positionMur;
                     nombreWallMoi--;
+                    derniereActionMoi = "wall";
                     resolve(move);
                 } else {
                     const move = ai.nextMove(gameState);
+                    if (move.action === "wall" && move.value[1] === 0) {
+                        nombreWallMoi--;
+                        onAPoseUnMur = true;
+                        derniereActionMoi = "wall";
+                        coordoneesDernierMur = move.value[0];
+                    }
                     resolve(move);
                 }
             }
         }else{
             const move = ai.nextMove(gameState);
+            if (move.action === "wall" && move.value[1] === 0) {
+                nombreWallMoi--;
+                onAPoseUnMur = true;
+                derniereActionMoi = "wall";
+                coordoneesDernierMur = move.value[0];
+            }
             resolve(move);
         }
         const end = performance.now();
@@ -722,6 +750,11 @@ function correction(rightMove){
     //return a Promise that is resolved into the boolean true, indicating it is ready to continue
     return new Promise((resolve, reject) => {
         setTimeout(() => {
+            if(derniereActionMoi === "wall"){
+                nombreWallMoi++;
+                onAPoseUnMur = false;
+                coordoneesDernierMur = "";
+            }
             if(rightMove.action === "wall" && rightMove.value[1] === 0){
                 nombreWallMoi--;
                 onAPoseUnMur = true;
