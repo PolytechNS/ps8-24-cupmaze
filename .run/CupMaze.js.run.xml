@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="CupMaze.js" type="NodeJSConfigurationType" path-to-node="wsl://kali-linux@/usr/bin/node" nameIsGenerated="true" path-to-js-file="CupMaze.js" working-dir="$PROJECT_DIR$/back/logic">
+    <method v="2" />
+  </configuration>
+</component>
