@@ -2,15 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="mainMenu.css">
     <title>Menu principal :</title>
 </head>
 <body>
-    <h1>Bienvenue sur le menu principal du jeu !</h1>
-    <p id="nameCurrentPlayer"></p>
-    <button id="button-launch-botGame">Lancer une partie contre un bot</button>
-    <button id="button-launch-localGame">Lancer une partie locale</button>
-    <button id="button-retrieveGame">Récupérer la dernière partie sauvegardée</button>
+    <div class="left-band">
 
+    </div>
+    <div class="center">
+        <p id="welcomeMsg">Bienvenue sur le menu principal du jeu !</p>
+        <p>
+            <button id="button-launch-botGame" class="button">Lancer une partie contre un bot</button>
+        </p>
+        <p>
+            <button id="button-launch-localGame" class="button">Lancer une partie locale</button>
+        </p>
+        <p>
+-        <button id="button-retrieveGame" class="button">Récupérer la dernière partie sauvegardée</button>
+        </p>
+    </div>
+    <div class="right-band">
+
+    </div>
     <script src="./js/socket.io.js"></script>
     <script>
         let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
