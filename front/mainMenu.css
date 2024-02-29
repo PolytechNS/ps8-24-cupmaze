@@ -10,10 +10,6 @@ body {
     background-color: #cccccc;
 }
 
-h1{
-    margin-bottom: 10%;
-}
-
 .left-band, .right-band {
     width: 20%;
     background: rgba(55, 84, 76, 0.7);
@@ -25,13 +21,21 @@ h1{
 }
 
 #welcomeMsg{
-    color: #cccccc;
-    font-size: xx-large;
+    color: rgba(255, 255, 255);
+    font-weight: bolder;
+    text-shadow: -1px 1px 0 darkgreen,
+    1px 1px 0 darkgreen,
+    1px -1px 0 darkgreen,
+    -1px -1px 0 darkgreen;
+    font-size: xxx-large;
 }
 
 .button{
-    margin: 3%;
-    font-size: x-large;
+    color: rgba(255, 255, 255);
+    margin: 2%;
+    font-size: xx-large;
+    font-weight: bold;
     padding: 2%;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(55, 84, 76, 0.7);
+    border: none;
 }
