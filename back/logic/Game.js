@@ -3,6 +3,7 @@ const { Case } = require('./Case.js');
 const { Space } = require('./Space.js');
 const { getPossibleMoves } = require('./movePlayerReferee.js');
 
+const { Node, Graph, NodeWall, PriorityQueue } = require('./CupMaze.js');
 
 class Game {
     constructor() {
@@ -27,6 +28,8 @@ class Game {
         this.lastWallsLaid = [];
         this.lastWallLaidsIDHtml = [];
 
+        this.graph = new Graph(9, 9);
+
         this.casePosition = [];
         this.wallPossible = [];
         this.gameState = {};
@@ -44,23 +47,25 @@ class Game {
         this.elements = savedGame.elements;
         this.lastWallsLaid = savedGame.lastWallsLaid;
         this.lastWallLaidsIDHtml = savedGame.lastWallLaidsIDHtml;
+
+        this.graph = savedGame.graph;
     }
 
     init() {
         for (let i = 0; i < 9; i++) {
             for (let j = 0; j < 9; j++) {
                 //ajoute case, mur et à la fin on doit juste finir sur case
-                this.elements.push(new Case(i, j, false));
+                this.elements.push(new Case(j, i, false));
                 if(j<8) {
                     //console.log("wall vertical", i, j);
-                    this.elements.push(new Wall(i, j, false, "vertical"));
+                    this.elements.push(new Wall(j, i, false, "vertical"));
                 }
             }
             for(let j = 0; j < 9; j++){
-                this.elements.push(new Wall(i, j, false, "horizontal"));
+                this.elements.push(new Wall(j, i, false, "horizontal"));
                 // on rajoute un space entre chaque mur
                 if (j < 8) {
-                    this.elements.push(new Space(i, j, true));
+                    this.elements.push(new Space(j, i, true));
                 }
             }
         }

@@ -76,27 +76,25 @@ function main(isLoadGame) {
 function initializeTable() {
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
-            const cellId = i + "-" + j;
+            const cellId = (j+1) + "-" + (9-i);
             const cell = document.createElement("div");
             cell.id = cellId+"~cell";
             cell.classList.add("cell");
             cell.addEventListener("click", choosePositionToBegin);
             board.appendChild(cell);
             if(j !== 8) {
-                const wallId = i + "-" + j + "~" + (i + 1) + "-" + j;
                 const wall = document.createElement("div");
-                wall.id = "wv~"+i+"-"+j;
+                wall.id = "wv~"+(j+1)+"-"+(9-i);
                 wall.classList.add("wall-vertical")
                 board.appendChild(wall);
             }
         }
         if(i === 8) break;
         for (let j = 0; j < 9; j++) {
-            const wallId = i + "-" + j + "~" + i + "-" + (j + 1);
             const wall = document.createElement("div");
-            wall.id = "wh~"+i+"-"+j;
+            wall.id = "wh~"+(j+1)+"-"+(9-i);
             wall.classList.add("wall-horizontal");
-            const spaceId = i + "-" + j;
+            const spaceId = (j+1)+"-"+(9-i);
             const space = document.createElement("div");
             space.id = spaceId+"-space";
             space.classList.add("space");

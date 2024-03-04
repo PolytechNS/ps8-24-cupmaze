@@ -1,5 +1,5 @@
 
-const {Game} = require("./Game");
+const {Game} = require("./logic/Game.js");
 
 /*----------------------------------------------------------*/
 class dataAdapter {
@@ -22,7 +22,7 @@ class dataAdapter {
             for (let x = 0; x < 9; x++) {
                 row.push(`${y+1}${x+1}`);
                 if(x > 0 && y < 8) {
-                    this.game.wallPossible.push([`${y+1}${x+1}`, 0]);
+                    this.game.wallPossible.push([`${y+1}${x+1}`, -1]);
                 }
                 if (x === 4) {
                     boardRow.push(0);
@@ -64,7 +64,8 @@ function displayBoardWall(board) {
 
 const game = new Game();
 const adapter = new dataAdapter(game);
-//displayBoard(game.casePosition);
+displayBoard(game.casePosition);
 colonne = 4;
 ligne = 8;
+console.log(game.casePosition[colonne-1][ligne-1]);
 
