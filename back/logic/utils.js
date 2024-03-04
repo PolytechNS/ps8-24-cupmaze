@@ -34,18 +34,18 @@ function findSpace(pos_x, pos_y, elements) {
 
 function findAdjacentWall(wall, elements) {
     if (wall === undefined) { return undefined; }
-    const line = wall.pos_x;
-    const column = wall.pos_y;
+    const colonne = wall.pos_x;
+    const ligne = wall.pos_y;
     const inclinaison = wall.inclinaison;
-    if (inclinaison === "vertical" && line < 8) {
-        return findWall(line + 1, column, inclinaison, elements);
-    } else if (inclinaison === "horizontal" && column < 8) {
-        return findWall(line, column + 1, inclinaison, elements);
+    if (inclinaison === "vertical" && colonne < 9) {
+        return findWall(colonne, ligne-1, inclinaison, elements);
+    } else if (inclinaison === "horizontal" && ligne < 9) {
+        return findWall(colonne+1, ligne, inclinaison, elements);
     } else {
         if (inclinaison === "vertical") {
-            return findWall(line - 1, column, inclinaison, elements);
+            return findWall(colonne, ligne, inclinaison, elements);
         }
-        return findWall(line, column - 1, inclinaison, elements);
+        return findWall(colonne+1, ligne, inclinaison, elements);
     }
 }
 

@@ -3,7 +3,7 @@ const { Server } = require("socket.io");
 const { Game } = require("../logic/Game.js");
 const { getGame, createGame, clearGames} = require("../database/mongo");
 const { Case } = require("../logic/Case.js");
-const { findWall, findAdjacentWall, findAdjacentSpace,  removeHighlight } = require("../logic/utils");
+const { findWall, findAdjacentWall, findAdjacentSpace,  removeHighlight, findSpace} = require("../logic/utils");
 const { isWallPlacementValid } = require("../logic/wallLayingUtils.js");
 const { Wall } = require("../logic/Wall");
 const {beginningPositionIsValid} = require("../logic/movePlayerReferee");
@@ -20,7 +20,6 @@ function createSocket(server) {
     gameNamespace.on("connection", (socket) => {
         console.log("a user connected");
         const game = new Game();
-        console.log(game.elements);
 
         socket.on("newMove", (msg) => {
             console.log("On demande à l'IA de jouer maintenant");
@@ -189,22 +188,31 @@ function createSocket(server) {
 
         socket.on("wallLaid",(firstWallToColor, wallType, wallPosition, wallId) => {
             console.log("wallLaid", firstWallToColor, wallType, wallPosition);
-
+            console.log("game.actionsToDo", game.actionsToDo);
+            if (game.actionsToDo === 0) {
+                gameNamespace.emit("laidWall", null, null, null);
+                return;
+            }
             let adjacentWallId = null;
             let adjacentSpaceId = null;
 
-            const x = parseInt(wallPosition[0]);
-            const y = parseInt(wallPosition[1]);
+            const colonne = parseInt(wallPosition[0]);
+            const ligne = parseInt(wallPosition[2]);
             let wallInclinaison;
             if (firstWallToColor === null) {
                 console.log("vide");
                 return;
             }
+
             if (wallType === "wv") { wallInclinaison = "vertical"; }
             else { wallInclinaison = "horizontal"; }
-            const wall = findWall(x,y, wallInclinaison, game.elements);
-            let adjacentWall = findAdjacentWall(wall, game.elements);
-            let adjacentSpace = findAdjacentSpace(wall, game.elements);
+
+            const wall = findWall(colonne,ligne, wallInclinaison, game.elements);
+            const adjacentWall =
+                (wallInclinaison === "vertical")
+                    ? findWall(colonne, ligne-1, wallInclinaison, game.elements)
+                    : findWall(colonne+1, ligne, wallInclinaison, game.elements);
+            const adjacentSpace = findSpace(colonne, ligne, game.elements);
 
             if (isWallPlacementValid(wall,adjacentWall, adjacentSpace) === false) {
                 gameNamespace.emit("laidWall", null, null, null);
@@ -214,6 +222,7 @@ function createSocket(server) {
             if (game.actionsToDo > 0 && ((game.currentPlayer === 1 && game.nbWallsPlayer1 > 0) || (game.currentPlayer === 2 && game.nbWallsPlayer2 > 0))) {
                 console.log("AVANT layWall");
                 game.layWall(wall,adjacentWall,adjacentSpace);
+                game.graph.placeWall(colonne,ligne, (wallInclinaison === "vertical") ? 0 : 1);
                 game.actionsToDo--;
                 game.lastActionType = "wall";
                 if (game.currentPlayer === 1) {
@@ -231,7 +240,6 @@ function createSocket(server) {
                     gameNamespace.emit("laidWall", adjacentWallId, adjacentSpaceId, wallType, game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
                 }
             }
-            game.actionsToDo=1;
             game.lastWallLaidsIDHtml = [wallId, adjacentWallId, adjacentSpaceId];
         });
 
