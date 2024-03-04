@@ -20,6 +20,7 @@ function createSocket(server) {
     gameNamespace.on("connection", (socket) => {
         console.log("a user connected");
         const game = new Game();
+        console.log(game.elements);
 
         socket.on("newMove", (msg) => {
             console.log("On demande à l'IA de jouer maintenant");
@@ -114,13 +115,12 @@ function createSocket(server) {
 
         socket.on("choosePositionToBegin", (cellId) => {
             console.log("choosePositionToBegin", cellId);
-            const x = parseInt(cellId.split("-")[0]);
-            const y = parseInt(cellId.split("-")[1]);
+            const colonne = parseInt(cellId.split("-")[0]);
+            const ligne = parseInt(cellId.split("-")[1]);
             const action = game.actionsToDo;
             const currentPlayer = game.currentPlayer;
             console.log("currentPlayer", currentPlayer);
-            console.log("action", x);
-            var res = beginningPositionIsValid(game.currentPlayer, x);
+            var res = beginningPositionIsValid(game.currentPlayer, ligne);
             console.log("res", res);
             gameNamespace.emit("beginningPositionIsValid", res);
 
@@ -128,7 +128,7 @@ function createSocket(server) {
                 gameNamespace.emit("checkAction", true);
             }
 
-            game.playerPosition.player1 = [x, y];
+            game.playerPosition.player1 = [colonne, ligne];
             gameNamespace.emit("currentPlayer", currentPlayer, game.playerPosition.player1);
             game.actionsToDo--;
             game.lastActionType = "position"
@@ -186,41 +186,6 @@ function createSocket(server) {
                 nbWallsPlayer1, nbWallsPlayer2);
         });
 
-        socket.on("wallListener", (firstWallToColor, wallType, wallPosition) => {
-            console.log("wallListener", firstWallToColor, wallType, wallPosition);
-            const x = parseInt(wallPosition[0]);
-            const y = parseInt(wallPosition[1]);
-            let wallInclinaison;
-            console.log("wallType", wallType);
-          
-            if (firstWallToColor === null) {
-                console.log("vide");
-                return;
-            }
-            if (wallType === "wv") { wallInclinaison = "vertical"; }
-            else { wallInclinaison = "horizontal"; }
-            const wall = findWall(x,y, wallInclinaison, game.elements);
-
-            let adjacentWall = findAdjacentWall(wall, game.elements);
-            let adjacentSpace = findAdjacentSpace(wall, game.elements);
-            console.log("wall", wall);
-            console.log("adjacentSpace", adjacentSpace);
-            console.log("adjacentWall", adjacentWall);
-            if (isWallPlacementValid(wall, adjacentWall, adjacentSpace) === false) {
-                //removeHighlight(firstWallToColor, adjacentWall, adjacentSpace);
-                gameNamespace.emit("highlightElements", null, null);
-                return;
-            }
-
-            //highlightElements(firstWallToColor, adjacentWall, space);
-            if (adjacentWall === undefined || adjacentSpace === undefined) {
-                gameNamespace.emit("highlightElements", null, null);
-            } else {
-                adjacentSpaceId = adjacentSpace.pos_x + "-" + adjacentSpace.pos_y + "-space";
-                adjacentWallId = wallType + "~" + adjacentWall.pos_x + "-" + adjacentWall.pos_y;
-                gameNamespace.emit("highlightElements", adjacentWall, adjacentSpace, adjacentWallId, adjacentSpaceId);
-            }
-        });
 
         socket.on("wallLaid",(firstWallToColor, wallType, wallPosition, wallId) => {
             console.log("wallLaid", firstWallToColor, wallType, wallPosition);

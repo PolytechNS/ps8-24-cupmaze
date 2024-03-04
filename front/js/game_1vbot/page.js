@@ -1,9 +1,9 @@
-import { extractWallInfo, highlightElements, removeHighlight} from "../game_local_1v1/utils.js";
 import {beginningPositionIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
+
 
 let socket;
 let lastActionType = "";
@@ -282,6 +282,63 @@ function saveGame() {
 
 /** #############################################  WALL LAYING METHODS  ############################################# **/
 
+function extractWallInfo(wallId) {
+    const wallType = wallId.split("~")[0];
+    const wallPosition = wallId.split("~")[1];
+    return { wallType, wallPosition };
+}
+
+function findAdjacentWall(wallType, wallPosition) {
+    const colonne = parseInt(wallPosition.split("-")[0]);
+    const ligne = parseInt(wallPosition.split("-")[1]);
+
+    if (wallType === "wv" && colonne < 9) {
+        return  document.getElementById(`wv~${colonne}-${ligne-1}`);
+    } else if (wallType === "wh" && ligne < 9) {
+        return document.getElementById(`wh~${colonne+1}-${ligne}`);
+    } else {
+        if (wallType === "wv") {
+            return document.getElementById(`wv~${colonne}-${ligne}`);
+        }
+        return document.getElementById(`wh~${colonne+1}-${ligne}`);
+    }
+}
+
+function findAdjacentSpace(wallPosition) {
+    const colonne = parseInt(wallPosition.split("-")[0]);
+    const ligne = parseInt(wallPosition.split("-")[1]);
+
+    var space = `${colonne}-${ligne}-space`;
+    if (colonne < 9  && ligne <= 9) {
+        console.log("space", space);
+        return document.getElementById(space);
+    } else {
+        if (ligne === 9) {
+            console.log("space", `${colonne-1}-${ligne}-space`);
+            return document.getElementById(`${colonne}-${ligne-1}-space`);
+        } else {
+            console.log("space", `${colonne}-${ligne-1}-space`);
+            return document.getElementById(`${colonne-1}-${ligne}-space`);
+        }
+    }
+}
+
+function isWallPlacementValid(firstWall, secondWall, space) {
+    const isLaid = firstWall.classList.contains("wall-laid") || secondWall.classList.contains("wall-laid") || space.classList.contains("wall-laid");
+    return !isLaid;
+}
+
+function highlightElements(firstWall, secondWall, space) {
+    secondWall.classList.add("wall-hovered");
+    space.classList.add("space-hovered");
+}
+
+function removeHighlight(firstWall, secondWall, space) {
+    firstWall.classList.remove("wall-hovered");
+    secondWall.classList.remove("wall-hovered");
+    space.classList.remove("space-hovered");
+
+}
 /*
  fonction pour gerer le survol des murs
  */
@@ -294,49 +351,9 @@ function wallListener(event) {
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
 
-    socket.emit("wallListener", firstWallToColor, wallType, wallPosition);
-    socket.on("highlightElements",(adjacentWall, space, adjacentWallId, adjacentSpaceId) => {
-        if (adjacentWall === null ) {
-            console.log("adjacentWall is null");
-            removeHighlight(firstWallToColor, adjacentWall, space)
-            return;
-        }
-        const wallToColor = document.getElementById(adjacentWallId);
-        const spaceToColor = document.getElementById(adjacentSpaceId);
-        highlightElements(firstWallToColor, wallToColor, spaceToColor);
-        firstWallToColor.addEventListener("mouseleave", () => {
-            removeHighlight(firstWallToColor, wallToColor, spaceToColor);
-        });
-        socket.off("highlightElements");
-    });
-    /*
-    const firstWallToColor = event.target;
-    firstWallToColor.classList.add("wall-hovered");
-
-    // on parse les ID pour avoir les coordonnées des murs
-    const wallId = firstWallToColor.id;
-    const { wallType, wallPosition } = extractWallInfo(wallId);
-    console.log("wallType", wallType);
-
-    socket.emit("wallListener", firstWallToColor, wallType, wallPosition);
-    socket.on("highlightElements",(adjacentWall, space, adjacentWallId, adjacentSpaceId) => {
-        console.log("highlightElements", adjacentWallId, adjacentSpaceId);
-        console.log("spaceId", adjacentSpaceId);
-        console.log("wallId", adjacentWallId);
-        const wallToColor = document.getElementById(adjacentWallId);
-        console.log("wall", wallToColor);
-        const spaceToColor = document.getElementById(adjacentSpaceId);
-        console.log("space", spaceToColor);
-        highlightElements(firstWallToColor, wallToColor, spaceToColor);
-        firstWallToColor.addEventListener("mouseleave", () => {
-            removeHighlight(firstWallToColor, wallToColor, spaceToColor);
-        });
-        socket.off("highlightElements");
-    });
-    /*
     // la on va chercher les mur a colorier et l'espace entre les murs a colorier
-    //const secondWallToColor = findAdjacentWall(wallType, wallPosition);
-    //const spaceToColor = findAdjacentSpace(wallPosition);
+    const secondWallToColor = findAdjacentWall(wallType, wallPosition);
+    const spaceToColor = findAdjacentSpace(wallPosition);
 
     if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
         removeHighlight(firstWallToColor, secondWallToColor, spaceToColor)
@@ -349,7 +366,6 @@ function wallListener(event) {
     firstWallToColor.addEventListener("mouseleave", () => {
         removeHighlight(firstWallToColor, secondWallToColor, spaceToColor);
     });
-     */
 }
 
 /**
