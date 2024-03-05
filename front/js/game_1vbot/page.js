@@ -56,9 +56,9 @@ function main(isLoadGame) {
         initializeTable();
         //Mettre le brouillard de guerre
         //Mettre le brouillard de guerre
-        setVisionForPlayer(1, {player1: null, player2: null});
+        //setVisionForPlayer(1, {player1: null, player2: null});
         //On setup les différents textes nécessaires
-        setUpNewRound(1,10,10,1);
+        //setUpNewRound(1,10,10,1);
     }
 }
 
@@ -225,8 +225,8 @@ function validateRound() {
     });
     socket.on("updateRound", (possibleMoves, numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
         console.log("updateRound", numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
-        setVisionForPlayer(currentPlayer, playerPosition);
-        setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
+        //setVisionForPlayer(currentPlayer, playerPosition);
+        //setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
         socket.off("updateBoard");
     });
 }
@@ -489,44 +489,7 @@ function choosePositionToBegin(event) {
     });
     showButtonVisible();
 }
-/*
-    const clickedCell = event.target;
-    console.log(clickedCell);
-    if(!beginningPositionIsValid(currentPlayer,clickedCell.id[0])){
-        alert("Vous devez commencez par la première ligne")
-        return;
-    }
 
-    //On vérifie si le joueur possède assez d'actions
-    if(actionsToDo===0){
-        alert("Vous n'avez plus d'actions disponibles");
-        return;
-    }
-
-    clickedCell.classList.add("occupied");
-    playerPositions[`player${currentPlayer}`] = clickedCell.id;
-    addPlayerCircle(clickedCell.id, currentPlayer);
-
-    if (playerPositions.player1) {
-        const cells = document.querySelectorAll(".cell");
-        cells.forEach(cell => {
-            cell.removeEventListener("click", choosePositionToBegin);
-            cell.addEventListener("click", movePlayer);
-        });
-
-        const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-        walls.forEach(wall=>{
-            wall.addEventListener("mouseenter",wallListener);
-            wall.addEventListener("click",wallLaid);
-        })
-
-    }
-    //On enlève l'action réalisée au compteur
-    showButtonVisible();
-    //On sauvegarde la dernière action
-    lastActionType = "position";
-}
-*/
 function movePlayer(event) {
     const target = event.target;
     console.log(target);
@@ -543,12 +506,11 @@ function movePlayer(event) {
     }
     const clickedCell=document.getElementById(cellId);
 
-    socket.emit("newMoveHumanIsPossible", clickedCell.id[2], clickedCell.id[0]);
-    socket.on("isNewMoveHumanIsPossible", (isPossible, lastPosition, newPosition) => {
-        if(isPossible){
+    socket.emit("newMoveHumanIsPossible", clickedCell.id);
+    socket.on("isNewMoveHumanIsPossible", (isPossible, lastPosition) => {
+        if (isPossible) {
             console.log("move valid");
             if(lastPosition!==null) removePlayerCircle(lastPosition, 1);
-            console.log("allo");
             addPlayerCircle(target, 1);
             lastActionType = "position";
             showButtonVisible();
@@ -557,16 +519,6 @@ function movePlayer(event) {
         }
         socket.off("isNewMoveHumanIsPossible");
     });
-
-    /*if (clickedCell.classList.contains("possible-move") && actionsToDo===1) {
-        console.log("move valid");
-        removePlayerCircle(playerPositions,currentPlayer);
-        playerPositions[`player${currentPlayer}`] = clickedCell.id;
-        addPlayerCircle(clickedCell,currentPlayer);
-        showButtonVisible();
-        //On sauvegarde la dernière action
-        lastActionType = "position";
-    }*/
 }
 
 

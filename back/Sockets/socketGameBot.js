@@ -84,10 +84,13 @@ function createSocket(server) {
             gameNamespace.emit("gameOver", answer[0], answer[1]);
         });
 
-        socket.on("newMoveHumanIsPossible", async (positionY, positionX) => {
-            let possibleMoves = await game.getPossibleMoves(game.playerPosition["player1"]);
+        socket.on("newMoveHumanIsPossible", async (clickedCellId) => {
+            console.log("newMoveHumanIsPossible", clickedCellId);
+            let possibleMoves = game.getPossibleMoves(game.playerPosition.player1);
             console.log("possibleMoves", possibleMoves);
-            let caseWanted = await game.getCase(positionY, positionX);
+            const colonne = parseInt(clickedCellId.split("-")[0]);
+            const ligne = parseInt(clickedCellId.split("-")[1]);
+            let caseWanted = await game.getCase(ligne, colonne);
             let isPossible = possibleMoves.includes(caseWanted);
             if (isPossible && game.actionsToDo===1) {
                 let saveOldPosition = game.getPlayerCurrentPosition(1);
@@ -137,6 +140,7 @@ function createSocket(server) {
 
         socket.on("validateRound", (msg) => {
             const playerPosition = game.playerPosition;
+            console.log("validateRound", playerPosition.player2);
             let possibleMoves = game.getPossibleMoves(playerPosition.player2);
             console.log("possibleMoves", possibleMoves);
             const numberTour = game.numberTour;

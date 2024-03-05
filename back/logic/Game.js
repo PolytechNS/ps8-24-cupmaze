@@ -52,8 +52,8 @@ class Game {
     }
 
     init() {
-        for (let i = 0; i < 9; i++) {
-            for (let j = 0; j < 9; j++) {
+        for (let i = 0; i <= 9; i++) {
+            for (let j = 0; j <= 9; j++) {
                 //ajoute case, mur et à la fin on doit juste finir sur case
                 this.elements.push(new Case(j, i, false));
                 if(j<8) {
@@ -61,7 +61,7 @@ class Game {
                     this.elements.push(new Wall(j, i, false, "vertical"));
                 }
             }
-            for(let j = 0; j < 9; j++){
+            for(let j = 0; j <= 9; j++){
                 this.elements.push(new Wall(j, i, false, "horizontal"));
                 // on rajoute un space entre chaque mur
                 if (j < 8) {
@@ -72,7 +72,6 @@ class Game {
     }
 
     getPossibleMoves(playerPosition) {
-        //if(this.actionsToDo===0) return [];
         return getPossibleMoves(playerPosition, this.elements);
     }
 
