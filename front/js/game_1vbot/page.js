@@ -386,7 +386,7 @@ function wallLaid(event) {
     }
 
     socket.emit("wallLaid", firstWallToColor, wallType, wallPosition, wallId);
-    socket.on("laidWall", (currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
+    socket.on("laidWall", (wallType, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
         if (currentPlayer === null) {
             alert("Vous n'avez plus d'actions disponibles");
             return;
