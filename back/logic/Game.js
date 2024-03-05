@@ -72,7 +72,7 @@ class Game {
     }
 
     getPossibleMoves(playerPosition) {
-        if(this.actionsToDo===0) return [];
+        //if(this.actionsToDo===0) return [];
         return getPossibleMoves(playerPosition, this.elements);
     }
 

@@ -3,7 +3,7 @@ function computeMove(possiblesMoves, playerPosition ) {
     //console.log("gameState", gameState);
     if (playerPosition === null) {
         let moveIndex = Math.floor(Math.random() * 7);
-        return [8, moveIndex];
+        return [moveIndex, 9];
     }
     let possibleMoves = possiblesMoves;
     // Get a random integer between 0 and possibleMoves.length-1

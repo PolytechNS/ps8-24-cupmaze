@@ -6,10 +6,10 @@ function beginningPositionIsValid(currentPlayer, position) {
 
 function getPossibleMoves(playerPosition, elements) {
     const possibleMoves = [];
+    if (playerPosition === null) { return null; }
     console.log("playerPosition", playerPosition);
     const column = playerPosition[1];
     const line = playerPosition[0];
-    if (playerPosition === null) { return null; }
 
     function checkMove(newLine, newColumn, possibleMoves, direction) {
         if (newLine < 0 || newLine > 8 || newColumn < 0 || newColumn > 8) {

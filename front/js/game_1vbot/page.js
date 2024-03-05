@@ -337,7 +337,6 @@ function removeHighlight(firstWall, secondWall, space) {
     firstWall.classList.remove("wall-hovered");
     secondWall.classList.remove("wall-hovered");
     space.classList.remove("space-hovered");
-
 }
 /*
  fonction pour gerer le survol des murs
@@ -379,19 +378,24 @@ function wallLaid(event) {
     // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
+    const adjacentWall = findAdjacentWall(wallType, wallPosition);
+    const adjacentSpace = findAdjacentSpace(wallPosition);
+
+    if(isWallPlacementValid(firstWallToColor, adjacentWall, adjacentSpace) === false) {
+        return;
+    }
 
     socket.emit("wallLaid", firstWallToColor, wallType, wallPosition, wallId);
-    socket.on("laidWall", (secondWallToColor, spaceToColor, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
-        if (secondWallToColor === null) {
+    socket.on("laidWall", (currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
+        if (currentPlayer === null) {
+            alert("Vous n'avez plus d'actions disponibles");
             return;
         }
-        const htmlSecondWallToColor = document.getElementById(secondWallToColor);
-        const htmlSpaceToColor = document.getElementById(spaceToColor);
-        htmlSecondWallToColor.classList.add("wall-laid", "laidBy" + currentPlayer);
-        htmlSecondWallToColor.removeEventListener("mouseenter", wallListener);
-        htmlSecondWallToColor.removeEventListener("click", wallLaid);
+        adjacentWall.classList.add("wall-laid", "laidBy" + currentPlayer);
+        adjacentWall.removeEventListener("mouseenter", wallListener);
+        adjacentWall.removeEventListener("click", wallLaid);
 
-        htmlSpaceToColor.classList.add("wall-laid", "laidBy" + currentPlayer);
+        adjacentSpace.classList.add("wall-laid", "laidBy" + currentPlayer);
 
         firstWallToColor.classList.add("wall-laid", "laidBy" + currentPlayer);
         firstWallToColor.removeEventListener("mouseenter", wallListener);

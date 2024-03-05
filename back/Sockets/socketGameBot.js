@@ -128,14 +128,17 @@ function createSocket(server) {
             }
 
             game.playerPosition.player1 = [colonne, ligne];
+            game.graph.updateNodeState(colonne, ligne, currentPlayer);
             gameNamespace.emit("currentPlayer", currentPlayer, game.playerPosition.player1);
             game.actionsToDo--;
             game.lastActionType = "position"
+            console.log("choosePositionToBegin", game.playerPosition.player1);
         });
 
         socket.on("validateRound", (msg) => {
             const playerPosition = game.playerPosition;
             let possibleMoves = game.getPossibleMoves(playerPosition.player2);
+            console.log("possibleMoves", possibleMoves);
             const numberTour = game.numberTour;
             let currentplayer = game.currentPlayer;
             const nbWallsPlayer1 = game.nbWallsPlayer1;
@@ -188,9 +191,8 @@ function createSocket(server) {
 
         socket.on("wallLaid",(firstWallToColor, wallType, wallPosition, wallId) => {
             console.log("wallLaid", firstWallToColor, wallType, wallPosition);
-            console.log("game.actionsToDo", game.actionsToDo);
             if (game.actionsToDo === 0) {
-                gameNamespace.emit("laidWall", null, null, null);
+                gameNamespace.emit("laidWall", null, true, true);
                 return;
             }
             let adjacentWallId = null;
@@ -214,11 +216,6 @@ function createSocket(server) {
                     : findWall(colonne+1, ligne, wallInclinaison, game.elements);
             const adjacentSpace = findSpace(colonne, ligne, game.elements);
 
-            if (isWallPlacementValid(wall,adjacentWall, adjacentSpace) === false) {
-                gameNamespace.emit("laidWall", null, null, null);
-                return;
-            }
-
             if (game.actionsToDo > 0 && ((game.currentPlayer === 1 && game.nbWallsPlayer1 > 0) || (game.currentPlayer === 2 && game.nbWallsPlayer2 > 0))) {
                 console.log("AVANT layWall");
                 game.layWall(wall,adjacentWall,adjacentSpace);
@@ -237,7 +234,7 @@ function createSocket(server) {
                 } else {
                     adjacentWallId = wallType + "~" + adjacentWall.pos_x + "-" + adjacentWall.pos_y;
                     adjacentSpaceId = adjacentSpace.pos_x + "-" + adjacentSpace.pos_y + "-space";
-                    gameNamespace.emit("laidWall", adjacentWallId, adjacentSpaceId, wallType, game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
+                    gameNamespace.emit("laidWall",wallType, game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
                 }
             }
             game.lastWallLaidsIDHtml = [wallId, adjacentWallId, adjacentSpaceId];
