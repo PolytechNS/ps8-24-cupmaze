@@ -608,11 +608,9 @@ exports.setup = function setup(AIplay) {
     tourActuel++;
     monChiffre = AIplay;
     return new Promise((resolve, reject) => {
-        setTimeout(() => {
             ai = new IA();
             position = ai.setup(AIplay);
             resolve(position);
-        }, 1000);
     });
 }
 
@@ -742,13 +740,12 @@ exports.nextMove = function nextMove(gameState){
         }
         const end = performance.now();
         //console.log("nextMove", end - start);
-    },200);
+    });
 }
 exports.correction = function correction(rightMove){
     //console.log("rightMove");
     //return a Promise that is resolved into the boolean true, indicating it is ready to continue
     return new Promise((resolve, reject) => {
-        setTimeout(() => {
             if(derniereActionMoi === "wall"){
                 nombreWallMoi++;
                 onAPoseUnMur = false;
@@ -760,7 +757,6 @@ exports.correction = function correction(rightMove){
                 coordoneesDernierMur = rightMove.value[0];
             }
             resolve(true);
-        }, 50);
     });
 }
 
@@ -942,16 +938,12 @@ function isPlayerDetectedByOurWall(positionMurX, positionMurY, board){
 }
 
 exports.updateBoard = function updateBoard(gameState){
-    //console.log("updateBoard");
-    //return a Promise resolved into the boolean true in 50ms maximum.
     return new Promise((resolve, reject) => {
-        setTimeout(() => {
             ai.updateBoard(gameState);
             if(isPlayerVisible(gameState.board)[0]){
                 trackerAdversaire = isPlayerVisible(gameState.board)[1].toString() + isPlayerVisible(gameState.board)[2].toString();
                 positionPotentiellesDuBot = [];
                 positionPotentiellesDuBot.push(trackerAdversaire);
-                //console.log("ON A VU LE JOUEUR");
             } else {
                 if(onAPoseUnMur){
                     let answer = isPlayerDetectedByOurWall(parseInt(coordoneesDernierMur[0]), parseInt(coordoneesDernierMur[1]), gameState.board);
@@ -969,7 +961,6 @@ exports.updateBoard = function updateBoard(gameState){
             onAPoseUnMur = false;
             tourActuel++;
             resolve(true);
-        }, 50);
     });
 }
 
