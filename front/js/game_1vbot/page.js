@@ -2,7 +2,7 @@ import {beginningPositionIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
-import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
+import {setVisionForPlayer} from "./fog_of_war.js";
 
 
 let socket;
