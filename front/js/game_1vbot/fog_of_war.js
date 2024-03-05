@@ -5,16 +5,16 @@ const INFINITY = 9999;
 function calculateVisibility(playerPositions) {
     let position1Column ;
     let position1Line ;
-    if (playerPositions.player1) {
+    if (playerPositions.player1!==null) {
         position1Column = parseInt(playerPositions.player1[0]);
-        position1Line = parseInt(playerPositions.player1[2]);
+        position1Line = parseInt(playerPositions.player1[1]);
     }
 
     let position2Column ;
     let position2Line ;
-    if (playerPositions.player2) {
+    if (playerPositions.player2!==null) {
         position2Column = parseInt(playerPositions.player2[0]);
-        position2Line = parseInt(playerPositions.player2[2]);
+        position2Line = parseInt(playerPositions.player2[1]);
     }
 
     const cells = document.querySelectorAll(".cell");
@@ -27,8 +27,8 @@ function calculateVisibility(playerPositions) {
             const cellLine = parseInt(cell.id[2]);
 
             //set initial visibility
-            if(cellLine<4) cell.visibility="-1";
-            else if (cellLine===4) cell.visibility="0";
+            if(cellLine<5) cell.visibility="-1";
+            else if (cellLine===5) cell.visibility="0";
             else cell.visibility="1";
 
 
@@ -73,24 +73,24 @@ function wallVision(wall,visionSign){
             |  BBL  |  BBR  |
      */
     if(wall.id.includes("space")){
+        console.log("add fog to : "+wall.id);
         const wallColumn = parseInt(wall.id.match(/\d+/g)[0]);
         const wallLine = parseInt(wall.id.match(/\d+/g)[1]);
 
         let cellAL = document.getElementById(wallColumn + "-" + wallLine + "~cell");
-        let cellBL = document.getElementById((wallColumn - 1) + "-" + wallLine + "~cell");
-        let cellAR = document.getElementById("" + wallColumn + "-" + (wallLine + 1) + "~cell");
-        let cellBR = document.getElementById((wallColumn - 1) + "-" + (wallLine + 1) + "~cell");
+        let cellBL = document.getElementById(wallColumn + "-" + (wallLine -1 ) + "~cell");
+        let cellAR = document.getElementById("" + (wallColumn + 1) + "-" + wallLine + "~cell");
+        let cellBR = document.getElementById((wallColumn + 1 ) + "-" + (wallLine - 1) + "~cell");
 
-        let cellAAL = document.getElementById("" + (wallColumn + 1) + "-" + wallLine + "~cell");
+        let cellAAL = document.getElementById("" + wallColumn + "-" + (wallLine + 1) + "~cell");
         let cellAAR = document.getElementById("" + (wallColumn + 1) + "-" + (wallLine + 1) + "~cell");
-        let cellBBL = document.getElementById("" + (wallColumn - 2) + "-" + wallLine + "~cell");
-        let cellBBR = document.getElementById((wallColumn - 2) + "-" + (wallLine + 1) + "~cell");
+        let cellBBL = document.getElementById("" + wallColumn+ "-" + (wallLine - 2) + "~cell");
+        let cellBBR = document.getElementById((wallColumn + 1) + "-" + (wallLine - 2) + "~cell");
 
-        let cellALL = document.getElementById("" + wallColumn + "-" + (wallLine - 1) + "~cell");
-        let cellARR = document.getElementById("" + wallColumn + "-" + (wallLine + 2) + "~cell");
-        let cellBLL = document.getElementById("" + (wallColumn - 1) + "-" + (wallLine - 1) + "~cell");
-        let cellBRR = document.getElementById((wallColumn - 1) + "-" + (wallLine + 2) + "~cell");
-
+        let cellALL = document.getElementById("" + (wallColumn - 1) + "-" + wallLine + "~cell");
+        let cellARR = document.getElementById("" + (wallColumn + 2) + "-" + wallLine + "~cell");
+        let cellBLL = document.getElementById("" + (wallColumn - 1) + "-" + (wallLine -1) + "~cell");
+        let cellBRR = document.getElementById((wallColumn + 2) + "-" + (wallLine - 1) + "~cell");
         const plusTwoCells = [cellAL, cellBL, cellAR, cellBR];
         const plusOneCell = [cellAAL, cellAAR, cellBBL, cellBBR, cellALL, cellARR, cellBLL, cellBRR];
 
@@ -136,6 +136,7 @@ function setVisionForPlayer(currentPlayer,playerPositions){
                     player1circle.style.display="block";
                 }
             }
+            console.log("cell : "+cell.id+" /// visibility : "+cell.visibility);
         }
     )
 }
