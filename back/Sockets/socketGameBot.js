@@ -132,6 +132,8 @@ function createSocket(server) {
             }
 
             game.playerPosition.player1 = [colonne, ligne];
+            const caseWanted = game.getCase(colonne, ligne);
+            caseWanted.setIsOccupied(true);
             game.graph.updateNodeState(colonne, ligne, currentPlayer);
             gameNamespace.emit("currentPlayer", currentPlayer, game.playerPosition.player1);
             game.actionsToDo--;
@@ -187,7 +189,7 @@ function createSocket(server) {
                 possibleMoves = game.getPossibleMoves(playerPosition.player1);
             }
             console.log("updateRound");
-            console.log("possibleMoves", possibleMoves);
+            console.log("possibleMoves player 1", possibleMoves);
             console.log("playerPosition", playerPosition);
             console.log("action", game.actionsToDo);
             gameNamespace.emit("updateRound",

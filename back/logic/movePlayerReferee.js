@@ -27,6 +27,7 @@ function getPossibleMoves(playerPosition, elements) {
         console.log("cell", cell);
         if (!wall || !wall.isLaid) {
             if (cell.isOccupied) {
+                console.log("cell.isOccupied", cell.isOccupied);
                 const jumpCell = findJumpCell(newLine, newColumn, direction, elements);
                 if (jumpCell) {
                     possibleMoves.push(jumpCell);
