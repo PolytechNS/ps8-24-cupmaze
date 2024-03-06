@@ -5,10 +5,7 @@ function removePlayerCircle(oldPosition,currentPlayer) {
     console.log("removePlayerCircle")
     const oldCell = document.getElementById(oldPosition);
     oldCell.classList.remove("occupied");
-    // ne pas mettre firstChild car je veut juste retirer
-    // le cercle et pas tout ce qu'il y a dans la cellule
     const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
-    //check if they are child and remove it
     console.log(playerCircle.children);
     if (playerCircle && oldCell.contains(playerCircle)) {
         oldCell.removeChild(playerCircle);

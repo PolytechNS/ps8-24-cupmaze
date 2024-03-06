@@ -12,21 +12,11 @@ function getPossibleMoves(playerPosition, elements) {
     console.log("colonne", colonne, "line", ligne);
 
     function checkMove(newColonne, newLigne, possibleMoves, direction) {
-        console.log("newColonne", newColonne);
-        console.log("newLigne", newLigne);
         if (newColonne < 1 || newColonne > 9 || newLigne < 1 || newLigne > 9) {
             return;
         }
         const wall = wallFinder(newColonne, newLigne, colonne, ligne, direction, elements);
-        /*
-        const wall = (newLigne === ligne) ?
-            utils.findWall(newColonne, Math.min(ligne, newLigne), "vertical", elements) :
-            utils.findWall(Math.min(colonne, newColonne), ligne, "horizontal", elements);
-*/
-        console.log("wall found", wall);
-
         const cell = utils.findCase(newColonne, newLigne, elements);
-        //console.log("cell", cell);
         if (!wall || !wall.isLaid) {
             if (cell.isOccupied) {
                 console.log("cell.isOccupied", cell.isOccupied);

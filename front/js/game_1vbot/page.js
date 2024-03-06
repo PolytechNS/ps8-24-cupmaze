@@ -184,9 +184,8 @@ function validateRound() {
     isGameOver();
     // on envoie un message au serveur pour lui dire de valider le round
     socket.emit("validateRound");
-    console.log("validateRound");
+
     socket.on("numberTour", (numberTour) => {
-        console.log("numberTour", numberTour);
         if (numberTour > 1) {
             possibleMoves.forEach(cell => {
                 cell.classList.remove("possible-move");

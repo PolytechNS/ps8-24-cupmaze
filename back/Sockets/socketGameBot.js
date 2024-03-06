@@ -86,17 +86,19 @@ function createSocket(server) {
         });
 
         socket.on("newMoveHumanIsPossible", async (clickedCellId) => {
-            console.log("newMoveHumanIsPossible", clickedCellId);
+
             let possibleMoves = game.getPossibleMoves(game.playerPosition.player1);
-            console.log("possibleMoves player 1", possibleMoves);
             const colonne = parseInt(clickedCellId.split("-")[0]);
             const ligne = parseInt(clickedCellId.split("-")[1]);
             let caseWanted = await game.getCase(ligne, colonne);
             let isPossible = possibleMoves.includes(caseWanted);
+
             if (isPossible && game.actionsToDo===1) {
                 let saveOldPosition = game.getPlayerCurrentPosition(1);
                 let htmlOldPosition=saveOldPosition[0]+"-"+saveOldPosition[1]+"~cell";
                 let htmlNewPosition=caseWanted.getPos_x()+"-"+caseWanted.getPos_y()+"~cell";
+                game.graph.updateNodeState(saveOldPosition[0], saveOldPosition[1], -1);
+                game.graph.updateNodeState(caseWanted.getPos_x(), caseWanted.getPos_y(), 1);
                 game.movePlayer(1, caseWanted, game.getPlayerCurrentPosition(1));
                 if (saveOldPosition !== null) gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
                 else gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
@@ -113,18 +115,17 @@ function createSocket(server) {
             }
             game.playerPosition["player1"] = game.lastPlayerPosition["player1"]
             game.actionsToDo=1;
+            game.graph.updateNodeState(game.playerPosition["player1"][0], game.playerPosition["player1"][1], 0);
             gameNamespace.emit("undoMove", oldPositionHTML, newPositionHtml, 1, game.numberTour);
         });
 
         socket.on("choosePositionToBegin", (cellId) => {
-            console.log("choosePositionToBegin", cellId);
+
             const colonne = parseInt(cellId.split("-")[0]);
             const ligne = parseInt(cellId.split("-")[1]);
             const action = game.actionsToDo;
             const currentPlayer = game.currentPlayer;
-            console.log("currentPlayer", currentPlayer);
             var res = beginningPositionIsValid(game.currentPlayer, ligne);
-            console.log("res", res);
             gameNamespace.emit("beginningPositionIsValid", res);
 
             if (action === 0) {
@@ -142,8 +143,8 @@ function createSocket(server) {
         });
 
         socket.on("validateRound", (msg) => {
+
             const playerPosition = game.playerPosition;
-            console.log("validateRound", playerPosition.player2);
             let possibleMoves = game.getPossibleMoves(playerPosition.player2);
             const numberTour = game.numberTour;
             let currentplayer = game.currentPlayer;
@@ -160,6 +161,7 @@ function createSocket(server) {
             game.currentPlayer = 2
             game.actionsToDo = 1;
             const cellId = newAIPosition[0] + "-" + newAIPosition[1] + "~cell";
+            game.graph.updateNodeState(newAIPosition[0], newAIPosition[1], 2);
             if(game.actionsToDo === 1){
                 gameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
                 game.playerPosition.player2 = newAIPosition;
@@ -170,13 +172,11 @@ function createSocket(server) {
             game.numberTour++;
             game.actionsToDo = 1;
 
-            // on verifie si la partie est finie
             const winner = game.isGameOver(game.playerPosition);
             if (winner !== 0) {
                 gameNamespace.emit("gameOver", winner);
                 return;
             }
-
 
             console.log("#####CHANGEMENT DE TOUR#####");
             gameNamespace.emit("numberTourAfter", numberTour);
@@ -210,10 +210,7 @@ function createSocket(server) {
             const colonne = parseInt(wallPosition[0]);
             const ligne = parseInt(wallPosition[2]);
             let wallInclinaison;
-            if (firstWallToColor === null) {
-                console.log("vide");
-                return;
-            }
+            if (firstWallToColor === null) { return;}
 
             if (wallType === "wv") { wallInclinaison = "vertical"; }
             else { wallInclinaison = "horizontal"; }
@@ -224,11 +221,12 @@ function createSocket(server) {
                     ? findWall(colonne, ligne-1, wallInclinaison, game.elements)
                     : findWall(colonne+1, ligne, wallInclinaison, game.elements);
             const adjacentSpace = findSpace(colonne, ligne, game.elements);
+            // on verifie que la pose de ce mur n'enferme pas un joueur
 
             if (game.actionsToDo > 0 && ((game.currentPlayer === 1 && game.nbWallsPlayer1 > 0) || (game.currentPlayer === 2 && game.nbWallsPlayer2 > 0))) {
                 console.log("AVANT layWall");
                 game.layWall(wall,adjacentWall,adjacentSpace);
-                game.graph.placeWall(colonne,ligne, (wallInclinaison === "vertical") ? 0 : 1);
+                game.graph.placeWall(colonne,ligne, (wallInclinaison === "vertical") ? 0 : 1)
                 game.actionsToDo--;
                 game.lastActionType = "wall";
                 if (game.currentPlayer === 1) {
@@ -237,7 +235,6 @@ function createSocket(server) {
                     game.nbWallsPlayer2--;
                 }
                 game.lastActionType = "wall";
-                console.log("adjacentWall", adjacentWall);
                 if (adjacentWall === undefined || adjacentSpace === undefined) {
                     gameNamespace.emit("laidWall", null, null, null);
                 } else {

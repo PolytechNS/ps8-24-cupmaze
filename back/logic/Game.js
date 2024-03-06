@@ -54,16 +54,13 @@ class Game {
     init() {
         for (let i = 0; i <= 9; i++) {
             for (let j = 0; j <= 9; j++) {
-                //ajoute case, mur et à la fin on doit juste finir sur case
                 this.elements.push(new Case(j, i, false));
                 if(j<8) {
-                    //console.log("wall vertical", i, j);
                     this.elements.push(new Wall(j, i, false, "vertical"));
                 }
             }
             for(let j = 0; j <= 9; j++){
                 this.elements.push(new Wall(j, i, false, "horizontal"));
-                // on rajoute un space entre chaque mur
                 if (j < 8) {
                     this.elements.push(new Space(j, i, true));
                 }
@@ -127,17 +124,7 @@ class Game {
         const lastCase = this.getCase(this.lastPlayerPosition[`player${number}`][1], this.lastPlayerPosition[`player${number}`][0]);
         lastCase.setIsOccupied(false);
         this.actionsToDo=0;
-
-        //return getPossibleMoves(playerPosition, this.elements);
     }
-    /*
-    isGameOver(playersPositions) {
-        if (playersPositions.player1[1] === 9) return 1;
-        if (playersPositions.player2[1] === 1) return 2;
-        return 0;
-    }
-
-     */
 
     layWall(firstCase, secondCase, space) {
         // on chercher les mur et le space dans les elements
@@ -146,13 +133,11 @@ class Game {
             if (this.elements[i] instanceof Wall) {
                 if (this.elements[i].equals(firstCase) || this.elements[i].equals(secondCase)) {
                     this.elements[i].setIsLaid(true);
-                    console.log("MUR TROUVE");
                 }
             }
             if (this.elements[i] instanceof Space) {
                 if (this.elements[i].equals(space)) {
                     this.elements[i].setIsLaid(true);
-                    console.log("SPACE TROUVE");
                 }
             }
         }
@@ -188,10 +173,11 @@ class Game {
         for(let i=0; i!==this.lastWallsLaid.length; i++){
             this.lastWallsLaid[i].setIsLaid(false);
         }
+        const colonne = this.lastWallsLaid[0].getPos_x();
+        const ligne = this.lastWallsLaid[0].getPos_y();
+        this.graph.removeWall(colonne, ligne);
     }
-
-
-
 }
+
 
 module.exports = { Game };
