@@ -349,11 +349,15 @@ function removeHighlight(firstWall, secondWall, space) {
 function wallListener(event) {
 
     const firstWallToColor = event.target;
-    firstWallToColor.classList.add("wall-hovered");
 
     // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
+    console.log(wallType, wallPosition);
+    if (wallPosition[0] === "9" || wallPosition[2] === "1") {
+        return;
+    }
+    firstWallToColor.classList.add("wall-hovered");
 
     // la on va chercher les mur a colorier et l'espace entre les murs a colorier
     const secondWallToColor = findAdjacentWall(wallType, wallPosition);
