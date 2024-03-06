@@ -7,28 +7,30 @@ function beginningPositionIsValid(currentPlayer, position) {
 function getPossibleMoves(playerPosition, elements) {
     const possibleMoves = [];
     if (playerPosition === null) { return null; }
-    const column = playerPosition[1];
-    const line = playerPosition[0];
+    const ligne = playerPosition[1];
+    const colonne = playerPosition[0];
+    console.log("colonne", colonne, "line", ligne);
 
-
-    function checkMove(newLine, newColumn, possibleMoves, direction) {
-        console.log("newLine", newLine);
-        console.log("newColumn", newColumn);
-        if (newLine < 1 || newLine > 9 || newColumn < 1 || newColumn > 9) {
+    function checkMove(newColonne, newLigne, possibleMoves, direction) {
+        console.log("newColonne", newColonne);
+        console.log("newLigne", newLigne);
+        if (newColonne < 1 || newColonne > 9 || newLigne < 1 || newLigne > 9) {
             return;
         }
+        const wall = wallFinder(newColonne, newLigne, colonne, ligne, direction, elements);
+        /*
+        const wall = (newLigne === ligne) ?
+            utils.findWall(newColonne, Math.min(ligne, newLigne), "vertical", elements) :
+            utils.findWall(Math.min(colonne, newColonne), ligne, "horizontal", elements);
+*/
+        console.log("wall found", wall);
 
-        const wall = (newLine === line) ?
-            utils.findWall(newLine, Math.min(column, newColumn), "vertical", elements) :
-            utils.findWall(Math.min(line, newLine), column, "horizontal", elements);
-
-
-        const cell = utils.findCase(newLine, newColumn, elements);
-        console.log("cell", cell);
+        const cell = utils.findCase(newColonne, newLigne, elements);
+        //console.log("cell", cell);
         if (!wall || !wall.isLaid) {
             if (cell.isOccupied) {
                 console.log("cell.isOccupied", cell.isOccupied);
-                const jumpCell = findJumpCell(newLine, newColumn, direction, elements);
+                const jumpCell = findJumpCell(newColonne, newLigne, direction, elements);
                 if (jumpCell) {
                     possibleMoves.push(jumpCell);
                 }
@@ -39,42 +41,55 @@ function getPossibleMoves(playerPosition, elements) {
     }
 
 
-    checkMove(line - 1, column, possibleMoves, "A");
-    checkMove(line + 1, column, possibleMoves, "B");
-    checkMove(line, column - 1, possibleMoves, "L");
-    checkMove(line, column + 1, possibleMoves, "R");
+    checkMove(colonne - 1, ligne, possibleMoves, "A");
+    checkMove(colonne + 1, ligne, possibleMoves, "B");
+    checkMove(colonne, ligne - 1, possibleMoves, "L");
+    checkMove(colonne, ligne + 1, possibleMoves, "R");
 
     return possibleMoves;
 }
 
-function findJumpCell(line, column, direction, elements) {
-    let jumpLine = line;
-    let jumpColumn = column;
+function wallFinder(newColonne, newLigne, colonne, ligne, direction, elements) {
+    switch (direction) {
+        case "A":
+            return utils.findWall(newColonne, newLigne, "vertical", elements);
+        case "B":
+            return utils.findWall(colonne, ligne, "vertical", elements);
+        case "L":
+            return utils.findWall(colonne, ligne, "horizontal", elements);
+        case "R":
+            return utils.findWall(colonne, newLigne, "horizontal", elements);
+    }
+}
+
+function findJumpCell(colonne, ligne, direction, elements) {
+    let jumpColonne = colonne;
+    let jumpLigne = ligne;
     let isWall = false;
 
     switch (direction) {
         case "A":
-            jumpLine--;
-            isWall = utils.findWall(jumpLine, column, "horizontal", elements)?.isLaid || false;
+            jumpColonne--;
+            isWall = utils.findWall(jumpColonne, ligne, "horizontal", elements)?.isLaid || false;
             break;
         case "B":
-            jumpLine++;
-            isWall = utils.findWall(line, column, "horizontal", elements)?.isLaid || false;
+            jumpColonne++;
+            isWall = utils.findWall(colonne, ligne, "horizontal", elements)?.isLaid || false;
             break;
         case "L":
-            jumpColumn--;
-            isWall = utils.findWall(line, jumpColumn, "vertical", elements)?.isLaid || false;
+            jumpLigne--;
+            isWall = utils.findWall(colonne, jumpLigne, "vertical", elements)?.isLaid || false;
             break;
         case "R":
-            jumpColumn++;
-            isWall = utils.findWall(line, column, "vertical", elements)?.isLaid || false;
+            jumpLigne++;
+            isWall = utils.findWall(colonne, ligne, "vertical", elements)?.isLaid || false;
             break;
     }
 
-    const inBoard = jumpLine >= 0 && jumpLine <= 8 && jumpColumn >= 0 && jumpColumn <= 8;
+    const inBoard = jumpColonne >= 0 && jumpColonne <= 8 && jumpLigne >= 0 && jumpLigne <= 8;
 
     if (inBoard && !isWall) {
-        return utils.findCase(jumpLine, jumpColumn, elements);
+        return utils.findCase(jumpColonne, jumpLigne, elements);
     }
     return null;
 }

@@ -93,7 +93,7 @@ class Game {
     }
 
     getCase(y, x) {
-        console.log("On cherche la case : ", y, x);
+        console.log("On cherche la case : ", x, y);
         for (let i = 0; i < this.elements.length; i++) {
             if(this.elements[i] instanceof Case){
                 if(this.elements[i].getPos_x()===parseInt(x) && this.elements[i].getPos_y()===parseInt(y)){
