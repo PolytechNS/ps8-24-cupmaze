@@ -81,6 +81,7 @@ function createSocket(server) {
         socket.on("isGameOver", () => {
             console.log("On demande à l'IA si la partie est terminée");
             let answer = game.isGameOver();
+            console.log("La partie est terminée : ", answer[0], " et le gagnant est : ", answer[1]);
             gameNamespace.emit("gameOver", answer[0], answer[1]);
         });
 
@@ -153,6 +154,8 @@ function createSocket(server) {
             if (newAIPosition instanceof Case) {
                 newAIPosition = [newAIPosition.getPos_x(), newAIPosition.getPos_y()]
             }
+
+
             game.currentPlayer = 2
             game.actionsToDo = 1;
             const cellId = newAIPosition[0] + "-" + newAIPosition[1] + "~cell";
@@ -162,6 +165,10 @@ function createSocket(server) {
                 game.actionsToDo=0;
             }
 
+            game.currentPlayer = 1;
+            game.numberTour++;
+            game.actionsToDo = 1;
+
             // on verifie si la partie est finie
             const winner = game.isGameOver(game.playerPosition);
             if (winner !== 0) {
@@ -169,9 +176,6 @@ function createSocket(server) {
                 return;
             }
 
-            game.currentPlayer = 1;
-            game.numberTour++;
-            game.actionsToDo = 1;
 
             console.log("#####CHANGEMENT DE TOUR#####");
             gameNamespace.emit("numberTourAfter", numberTour);

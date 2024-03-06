@@ -76,17 +76,17 @@ class Game {
     }
 
     isGameOver() {
-        if(this.playerPosition[0]===null || this.playerPosition[1]===null){
+        if(this.playerPosition.player1 ===null || this.playerPosition.player2===null){
             console.error("ATTENTION UNE DES DEUX POSITIONS EST NULL DANS LE BACK");
             return [false, -1];
         }
-        if(this.playerPosition[0].getPos_x()===8 && this.playerPosition[1].getPos_x() === 0){
+        if(this.playerPosition.player1[1] === 9 && this.playerPosition.player2[1] === 1){
             return [true, 0];
         }
-        if(this.playerPosition[0].getPos_x()===8 && this.playerPosition[1].getPos_x() !==0){
+        if(this.playerPosition.player1[1] === 9 && this.playerPosition.player2[1] !== 1){
             return [true, 1];
         }
-        if(this.playerPosition[0].getPos_x()!==8 && this.playerPosition[1].getPos_x() ===0){
+        if(this.playerPosition.player1[1] !== 9 && this.playerPosition.player2[1] === 1){
             return [true, 2];
         }
         return [false, -1];
@@ -128,12 +128,14 @@ class Game {
 
         //return getPossibleMoves(playerPosition, this.elements);
     }
-
+    /*
     isGameOver(playersPositions) {
-        if (playersPositions.player1[0] === 8) return 1;
-        if (playersPositions.player2[0] === 0) return 2;
+        if (playersPositions.player1[1] === 9) return 1;
+        if (playersPositions.player2[1] === 1) return 2;
         return 0;
     }
+
+     */
 
     layWall(firstCase, secondCase, space) {
         // on chercher les mur et le space dans les elements

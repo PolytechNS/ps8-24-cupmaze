@@ -180,7 +180,8 @@ function getNatureOfElement(element){
  * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
  */
 function validateRound() {
-  
+
+    isGameOver();
     // on envoie un message au serveur pour lui dire de valider le round
     socket.emit("validateRound");
     console.log("validateRound");
@@ -239,9 +240,13 @@ function isGameOver(){
     socket.emit("isGameOver", null);
     socket.on("gameOver", function(isGameOver, numberWinner){
         if(isGameOver){
-            if(numberWinner === 1) victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
-            else if(numberWinner === 2) victoryAnswer = "Victoire du joueur 2 !! Félicitations ! ";
-            else victoryAnswer = "Egalité entre les deux joueurs !";
+            if(numberWinner === 1) {
+                victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
+                alert(victoryAnswer);
+            } else if(numberWinner === 2) {
+                victoryAnswer = "Victoire du joueur 2 !! Félicitations ! ";
+                alert(victoryAnswer);
+            }
             return true;
         }
         socket.off("gameOver");
@@ -405,41 +410,6 @@ function wallLaid(event) {
         socket.off("laidWall");
         lastActionType="wall";
     });
-    /*
-    // la on va chercher les mur a colorier et l'espace entre les murs a colorier
-    const secondWallToColor = findAdjacentWall(wallType, wallPosition);
-    const spaceToColor = findAdjacentSpace(wallPosition);
-
-    if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
-        return;
-    }
-
-    /**
-     * On vérifie si les joueurs possèdent bien le bon nombre de murs avant de les poser
-
-    if(actionsToDo>0 && ((currentPlayer===1 && nbWallsPlayer1>0) || (currentPlayer===2 && nbWallsPlayer2>0))) {
-        secondWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
-        secondWallToColor.removeEventListener("mouseenter",wallListener);
-        secondWallToColor.removeEventListener("click",wallLaid);
-
-        spaceToColor.classList.add("wall-laid","laidBy" + currentPlayer);
-
-        firstWallToColor.classList.add("wall-laid","laidBy" + currentPlayer);
-        firstWallToColor.removeEventListener("mouseenter",wallListener);
-        firstWallToColor.removeEventListener("click",wallLaid);
-
-        if (currentPlayer === 1) nbWallsPlayer1--;
-        else nbWallsPlayer2--;
-
-        showButtonVisible();
-        //On sauvegarde la dernière action
-        lastActionType = "wall " + firstWallToColor.id + " " + spaceToColor.id + " " + secondWallToColor.id;
-        updateNumberWallsDisplay(currentPlayer,nbWallsPlayer1,nbWallsPlayer2);
-    }
-    else{
-        alert("Insufficent number of actions and/or walls");
-    }
-    */
 }
 
 /** #############################################  MOVE PLAYER METHODS  ############################################# **/
@@ -449,10 +419,8 @@ function wallLaid(event) {
  * Chaque joueur doit placer un pion sur la 1er ligne pour le joueur 1
  * et sur la derniere ligne pour le joueur 2 sinon on affiche un message d'erreur
  * et ensuite on change de listener pour le tour suivant car le comportement change
- *
  */
 function choosePositionToBegin(event) {
-
     socket.emit("choosePositionToBegin", event.target.id);
     socket.on("beginningPositionIsValid", (res) => {
         if (!res) {
