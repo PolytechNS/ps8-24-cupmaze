@@ -112,6 +112,7 @@ class Graph {
                 }
             }
         }
+        this.wallRepresentation = Array.from(this.walls.values()).map(wall => wall.extractListRepresentation()).flat();
     }
     addNode(node) {
         const key = `${node.colonne},${node.ligne}`;
@@ -135,8 +136,47 @@ class Graph {
     removeWall(colonne, ligne) {
         const key = `${colonne},${ligne}`;
         this.walls.delete(key);
+        // on supprime les murs de la representation
+        this.wallRepresentation = this.wallRepresentation.filter(wall => wall[0] !== `${colonne+1}${ligne+1}`);
     }
+    removeAdjacentWallRepresentation(colonne,ligne,orientation) {
+        if (orientation === 0) {
+            // on retire de la repentation le mur mur avec wall[0] = (colonne-1,ligne) et wall[1] = 0
+            if (colonne > 0 && colonne < 8) {
+                for (let i = 0; i < this.wallRepresentation.length; i++) {
+                    if (this.wallRepresentation[i][0] === `${colonne}${ligne + 1}` && this.wallRepresentation[i][1] === 0
+                        || this.wallRepresentation[i][0] === `${colonne + 2}${ligne + 1}` && this.wallRepresentation[i][1] === 0) {
+                        this.wallRepresentation.splice(i, 1);
+                    }
+                }
+            }
+            if (colonne === 0) {
+                for (let i = 0; i < this.wallRepresentation.length; i++) {
+                    if (this.wallRepresentation[i][0] === `${colonne + 2}${ligne + 1}` && this.wallRepresentation[i][1] === 0) {
+                        this.wallRepresentation.splice(i, 1);
+                    }
+                }
+            }
+            if (colonne === 8) {
+                for (let i = 0; i < this.wallRepresentation.length; i++) {
+                    if (this.wallRepresentation[i][0] === `${colonne}${ligne + 1}` && this.wallRepresentation[i][1] === 0) {
+                        this.wallRepresentation.splice(i, 1);
+                    }
+                }
+            }
+        }
+        if (orientation === 1) {
+            // on retire de la repentation le mur mur avec wall[0] = (colonne,ligne-1) et wall[1] = 0
+            if (ligne > 0 && ligne < 8) {
+                for (let i = 0; i < this.wallRepresentation.length; i++) {
+                    if (this.wallRepresentation[i][0] === `${colonne}${ligne}` && this.wallRepresentation[i][1] === 1) {
+                        this.wallRepresentation.splice(i, 1);
+                    }
+                }
 
+            }
+        }
+    }
     removeWallPlacement(colonne, ligne, orientation) {
         if (orientation === 0) {
             this.addEdge(colonne, ligne, colonne, ligne - 1);
@@ -253,7 +293,7 @@ class Graph {
             return false;
         }
         if (orientation !== 0 && orientation !== 1) {
-            //console.log("invalid wall orientation");
+            console.log("invalid wall orientation");
             return false;
         }
         // check if there is already a wall
@@ -269,6 +309,7 @@ class Graph {
             this.removeEdge(colonne, ligne, colonne, ligne - 1);
             this.removeEdge(colonne + 1, ligne, colonne + 1, ligne - 1);
             this.removeWall(colonne, ligne);
+            this.removeAdjacentWallRepresentation(colonne,ligne,orientation);
         }
         // vertical wall
         if (orientation === 1) {
@@ -298,7 +339,8 @@ class Graph {
     }
     wallPossible(){
         // return a list of possible wall
-        return this.getWalls().map(wall => wall.extractListRepresentation()).flat();
+        //return this.getWalls().map(wall => wall.extractListRepresentation()).flat();
+        return this.wallRepresentation;
     }
 
     distanceBetween(playerPosition, goalPosition) {
@@ -534,15 +576,13 @@ class IA {
         return this.graph.isGameOver(this.player);
     }
     updateBoard(gameState){
-        let ownWalls = gameState.ownWalls;
-        this.ownWalls = ownWalls.count;
-        //console.log("ownWalls", ownWalls);
+        let ownWalls = gameState.ownWalls
         let opponentWalls = gameState.opponentWalls;
         let walls = ownWalls.concat(opponentWalls);
         let board = gameState.board;
         for (const wall of walls) {
-            let colonne = parseInt(wall[0][0]);
-            let ligne = parseInt(wall[0][1]);
+            let colonne = parseInt(wall[0][0])-1;
+            let ligne = parseInt(wall[0][1])-1;
             let orientation = wall[1];
             this.graph.placeWall(colonne, ligne, orientation);
         }
@@ -946,6 +986,7 @@ exports.updateBoard = function updateBoard(gameState){
                 positionPotentiellesDuBot.push(trackerAdversaire);
             } else {
                 if(onAPoseUnMur){
+                    /*
                     let answer = isPlayerDetectedByOurWall(parseInt(coordoneesDernierMur[0]), parseInt(coordoneesDernierMur[1]), gameState.board);
                     if(answer[0]){
                         //console.log("PAS VU MAIS TROUVE");
@@ -956,6 +997,7 @@ exports.updateBoard = function updateBoard(gameState){
                         positionPotentiellesDuBot.push(answer[1][1] + answer[1][0]);
                         positionPotentiellesDuBot.push(answer[2][1] + answer[2][0]);
                     }
+                     */
                 }
             }
             onAPoseUnMur = false;
@@ -964,4 +1006,9 @@ exports.updateBoard = function updateBoard(gameState){
     });
 }
 
-/*-------------------------------------------------------------------------------*/
+const game = new Graph(9, 9);
+console.log(game.wallPossible());
+game.placeWall(0,7, 0);
+console.log(game.wallPossible());
+
+
