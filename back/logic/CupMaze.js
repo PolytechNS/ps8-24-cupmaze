@@ -140,54 +140,92 @@ class Graph {
         this.wallRepresentation = this.wallRepresentation.filter(wall => wall[0] !== `${colonne+1}${ligne+1}`);
     }
     removeAdjacentWallRepresentation(colonne,ligne,orientation) {
-        if (orientation === 0) {
-            // on retire de la repentation le mur mur avec wall[0] = (colonne-1,ligne) et wall[1] = 0
-            if (colonne > 0 && colonne < 8) {
-                for (let i = 0; i < this.wallRepresentation.length; i++) {
-                    if (this.wallRepresentation[i][0] === `${colonne}${ligne + 1}` && this.wallRepresentation[i][1] === 0
-                        || this.wallRepresentation[i][0] === `${colonne + 2}${ligne + 1}` && this.wallRepresentation[i][1] === 0) {
-                        this.wallRepresentation.splice(i, 1);
-                    }
-                }
-            }
-            if (colonne === 0) {
-                for (let i = 0; i < this.wallRepresentation.length; i++) {
-                    if (this.wallRepresentation[i][0] === `${colonne + 2}${ligne + 1}` && this.wallRepresentation[i][1] === 0) {
-                        this.wallRepresentation.splice(i, 1);
-                    }
-                }
-            }
-            if (colonne === 8) {
-                for (let i = 0; i < this.wallRepresentation.length; i++) {
-                    if (this.wallRepresentation[i][0] === `${colonne}${ligne + 1}` && this.wallRepresentation[i][1] === 0) {
-                        this.wallRepresentation.splice(i, 1);
-                    }
-                }
+        if (colonne === 0) {
+            if (orientation === 0) {
+                const wallPlaced = this.wallRepresentation.find(wall => wall[0] === `${colonne + 2}${ligne + 1}` && wall[1] === 0);
+                this.wallRepresentation.splice(this.wallRepresentation.indexOf(wallPlaced), 1);
             }
         }
-        if (orientation === 1) {
-            // on retire de la repentation le mur mur avec wall[0] = (colonne,ligne-1) et wall[1] = 0
-            if (ligne > 0 && ligne < 8) {
-                for (let i = 0; i < this.wallRepresentation.length; i++) {
-                    if (this.wallRepresentation[i][0] === `${colonne}${ligne}` && this.wallRepresentation[i][1] === 1) {
-                        this.wallRepresentation.splice(i, 1);
-                    }
-                }
+        if (colonne > 0 && colonne < 7) {
+            if (orientation === 0) {
+                const wallPlaced = this.wallRepresentation.find(wall => wall[0] === `${colonne}${ligne + 1}` && wall[1] === 0);
+                this.wallRepresentation.splice(this.wallRepresentation.indexOf(wallPlaced), 1);
+                const wallPlaced2 = this.wallRepresentation.find(wall => wall[0] === `${colonne + 2}${ligne + 1}` && wall[1] === 0);
+                this.wallRepresentation.splice(this.wallRepresentation.indexOf(wallPlaced2), 1);
+            }
+        }
+        if (colonne === 7) {
+            if (orientation === 0) {
+                const wallPlaced = this.wallRepresentation.find(wall => wall[0] === `${colonne}${ligne + 1}` && wall[1] === 0);
+                this.wallRepresentation.splice(this.wallRepresentation.indexOf(wallPlaced), 1);
+            }
+        }
 
+        if (ligne === 8) {
+            if (orientation === 1) {
+                const wallPlaced = this.wallRepresentation.find(wall => wall[0] === `${colonne + 1}${ligne}` && wall[1] === 1);
+                this.wallRepresentation.splice(this.wallRepresentation.indexOf(wallPlaced), 1);
+            }
+        }
+        if (ligne < 8 && ligne > 1) {
+            if (orientation === 1) {
+                const wallPlaced = this.wallRepresentation.find(wall => wall[0] === `${colonne + 1}${ligne + 2}` && wall[1] === 1);
+                this.wallRepresentation.splice(this.wallRepresentation.indexOf(wallPlaced), 1);
+                const wallPlaced2 = this.wallRepresentation.find(wall => wall[0] === `${colonne + 1}${ligne}` && wall[1] === 1);
+                this.wallRepresentation.splice(this.wallRepresentation.indexOf(wallPlaced2), 1);
+            }
+        }
+        if (ligne === 1) {
+            if (orientation === 1) {
+                const wallPlaced = this.wallRepresentation.find(wall => wall[0] === `${colonne + 1}${ligne + 2}` && wall[1] === 1);
+                this.wallRepresentation.splice(this.wallRepresentation.indexOf(wallPlaced), 1);
+            }
+        }
+    }
+    addWallRepresentation(colonne,ligne,orientation){
+        if (colonne === 0) {
+            if (orientation === 0) {
+                this.wallRepresentation.push([`${colonne + 2}${ligne + 1}`, 0]);
+            }
+        }
+        if (colonne > 0 && colonne < 7) {
+            if (orientation === 0) {
+                this.wallRepresentation.push([`${colonne}${ligne + 1}`, 0]);
+                this.wallRepresentation.push([`${colonne + 2}${ligne + 1}`, 0]);
+            }
+        }
+        if (colonne === 7) {
+            if (orientation === 0) {
+                this.wallRepresentation.push([`${colonne}${ligne + 1}`, 0]);
+            }
+        }
+        if (ligne === 8) {
+            if (orientation === 1) {
+                this.wallRepresentation.push([`${colonne + 1}${ligne}`, 1]);
+            }
+        }
+        if (ligne < 8 && ligne > 1) {
+            if (orientation === 1) {
+                this.wallRepresentation.push([`${colonne + 1}${ligne + 2}`, 1]);
+                this.wallRepresentation.push([`${colonne + 1}${ligne}`, 1]);
+            }
+        }
+        if (ligne === 1) {
+            if (orientation === 1) {
+                this.wallRepresentation.push([`${colonne + 1}${ligne + 2}`, 1]);
             }
         }
     }
     removeWallPlacement(colonne, ligne, orientation) {
+        this.addWallRepresentation(colonne,ligne,orientation);
         if (orientation === 0) {
             this.addEdge(colonne, ligne, colonne, ligne - 1);
             this.addEdge(colonne + 1, ligne, colonne + 1, ligne - 1);
-
         } else if (orientation === 1) {
             this.addEdge(colonne, ligne, colonne - 1, ligne);
             this.addEdge(colonne, ligne + 1, colonne - 1, ligne + 1);
         }
     }
-
     getNodeState(colonne, ligne) {
         const node = this.getNode(colonne, ligne);
         return node ? node.state : null;
@@ -293,7 +331,6 @@ class Graph {
             return false;
         }
         if (orientation !== 0 && orientation !== 1) {
-            console.log("invalid wall orientation");
             return false;
         }
         // check if there is already a wall
@@ -313,9 +350,11 @@ class Graph {
         }
         // vertical wall
         if (orientation === 1) {
+            //console.log("wall placed at", `(${colonne+1},${ligne+1})`, orientation);
             this.removeEdge(colonne, ligne, colonne - 1, ligne);
             this.removeEdge(colonne, ligne + 1, colonne - 1, ligne + 1);
             this.removeWall(colonne, ligne);
+            this.removeAdjacentWallRepresentation(colonne,ligne,orientation);
         }
         //console.log("wall placed at", `(${colonne+1},${ligne+1})`, orientation);
     }
@@ -339,7 +378,6 @@ class Graph {
     }
     wallPossible(){
         // return a list of possible wall
-        //return this.getWalls().map(wall => wall.extractListRepresentation()).flat();
         return this.wallRepresentation;
     }
 
@@ -410,11 +448,10 @@ class IA {
         this.player = AIplay;
         this.ownWalls = 0;
         this.opponent = (AIplay === 1) ? 2 : 1;
-        const position = (AIplay === 1) ? "81" : "89";
+        const position = (AIplay === 1) ? "51" : "59";
         this.graph.updateNodeState(parseInt(position[0]) - 1, parseInt(position[1]) - 1, 1);
         this.playerPosition = position;
         this.previousPlayerPosition = position;
-        // on dira que l'adversaire est a 89
         this.adversaryPosition = (AIplay === 1) ? "" : "";
         this.graph.updateNodeState(parseInt(this.adversaryPosition[0]) - 1, parseInt(this.adversaryPosition[1]) - 1, 2);
         return position;
@@ -505,8 +542,8 @@ class IA {
         const startTime = performance.now();
         const bestMove = this.minimaxInit(gameState,2);
         const endTime = performance.now();
-        //console.log("time", endTime - startTime);
-        //console.log("bestMove", bestMove);
+        console.log("time", endTime - startTime);
+        console.log("bestMove", bestMove);
         return bestMove;
     }
     generateMoves() {
@@ -563,13 +600,12 @@ class IA {
         score += 100 - distanceToGoal;
         // distance to the player's goal for the adversary
         const distanceToAdversaryGoal = this.graph.distanceToGoal(this.opponent, this.adversaryPosition);
-        score -= 100 - distanceToAdversaryGoal;
+        score -= 100 + distanceToAdversaryGoal;
         if (distanceToGoal === 1) {
-            score += 1000;
+            score += 10000000000;
         } else if (distanceToAdversaryGoal === 1) {
-            score -= 1000;
+            score -= 10000000000;
         }
-        //console.log("score", score);
         return score;
     }
     isTerminalState() {
@@ -589,10 +625,10 @@ class IA {
         for (let i = 0; i < 9; i++) {
             for (let j = 0; j < 9; j++) {
                 if (board[i][j] === 1) {
-                    this.playerPosition = `${i+1}${j+1}`;
+                    this.playerPosition = `${i+1}${9-j+1}`;
                 }
                 if (board[i][j] === 2) {
-                    this.adversaryPosition = `${i+1}${j+1}`;
+                    this.adversaryPosition = `${i+1}${9-j+1}`;
                 }
                 this.graph.updateNodeState(i, j, board[i][j]);
             }
@@ -1005,10 +1041,27 @@ exports.updateBoard = function updateBoard(gameState){
             resolve(true);
     });
 }
+/*
+gameState = {
+    board: [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ],
+    ownWalls: [],
+    opponentWalls: []
+}
 
-const game = new Graph(9, 9);
-console.log(game.wallPossible());
-game.placeWall(0,7, 0);
-console.log(game.wallPossible());
+const ia = new IA(1);
+ia.setup(1);
+ia.graph.updateNodeState(4, 0, 1);
+ia.graph.updateNodeState(4, 1, 2);
+console.log(ia.nextMove(gameState));
 
-
+*/
