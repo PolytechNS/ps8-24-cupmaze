@@ -5,28 +5,31 @@ function createSocket(server) {
     const io = new Server(server);
     const rooms = [];
 
-    const gameNamespace = io.of("/api/game");
+    const gameNamespace = io.of("/api/game1v1");
     gameNamespace.on("connection", (socket) => {
         console.log("a user connected");
-        const existingRoom = rooms.find((room) => room.players.length === 1);
 
-        if (existingRoom) {
-            //Join existing room
-            existingRoom.clients.push(socket);
-            socket.join(existingRoom.name);
-            console.log('user joined existing room');
+        socket.on("waiting_room", () => {
+            console.log("user in waiting room");
+            const existingRoom = rooms.find((room) => room.players.length === 1);
 
-            io.to(existingRoom.name).emit('message', 'The Game will start shortly !');
-        } else {
-            //Create new room
-            const roomName = `room_${Date.now()}`;
-            const newRoom = {
-                name: roomName,
-                players: [socket],
-            };
-
-            rooms.push(newRoom);
-        }
+            if (existingRoom) {
+                //Join existing room
+                existingRoom.players.push(socket);
+                socket.join(existingRoom.name);
+                console.log('user joined existing in room', existingRoom.name);
+                startGame(existingRoom);
+            } else {
+                //Create new room
+                const roomName = `room_${Date.now()}`;
+                const newRoom = {
+                    name: roomName,
+                    players: [socket],
+                };
+                console.log('user created new room');
+                rooms.push(newRoom);
+            }
+        });
 
         gameNamespace.on('disconnect', () => {
             console.log('player disconnected');
@@ -52,4 +55,11 @@ function createSocket(server) {
         });
     });
 
+    function startGame(room) {
+        console.log('starting game');
+        gameNamespace.in(room.name).emit('startGame', room.name);
+
+    }
 }
+
+module.exports = {createSocket};
