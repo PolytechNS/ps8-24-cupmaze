@@ -1,0 +1,88 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+/* Grid container */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(300px, 1fr));
+    grid-template-rows: 200px 200px 200px;
+    grid-gap: 20px;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-image: url("imageResources/login_signup.jpg");
+    background-size: cover;
+    background-position: center;
+}
+
+/* Title */
+.title {
+    text-align: center;
+    font-size: 36px;
+    color: #29ABCA; /* Light blue */
+    margin-bottom: 20px;
+    grid-column: 2;
+    grid-row: 1;
+    background-color: white;
+}
+
+/* Description */
+.description {
+    text-align: center;
+    font-size: 26px;
+    color: #333;
+    margin-bottom: 20px;
+    grid-column: 2;
+    grid-row: 2;
+    background-color: white;
+
+}
+
+/* Form */
+#login-form {
+    background-color: #fff; /* White background */
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow */
+    grid-column: 2;
+    grid-row: 2;
+}
+
+/* Labels */
+label {
+    display: block;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+/* Inputs */
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+/* Submit button */
+button[type="submit"] {
+    background-color: #29ABCA; /* Light blue */
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Button hover effect */
+button[type="submit"]:hover {
+    background-color: #007bff; /* Darker blue on hover */
+}
