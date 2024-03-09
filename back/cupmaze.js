@@ -556,7 +556,7 @@ exports.correction = function correction(rightMove) {
 
 exports.updateBoard = function updateBoard(gameState) {
     return new Promise((resolve, reject) => {
-        //ai.updateBoard(gameState);
+        ai.updateBoard(gameState);
         resolve(true);
     });
 }
