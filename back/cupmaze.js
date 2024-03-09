@@ -426,7 +426,31 @@ class AI {
             this.playerPosition = nextMove;
             return nextMove;
         }
+    }
 
+    updateBoard(gameState){
+        let ownWalls = gameState.ownWalls
+        let opponentWalls = gameState.opponentWalls;
+        let walls = ownWalls.concat(opponentWalls);
+        let board = gameState.board;
+        for (const wall of walls) {
+            let colonne = parseInt(wall[0][0])-1;
+            let ligne = parseInt(wall[0][1])-1;
+            let orientation = wall[1];
+            this.graph.placeWall(colonne, ligne, orientation);
+        }
+        for (let i = 0; i < 9; i++) {
+            for (let j = 0; j < 9; j++) {
+                if (board[i][j] === 1) {
+                    this.playerPosition = `${i+1}${9-j+1}`;
+                }
+                if (board[i][j] === 2) {
+                    this.adversaryPosition = `${i+1}${9-j+1}`;
+                }
+                this.graph.updateNodeState(i, j, board[i][j]);
+            }
+        }
+        return true;
     }
 
 }
@@ -547,9 +571,7 @@ exports.nextMove = function nextMove(gameState) {
 
 exports.correction = function correction(rightMove) {
     return new Promise((resolve, reject) => {
-        if(rightMove.action === "move"){
-           position = rightMove.value;
-        }
+        position = rightMove.value;
         resolve(true);
     });
 }

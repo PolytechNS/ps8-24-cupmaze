@@ -691,10 +691,15 @@ exports.setup = function setup(AIplay) {
 }
 
 exports.nextMove = function nextMove(gameState){
-    const move = {
+    let move = {
         action: "",
         value: ""
     }
+
+    return new Promise((resolve, reject) => {
+        move = ai.nextMove(gameState);
+        resolve(move);
+    });
 
     let derniereActionJoueur;
     if(10 - gameState.opponentWalls.length !== nombreWallAdversaire){
