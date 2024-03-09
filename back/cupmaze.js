@@ -539,7 +539,7 @@ exports.nextMove = function nextMove(gameState) {
             } else {
                 return new Promise((resolve, reject) => {
                     move.action = "wall";
-                    move.value = [result[1]+result[2],0];
+                    move.value = [(parseInt(result[2]+result[1])+11).toString(),0];
                     resolve(move);
                 });
             }
@@ -561,7 +561,7 @@ exports.nextMove = function nextMove(gameState) {
             } else {
                 return new Promise((resolve, reject) => {
                     move.action = "wall";
-                    move.value = [result[1]+result[2],0];
+                    move.value = [(parseInt(result[2]+result[1])+11).toString(),0];
                     resolve(move);
                 });
             }

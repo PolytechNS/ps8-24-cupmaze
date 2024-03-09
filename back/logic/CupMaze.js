@@ -448,7 +448,7 @@ class IA {
         this.player = AIplay;
         this.ownWalls = 0;
         this.opponent = (AIplay === 1) ? 2 : 1;
-        const position = (AIplay === 1) ? "51" : "59";
+        const position = (AIplay === 1) ? "31" : "39";
         this.graph.updateNodeState(parseInt(position[0]) - 1, parseInt(position[1]) - 1, 1);
         this.playerPosition = position;
         this.previousPlayerPosition = position;
