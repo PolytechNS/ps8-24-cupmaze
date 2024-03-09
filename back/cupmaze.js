@@ -430,3 +430,129 @@ class AI {
     }
 
 }
+
+let tourActuel = 0;
+let monChiffre = 0;
+let ai;
+let position;
+
+
+function isPlayerVisible(board){
+    if(monChiffre === 1){
+        for(let y = 8; y >= 0; y--){
+            for(let x = 0; x <= 8; x++){
+                if(board[y][x] === 2){
+                    return [true, x, y];
+                }
+            }
+        }
+        return [false, null, null];
+    } else {
+        for(let y = 0; y <= 8; y++){
+            for(let x = 0; x <= 8; x++){
+                if(board[y][x] === 2){
+                    return [true, x, y];
+                }
+            }
+        }
+    }
+    return [false, null, null];
+}
+
+
+exports.setup = function setup(AIplay) {
+    tourActuel++;
+    monChiffre = AIplay;
+    return new Promise((resolve, reject) => {
+        ai = new AI();
+        position = ai.setup(AIplay);
+        resolve(position);
+    });
+}
+
+exports.nextMove = function nextMove(gameState) {
+    const move = {
+        action: "",
+        value: ""
+    };
+
+    result = isPlayerVisible(gameState.board);
+
+    if(result[0] === false){
+        if(monChiffre === 1){
+            return new Promise((resolve, reject) => {
+                move.action = "move";
+                move.value = (parseInt(position)+1).toString();
+                resolve(move);
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                move.action = "move";
+                move.value = (parseInt(position)-1).toString();
+                resolve(move);
+            });
+        }
+    } else {
+        let chemins_adversaires = [];
+        let chemins_moi = [];
+        if(monChiffre === 1){
+            for(let i = 1; i <= 9; i++){
+                chemins_adversaires.push(ai.graph.distanceBetween(position, i.toString()+"9"));
+                chemins_moi.push(ai.graph.distanceToGoal(result[1]+result[2], i.toString()+"1"));
+            }
+            //retrieve min of both arrays
+            let min_adversaire = Math.min(...chemins_adversaires);
+            let min_moi = Math.min(...chemins_moi);
+            if(min_moi < min_adversaire){
+                return new Promise((resolve, reject) => {
+                    move.action = "move";
+                    move.value = (parseInt(position)+1).toString();
+                    resolve(move);
+                });
+            } else {
+                return new Promise((resolve, reject) => {
+                    move.action = "wall";
+                    move.value = [result[1]+result[2],0];
+                    resolve(move);
+                });
+            }
+        }else{
+            for(let i = 1; i <= 9; i++){
+                chemins_adversaires.push(ai.graph.distanceBetween(position, i.toString()+"1"));
+                chemins_moi.push(ai.graph.distanceToGoal(result[1]+result[2], i.toString()+"9"));
+            }
+            //retrieve min of both arrays
+            let min_adversaire = Math.min(...chemins_adversaires);
+            let min_moi = Math.min(...chemins_moi);
+            if(min_moi < min_adversaire){
+                return new Promise((resolve, reject) => {
+                    move.action = "move";
+                    move.value = (parseInt(position)-1).toString();
+                    resolve(move);
+                });
+            } else {
+                return new Promise((resolve, reject) => {
+                    move.action = "wall";
+                    move.value = [result[1]+result[2],0];
+                    resolve(move);
+                });
+            }
+        }
+    }
+}
+
+exports.correction = function correction(rightMove) {
+    return new Promise((resolve, reject) => {
+        if(rightMove.action === "move"){
+           position = rightMove.value;
+        }
+        resolve(true);
+    });
+}
+
+exports.updateBoard = function updateBoard(gameState) {
+    return new Promise((resolve, reject) => {
+        //ai.updateBoard(gameState);
+        resolve(true);
+    });
+}
