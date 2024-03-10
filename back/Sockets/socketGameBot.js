@@ -11,20 +11,19 @@ const {beginningPositionIsValid} = require("../logic/movePlayerReferee");
 /**
  * Cette fonction va servir pour pouvoir créer le socket qui correspond à quand on va vouloir initialiser une partie entre le bot et un joueur en local
  * Cette fonction est appelée dans le fichier "index.js" pour l'initialiser en attendant une connexion d'un client
- * @param server
+ * @param io
  */
-function createSocket(server) {
-    const io = new Server(server);
+function createSocket(io) {
 
-    const gameNamespace = io.of("/api/game");
-    gameNamespace.on("connection", (socket) => {
+    const BotGameNamespace = io.of("/api/gameBot");
+    BotGameNamespace.on("connection", (socket) => {
         console.log("a user connected");
         const game = new Game();
 
         socket.on("newMove", (msg) => {
             console.log("On demande à l'IA de jouer maintenant");
             let newPosition = AIEasy.computeMove(msg);
-            gameNamespace.emit("updatedBoard", newPosition);
+            BotGameNamespace.emit("updatedBoard", newPosition);
         });
 
         socket.on("saveGame", (msg)=>{
@@ -82,7 +81,7 @@ function createSocket(server) {
             console.log("On demande à l'IA si la partie est terminée");
             let answer = game.isGameOver();
             console.log("La partie est terminée : ", answer[0], " et le gagnant est : ", answer[1]);
-            gameNamespace.emit("gameOver", answer[0], answer[1]);
+            BotGameNamespace.emit("gameOver", answer[0], answer[1]);
         });
 
         socket.on("newMoveHumanIsPossible", async (clickedCellId) => {
@@ -100,10 +99,10 @@ function createSocket(server) {
                 game.graph.updateNodeState(saveOldPosition[0], saveOldPosition[1], -1);
                 game.graph.updateNodeState(caseWanted.getPos_x(), caseWanted.getPos_y(), 1);
                 game.movePlayer(1, caseWanted, game.getPlayerCurrentPosition(1));
-                if (saveOldPosition !== null) gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
-                else gameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
+                if (saveOldPosition !== null) BotGameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
+                else BotGameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
             }else{
-                gameNamespace.emit("isNewMoveHumanIsPossible", false, null, null);
+                BotGameNamespace.emit("isNewMoveHumanIsPossible", false, null, null);
             }
         });
 
@@ -116,27 +115,27 @@ function createSocket(server) {
             game.playerPosition["player1"] = game.lastPlayerPosition["player1"]
             game.actionsToDo=1;
             game.graph.updateNodeState(game.playerPosition["player1"][0], game.playerPosition["player1"][1], 0);
-            gameNamespace.emit("undoMove", oldPositionHTML, newPositionHtml, 1, game.numberTour);
+            BotGameNamespace.emit("undoMove", oldPositionHTML, newPositionHtml, 1, game.numberTour);
         });
 
         socket.on("choosePositionToBegin", (cellId) => {
-
+            console.log("choosePositionToBegin", cellId);
             const colonne = parseInt(cellId.split("-")[0]);
             const ligne = parseInt(cellId.split("-")[1]);
             const action = game.actionsToDo;
             const currentPlayer = game.currentPlayer;
             var res = beginningPositionIsValid(game.currentPlayer, ligne);
-            gameNamespace.emit("beginningPositionIsValid", res);
+            BotGameNamespace.emit("beginningPositionIsValid", res);
 
             if (action === 0) {
-                gameNamespace.emit("checkAction", true);
+                BotGameNamespace.emit("checkAction", true);
             }
 
             game.playerPosition.player1 = [colonne, ligne];
             const caseWanted = game.getCase(colonne, ligne);
             caseWanted.setIsOccupied(true);
             game.graph.updateNodeState(colonne, ligne, currentPlayer);
-            gameNamespace.emit("currentPlayer", currentPlayer, game.playerPosition.player1);
+            BotGameNamespace.emit("currentPlayer", currentPlayer, game.playerPosition.player1);
             game.actionsToDo--;
             game.lastActionType = "position"
             console.log("choosePositionToBegin", game.playerPosition.player1);
@@ -151,7 +150,7 @@ function createSocket(server) {
             const nbWallsPlayer1 = game.nbWallsPlayer1;
             const nbWallsPlayer2 = game.nbWallsPlayer2;
 
-            gameNamespace.emit("numberTour", numberTour, possibleMoves);
+            BotGameNamespace.emit("numberTour", numberTour, possibleMoves);
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
             if (newAIPosition instanceof Case) {
                 newAIPosition = [newAIPosition.getPos_x(), newAIPosition.getPos_y()]
@@ -163,7 +162,7 @@ function createSocket(server) {
             const cellId = newAIPosition[0] + "-" + newAIPosition[1] + "~cell";
             game.graph.updateNodeState(newAIPosition[0], newAIPosition[1], 2);
             if(game.actionsToDo === 1){
-                gameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
+                BotGameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
                 game.playerPosition.player2 = newAIPosition;
                 game.actionsToDo=0;
             }
@@ -174,12 +173,12 @@ function createSocket(server) {
 
             const winner = game.isGameOver(game.playerPosition);
             if (winner !== 0) {
-                gameNamespace.emit("gameOver", winner);
+                BotGameNamespace.emit("gameOver", winner);
                 return;
             }
 
             console.log("#####CHANGEMENT DE TOUR#####");
-            gameNamespace.emit("numberTourAfter", numberTour);
+            BotGameNamespace.emit("numberTourAfter", numberTour);
 
             //game.lastPlayerPosition = game.playerPosition;
 
@@ -191,7 +190,7 @@ function createSocket(server) {
             console.log("possibleMoves player 1", possibleMoves);
             console.log("playerPosition", playerPosition);
             console.log("action", game.actionsToDo);
-            gameNamespace.emit("updateRound",
+            BotGameNamespace.emit("updateRound",
                 possibleMoves, numberTour,
                 playerPosition, currentplayer,
                 nbWallsPlayer1, nbWallsPlayer2);
@@ -201,7 +200,7 @@ function createSocket(server) {
         socket.on("wallLaid",(firstWallToColor, wallType, wallPosition, wallId) => {
             console.log("wallLaid", firstWallToColor, wallType, wallPosition);
             if (game.actionsToDo === 0) {
-                gameNamespace.emit("laidWall", null, true, true);
+                BotGameNamespace.emit("laidWall", null, true, true);
                 return;
             }
             let adjacentWallId = null;
@@ -236,11 +235,11 @@ function createSocket(server) {
                 }
                 game.lastActionType = "wall";
                 if (adjacentWall === undefined || adjacentSpace === undefined) {
-                    gameNamespace.emit("laidWall", null, null, null);
+                    BotGameNamespace.emit("laidWall", null, null, null);
                 } else {
                     adjacentWallId = wallType + "~" + adjacentWall.pos_x + "-" + adjacentWall.pos_y;
                     adjacentSpaceId = adjacentSpace.pos_x + "-" + adjacentSpace.pos_y + "-space";
-                    gameNamespace.emit("laidWall",wallType, game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
+                    BotGameNamespace.emit("laidWall",wallType, game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
                 }
             }
             game.lastWallLaidsIDHtml = [wallId, adjacentWallId, adjacentSpaceId];

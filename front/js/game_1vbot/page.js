@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", main(intent));
 
 
 function main(isLoadGame) {
-    socket = io("/api/game");
+    socket = io('/api/gameBot');
 
     board = document.getElementById("grid");
 
@@ -424,6 +424,7 @@ function wallLaid(event) {
  * et ensuite on change de listener pour le tour suivant car le comportement change
  */
 function choosePositionToBegin(event) {
+    console.log("choosePositionToBegin");
     socket.emit("choosePositionToBegin", event.target.id);
     socket.on("beginningPositionIsValid", (res) => {
         if (!res) {

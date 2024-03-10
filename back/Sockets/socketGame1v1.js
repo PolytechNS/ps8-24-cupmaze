@@ -1,12 +1,11 @@
 const {Server} = require("socket.io");
-const {Game} = require("../logic/Game");
 
-function createSocket(server) {
-    const io = new Server(server);
+function createSocket(io) {
+    //const io = new Server(server);
     const rooms = [];
 
-    const gameNamespace = io.of("/api/game1v1");
-    gameNamespace.on("connection", (socket) => {
+    const OnlineGameNamespace = io.of("/api/game1v1");
+    OnlineGameNamespace.on("connection", (socket) => {
         console.log("a user connected");
 
         socket.on("waiting_room", () => {
@@ -31,7 +30,7 @@ function createSocket(server) {
             }
         });
 
-        gameNamespace.on('disconnect', () => {
+        OnlineGameNamespace.on('disconnect', () => {
             console.log('player disconnected');
 
             //Remove player from room
@@ -57,7 +56,7 @@ function createSocket(server) {
 
     function startGame(room) {
         console.log('starting game');
-        gameNamespace.in(room.name).emit('startGame', room.name);
+        OnlineGameNamespace.in(room.name).emit('startGame', room.name);
 
     }
 }
