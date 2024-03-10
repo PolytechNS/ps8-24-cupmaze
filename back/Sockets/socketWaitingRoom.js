@@ -17,7 +17,6 @@ function createSocket(io) {
                 if (!waitingPlayers.includes(socket)) {
                     waitingPlayers.push(socket);
                 }
-
                 // on regarde si on a 2 joueurs en attente
                 if (waitingPlayers.length >= 2) {
                     // on recupère les 2 premiers joueurs

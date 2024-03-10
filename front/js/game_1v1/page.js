@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", main(intent));
 
 
 function main(isLoadGame) {
-    socket = io("/api/game");
+    socket = io("/api/onlineGame");
 
     board = document.getElementById("grid");
 
@@ -417,13 +417,10 @@ function undoAction(){
             document.getElementById(tabIDHTML[0]).classList.remove("wall-laid","laidBy"+player);
             document.getElementById(tabIDHTML[0]).addEventListener("mouseenter",wallListener);
             document.getElementById(tabIDHTML[0]).addEventListener("click",wallLaid);
-
             document.getElementById(tabIDHTML[1]).classList.remove("wall-laid","laidBy"+player);
             document.getElementById(tabIDHTML[1]).addEventListener("mouseenter",wallListener);
             document.getElementById(tabIDHTML[1]).addEventListener("click",wallLaid);
-
             document.getElementById(tabIDHTML[2]).classList.remove("wall-laid","laidBy"+player);
-
             updateNumberWallsDisplay(1, numberWall, null)
             socket.off("undoLayingWall");
         });
