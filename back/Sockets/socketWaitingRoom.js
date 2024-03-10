@@ -3,30 +3,34 @@ const {Server} = require("socket.io");
 function createSocket(io) {
     //const io = new Server(server);
     const rooms = [];
-    let waitingPlayers = []
+    let waitingPlayers = new Map();
 
     const WaitingRoomNamespace = io.of("/api/waitingRoom");
 
         WaitingRoomNamespace.on("connection", (socket) => {
             console.log("a user " + socket.id +" connected");
 
-            socket.on("waiting_room", () => {
+            socket.on("waiting_room", (playerToken) => {
                 console.log("user " + socket.id + " is in the waiting room");
 
                 // si le joueur n'est pas déjà dans la liste des joueurs en attente, on l'ajoute
-                if (!waitingPlayers.includes(socket)) {
-                    waitingPlayers.push(socket);
+                if (!waitingPlayers.has(playerToken)) {
+                    waitingPlayers.set(playerToken, socket.id);
                 }
+                console.log("token", playerToken);
                 // on regarde si on a 2 joueurs en attente
-                if (waitingPlayers.length >= 2) {
-                    // on recupère les 2 premiers joueurs
-                    const player1 = waitingPlayers.shift();
-                    const player2 = waitingPlayers.shift();
-                    const room = "room_" + player1.id + "_" + player2.id;
-                    player1.join(room);
-                    player2.join(room);
+                if (waitingPlayers.size >= 2) {
+                    const players = Array.from(waitingPlayers.values());
+                    const room = {
+                        name: "room_" + players[0] + "_" + players[1],
+                        players: players
+                    };
                     rooms.push(room);
-                    console.log('room created', room);
+                    console.log("room created", room.name);
+                    // on retire les joueurs de la liste des joueurs en attente
+                    waitingPlayers.delete(playerToken);
+                    waitingPlayers.delete(players[0]);
+                    waitingPlayers.delete(players[1]);
                     startGame(room);
                 }
 
@@ -34,16 +38,21 @@ function createSocket(io) {
 
             socket.on('disconnect', () => {
                 console.log('user disconnected');
-                waitingPlayers = waitingPlayers.filter(player => player.id !== socket.id);
+                // on retire le joueur de la liste des joueurs en attente
+                waitingPlayers.forEach((value, key) => {
+                    if (key === socket.id) {
+                        waitingPlayers.delete(key);
+                    }
+                });
             });
         });
 
-
-
-
     function startGame(room) {
         console.log('starting game');
-        WaitingRoomNamespace.in(room).emit('startGame', room);
+        const players = room.players;
+        players.forEach((player) => {
+            WaitingRoomNamespace.to(player).emit('startGame', room.name);
+        });
     }
 
 }

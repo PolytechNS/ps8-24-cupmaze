@@ -1,13 +1,19 @@
-// create a room for waiting
-// waiting room is a room where players wait for the game to start
 
-// au chargement de la page, on emet un socket pour dire qu'on est dans la waiting room
+const socket = io.connect('/api/waitingRoom');
 
-const socket = io('/api/waitingRoom');
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift
+}
+
+const token = getCookie('jwt');
+
+console.log('token', token);
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded');
-    socket.emit('waiting_room');
+    socket.emit('waiting_room', token);
 });
 
 socket.on('startGame', (room) => {

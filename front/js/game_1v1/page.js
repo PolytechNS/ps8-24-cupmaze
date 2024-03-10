@@ -11,13 +11,16 @@ let victoryAnswer = "";
 let board;
 let possibleMoves=[];
 const intent = window.location.search.split("=")[1];
-console.log(intent);
-document.addEventListener("DOMContentLoaded", main(intent));
+document.addEventListener("DOMContentLoaded", main());
 
 
+function main() {
+    socket = io("/api/onlineGame",);
 
-function main(isLoadGame) {
-    socket = io("/api/onlineGame");
+    socket.on("connect", () => {
+        console.log("connected");
+        socket.emit("joinGzme")
+    });
 
     board = document.getElementById("grid");
 
