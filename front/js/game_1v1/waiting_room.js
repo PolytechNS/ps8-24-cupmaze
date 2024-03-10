@@ -3,7 +3,7 @@
 
 // au chargement de la page, on emet un socket pour dire qu'on est dans la waiting room
 
-const socket = io('/api/game1v1');
+const socket = io('/api/waitingRoom');
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded');
@@ -14,3 +14,4 @@ socket.on('startGame', (room) => {
     console.log('message received', room);
     window.location.href = `/1v1game.html?room=${room}`;
 });
+
