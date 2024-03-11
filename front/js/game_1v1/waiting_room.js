@@ -4,12 +4,11 @@ const socket = io.connect('/api/waitingRoom');
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift
+    if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
+// on recupere le token jwt stocké dans le cookie
 const token = getCookie('jwt');
-
-console.log('token', token);
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded');

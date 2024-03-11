@@ -1,4 +1,8 @@
 const {Server} = require("socket.io");
+const {createGame, get} = require("../database/mongo.js");
+const {Game} = require("../logic/Game");
+const jwt = require('jsonwebtoken');
+const {getUser} = require("../database/mongo");
 
 function createSocket(io) {
     //const io = new Server(server);
@@ -10,29 +14,40 @@ function createSocket(io) {
         WaitingRoomNamespace.on("connection", (socket) => {
             console.log("a user " + socket.id +" connected");
 
-            socket.on("waiting_room", (playerToken) => {
+            socket.on("waiting_room", async (playerToken) => {
                 console.log("user " + socket.id + " is in the waiting room");
+                try {
+                    console.log("playerToken", playerToken);
+                    const email = jwt.verify(playerToken, 'secret').email;
+                    console.log("email", email);
+                    const user = await getUser(email);
+                    console.log("user", user);
+                    if (!user) {
+                        console.log("user not found");
+                        return;
+                    }
+                    if (!waitingPlayers.has(playerToken)) {
+                        waitingPlayers.set(playerToken, { userName: user.username, socketId: socket.id });
+                    }
+                    console.log("waiting players", waitingPlayers);
+                    if (waitingPlayers.size >= 2) {
+                        const players = Array.from(waitingPlayers.values());
+                        const room = {
+                            name: "room_" + players[0].userName + "_" + players[1].userName,
+                            players: players
+                        };
+                        rooms.push(room);
+                        console.log("room created", room.name);
+                        // on retire les joueurs de la liste des joueurs en attente
+                        waitingPlayers.delete(playerToken);
+                        waitingPlayers.delete(players[0].socketId);
+                        waitingPlayers.delete(players[1].socketId);
+                        startGame(room);
+                    }
+                } catch (e) {
+                    console.log(e);
+                }
 
-                // si le joueur n'est pas déjà dans la liste des joueurs en attente, on l'ajoute
-                if (!waitingPlayers.has(playerToken)) {
-                    waitingPlayers.set(playerToken, socket.id);
-                }
-                console.log("token", playerToken);
-                // on regarde si on a 2 joueurs en attente
-                if (waitingPlayers.size >= 2) {
-                    const players = Array.from(waitingPlayers.values());
-                    const room = {
-                        name: "room_" + players[0] + "_" + players[1],
-                        players: players
-                    };
-                    rooms.push(room);
-                    console.log("room created", room.name);
-                    // on retire les joueurs de la liste des joueurs en attente
-                    waitingPlayers.delete(playerToken);
-                    waitingPlayers.delete(players[0]);
-                    waitingPlayers.delete(players[1]);
-                    startGame(room);
-                }
 
             });
 
@@ -40,7 +55,9 @@ function createSocket(io) {
                 console.log('user disconnected');
                 // on retire le joueur de la liste des joueurs en attente
                 waitingPlayers.forEach((value, key) => {
-                    if (key === socket.id) {
+                    console.log("value", value, "key", key);
+                    console.log("socket.id", socket.id, "value.socketId", value.socketId);
+                    if (value.socketId === socket.id) {
                         waitingPlayers.delete(key);
                     }
                 });
@@ -50,8 +67,13 @@ function createSocket(io) {
     function startGame(room) {
         console.log('starting game');
         const players = room.players;
+
+
+        const newGame = new Game()
+
         players.forEach((player) => {
-            WaitingRoomNamespace.to(player).emit('startGame', room.name);
+            const playerSocketId = waitingPlayers.get(player).socketId;
+            WaitingRoomNamespace.to(playerSocketId).emit('startGame', room.name);
         });
     }
 

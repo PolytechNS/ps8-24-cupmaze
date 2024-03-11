@@ -88,8 +88,15 @@ async function clearGames(userEmail){
   return userEmail;
 }
 
+async function getUserByToken(token) {
+  const db = await getDb();
+  const users = db.collection('users');
+  return users.findOne({ token: token });
+}
+
 exports.createUser = createUser;
 exports.getUser = getUser;
 exports.createGame = createGame;
 exports.getGame = getGame;
 exports.clearGames = clearGames;
+exports.getUserByToken = getUserByToken;

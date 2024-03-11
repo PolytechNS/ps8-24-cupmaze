@@ -6,7 +6,10 @@ const { getPossibleMoves } = require('./movePlayerReferee.js');
 const { Node, Graph, NodeWall, PriorityQueue } = require('./CupMaze.js');
 
 class Game {
-    constructor() {
+    constructor(player1, player2, gameMode) {
+        this.players = [player1, player2];
+        this.gameMode = gameMode;
+
         this.userEmail = "";
         this.currentPlayer = 1;
         this.nbWallsPlayer1 = 10;
@@ -34,6 +37,7 @@ class Game {
         this.wallPossible = [];
         this.gameState = {};
     }
+
 
     assignGameContext(savedGame) {
         this.userEmail = savedGame.userEmail;

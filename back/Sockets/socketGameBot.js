@@ -18,7 +18,7 @@ function createSocket(io) {
     const BotGameNamespace = io.of("/api/gameBot");
     BotGameNamespace.on("connection", (socket) => {
         console.log("a user connected");
-        const game = new Game();
+        const game = new Game("","","IA");
 
         socket.on("newMove", (msg) => {
             console.log("On demande à l'IA de jouer maintenant");
