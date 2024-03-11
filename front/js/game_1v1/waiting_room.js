@@ -1,7 +1,7 @@
 
 const socket = io.connect('/api/waitingRoom');
 
-function getCookie(name) {
+export function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
@@ -10,13 +10,28 @@ function getCookie(name) {
 // on recupere le token jwt stocké dans le cookie
 const token = getCookie('jwt');
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded');
+document.addEventListener('DOMContentLoaded', init, false);
+
+function init() {
+    console.log('connected to the waiting room');
     socket.emit('waiting_room', token);
-});
+    socket.on('matchFound', (matchInfo) => onMatchFound(matchInfo));
+}
 
-socket.on('startGame', (room) => {
-    console.log('message received', room);
-    window.location.href = `/1v1game.html?room=${room}`;
-});
+function onMatchFound(matchInfo) {
+    console.log('match found', matchInfo);
+    setTimeout(() => {
+        localStorage.setItem('room', matchInfo.roomName);
+        localStorage.setItem('opponent', matchInfo.opponent);
+        localStorage.setItem('opponentId', matchInfo.opponentId);
+        window.location.href = `/1v1game.html`;
+    }, 1000);
+    console.log('message received');
+}
 
+/*
+socket.on('matchFound', () => {
+    console.log('message received');
+    window.location.href = `/1v1game.html`;
+});
+*/

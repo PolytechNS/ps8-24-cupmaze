@@ -88,10 +88,12 @@ async function clearGames(userEmail){
   return userEmail;
 }
 
-async function getUserByToken(token) {
+
+async function clearGameDb() {
   const db = await getDb();
-  const users = db.collection('users');
-  return users.findOne({ token: token });
+  const games = db.collection('games');
+  await games.deleteMany({});
+  return games;
 }
 
 exports.createUser = createUser;
@@ -99,4 +101,4 @@ exports.getUser = getUser;
 exports.createGame = createGame;
 exports.getGame = getGame;
 exports.clearGames = clearGames;
-exports.getUserByToken = getUserByToken;
+exports.clearGameDb = clearGameDb;

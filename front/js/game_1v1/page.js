@@ -3,6 +3,7 @@ import {removePlayerCircle, addPlayerCircle} from "../game_1vbot/movePlayerUtils
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
+import {getCookie} from "./waiting_room.js";
 
 
 let socket;
@@ -10,17 +11,24 @@ let lastActionType = "";
 let victoryAnswer = "";
 let board;
 let possibleMoves=[];
-const intent = window.location.search.split("=")[1];
-document.addEventListener("DOMContentLoaded", main());
+document.addEventListener("DOMContentLoaded", main,false);
+
+let gameInformation;
+function searchToObject() {
+    gameInformation = {
+        'roomName': localStorage.getItem('room'),
+        'opponent': localStorage.getItem('opponent'),
+        'opponentId': localStorage.getItem('opponentId'),
+    }
+}
 
 
 function main() {
-    socket = io("/api/onlineGame",);
-
-    socket.on("connect", () => {
-        console.log("connected");
-        socket.emit("joinGzme")
-    });
+    socket = io("/api/onlineGame");
+    searchToObject();
+    console.log("gameInformation", gameInformation);
+    socket.emit("setupGame", getCookie("jwt"));
+    socket.emit("joinRoom", gameInformation.roomName);
 
     board = document.getElementById("grid");
 
