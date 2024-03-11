@@ -77,13 +77,6 @@ function createSocket(io) {
             console.log("user disconnected");
         });
 
-        socket.on("isGameOver", () => {
-            console.log("On demande à l'IA si la partie est terminée");
-            let answer = game.isGameOver();
-            console.log("La partie est terminée : ", answer[0], " et le gagnant est : ", answer[1]);
-            BotGameNamespace.emit("gameOver", answer[0], answer[1]);
-        });
-
         socket.on("newMoveHumanIsPossible", async (clickedCellId) => {
 
             let possibleMoves = game.getPossibleMoves(game.playerPosition.player1);
@@ -171,8 +164,9 @@ function createSocket(io) {
             game.numberTour++;
             game.actionsToDo = 1;
 
-            const winner = game.isGameOver(game.playerPosition);
-            if (winner !== 0) {
+            const [gameIsOver, winner] = game.isGameOver(game.playerPosition);
+            console.log("isGameOver : "+gameIsOver+" , "+winner)
+            if (gameIsOver===true) {
                 BotGameNamespace.emit("gameOver", winner);
                 return;
             }
@@ -190,6 +184,7 @@ function createSocket(io) {
             console.log("possibleMoves player 1", possibleMoves);
             console.log("playerPosition", playerPosition);
             console.log("action", game.actionsToDo);
+            console.log("pre-update");
             BotGameNamespace.emit("updateRound",
                 possibleMoves, numberTour,
                 playerPosition, currentplayer,

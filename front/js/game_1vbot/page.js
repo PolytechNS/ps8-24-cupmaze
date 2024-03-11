@@ -1,4 +1,3 @@
-import {beginningPositionIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
@@ -56,9 +55,9 @@ function main(isLoadGame) {
         initializeTable();
         //Mettre le brouillard de guerre
         //Mettre le brouillard de guerre
-        //setVisionForPlayer(1, {player1: null, player2: null});
+        setVisionForPlayer(1, {player1: null, player2: null});
         //On setup les différents textes nécessaires
-        //setUpNewRound(1,10,10,1);
+        setUpNewRound(1,10,10,1);
     }
 }
 
@@ -194,22 +193,22 @@ function validateRound() {
         socket.off("numberTour");
     });
     socket.on("positionAI", (AIPosition, currentplayer,playerPosition) => {
-        console.log("debug positionAI");
-        console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
+        //console.log("debug positionAI");
+        //console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
         if (playerPosition["player2"] !== null){
             const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
             console.log("htmlOldPosition", htmlOldPosition);
             removePlayerCircle(htmlOldPosition, currentplayer);
         }
-        console.log("AIPosition", AIPosition);
+        //console.log("AIPosition", AIPosition);
         let circle_bot = document.getElementById(AIPosition);
-        console.log("circle_bot", circle_bot);
+        //console.log("circle_bot", circle_bot);
         addPlayerCircle(circle_bot, currentplayer);
         socket.off("positionAI");
     });
     socket.on("gameOver", (winner) => {
         if (winner !== null) {
-            document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + winner + " !! Félicitations ! ";$
+            document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + winner + " !! Félicitations ! ";
             document.getElementById("popup").style.display = 'flex';
             document.getElementById("popup-button").style.display = "none";
         }
@@ -225,9 +224,9 @@ function validateRound() {
     });
     socket.on("updateRound", (possibleMoves, numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
         console.log("updateRound", numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
-        //setVisionForPlayer(currentPlayer, playerPosition);
+        setVisionForPlayer(currentPlayer, playerPosition);
         //setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
-        socket.off("updateBoard");
+        socket.off("updateRound");
     });
 }
 
@@ -314,14 +313,14 @@ function findAdjacentSpace(wallPosition) {
 
     var space = `${colonne}-${ligne}-space`;
     if (colonne < 9  && ligne <= 9) {
-        console.log("space", space);
+        //console.log("space", space);
         return document.getElementById(space);
     } else {
         if (ligne === 9) {
-            console.log("space", `${colonne-1}-${ligne}-space`);
+            //console.log("space", `${colonne-1}-${ligne}-space`);
             return document.getElementById(`${colonne}-${ligne-1}-space`);
         } else {
-            console.log("space", `${colonne}-${ligne-1}-space`);
+            //console.log("space", `${colonne}-${ligne-1}-space`);
             return document.getElementById(`${colonne-1}-${ligne}-space`);
         }
     }
@@ -352,7 +351,7 @@ function wallListener(event) {
     // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
-    console.log(wallType, wallPosition);
+    //console.log(wallType, wallPosition);
     if (wallPosition[0] === "9" || wallPosition[2] === "1") {
         return;
     }
@@ -424,7 +423,7 @@ function wallLaid(event) {
  * et ensuite on change de listener pour le tour suivant car le comportement change
  */
 function choosePositionToBegin(event) {
-    console.log("choosePositionToBegin");
+    //console.log("choosePositionToBegin");
     socket.emit("choosePositionToBegin", event.target.id);
     socket.on("beginningPositionIsValid", (res) => {
         if (!res) {
@@ -442,7 +441,7 @@ function choosePositionToBegin(event) {
     });
     event.target.classList.add("occupied");
     socket.on("currentPlayer", (currentPlayer, playerposition) => {
-        console.log("currentPlayer");
+        //console.log("currentPlayer");
         addPlayerCircle(event.target, currentPlayer);
         lastActionType = "position";
         if (playerposition) {
@@ -464,8 +463,8 @@ function choosePositionToBegin(event) {
 
 function movePlayer(event) {
     const target = event.target;
-    console.log(target);
-    console.log(target.id);
+    //console.log(target);
+    //console.log(target.id);
     let cellId=target.id;
     // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
     if(target.id.includes("circle")){
@@ -474,14 +473,14 @@ function movePlayer(event) {
     }
     else if(target.classList.contains("fog")){
         cellId=target.id.split("~")[1]+"~cell";
-        console.log(cellId);
+        //console.log(cellId);
     }
     const clickedCell=document.getElementById(cellId);
 
     socket.emit("newMoveHumanIsPossible", clickedCell.id);
     socket.on("isNewMoveHumanIsPossible", (isPossible, lastPosition) => {
         if (isPossible) {
-            console.log("move valid");
+            //console.log("move valid");
             if(lastPosition!==null) removePlayerCircle(lastPosition, 1);
             addPlayerCircle(target, 1);
             lastActionType = "position";
@@ -513,7 +512,7 @@ function undoAction(){
     if(lastActionType === "position"){
         socket.emit("undoMovePosition");
         socket.on("undoMove", (oldPosition, newPosition, currentPlayer, numberTourGame) => {
-            console.log("undoMove", oldPosition, newPosition, currentPlayer, numberTourGame);
+            //console.log("undoMove", oldPosition, newPosition, currentPlayer, numberTourGame);
             removePlayerCircle(oldPosition, currentPlayer);
             if(newPosition!==""){
                 let cell = document.getElementById(newPosition);
