@@ -1,4 +1,4 @@
-const { createUser, getUser, createGame, getGame, getUserByName } = require('../database/mongo');
+const { createUser, getUser, createGame, getGame, getUserByName, addFriendRequest } = require('../database/mongo');
 
 const jwt = require('jsonwebtoken');
 
@@ -24,6 +24,9 @@ function manageRequest(request, response) {
             break;
         case 'searchAccount':
             searchAccountOnDB(request,response);
+            break;
+        case 'addFriend':
+            addPlayerFriendList(request,response);
             break;
         default:
             response.statusCode = 404;
@@ -54,6 +57,17 @@ function addPlayerFriendList(request, response){
     let usernameAdder = (request.url).toString().split("=")[1];
     let usernameToAdd = (request.url).toString().split("=")[2];
 
+    addFriendRequest("nom_utilisateur_demandeur", "nom_utilisateur_demandé")
+        .then(() => {
+            console.log("Demande d'ami ajoutée avec succès");
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "AddFriendRequestDone" }));
+        })
+        .catch((error) => {
+            console.error("Erreur lors de l'ajout de la demande d'ami :", error);
+            response.writeHead(401, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "ErrorAddFriendRequest" }));
+        });
 }
 
 
@@ -155,7 +169,7 @@ function creationOfUser(email, username, password, response) {
         // TODO : hash du mot de passe
 
         // on cree l'utilisateur
-        createUser({ email, username, password, friendsList:[] }).then(() => {
+        createUser({ email, username, password, friendsList:[], friendsRequests: [] }).then(() => {
             response.statusCode = 201;
             response.end('Utilisateur créé');
         });

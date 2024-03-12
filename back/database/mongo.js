@@ -29,6 +29,23 @@ async function createUser(user) {
   return user;
 }
 
+async function addFriendRequest(usernameAdder, usernameToAdd){
+  const db = await getDb();
+  const users = db.collection('users');
+  users.updateOne(
+      { $username: usernameToAdd},
+      { $push: { friendsRequests: usernameAdder}},
+      function(err, result) {
+        if (err) {
+          console.error('Erreur lors de la mise à jour des données :', err);
+          return;
+        }
+        console.log('Demande d\'ami ajoutée avec succès');
+        client.close();
+      }
+  );
+}
+
 async function getUser(email) {
   const db = await getDb();
   const users = db.collection('users');
@@ -119,3 +136,4 @@ exports.clearGames = clearGames;
 exports.clearGameDb = clearGameDb;
 exports.decodeJWTPayload = decodeJWTPayload;
 exports.getUserByName = getUserByName;
+exports.addFriendRequest = addFriendRequest;
