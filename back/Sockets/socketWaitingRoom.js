@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {getUser, clearGameDb} = require("../database/mongo");
+const {getUser, clearGameDb, decodeJWTPayload} = require("../database/mongo");
 const matchmaking = require("./matchmaking.js");
 const {Game} = require("../logic/Game");
 
@@ -31,7 +31,7 @@ function createSocket(io) {
                 if (currentRoomId === null) {
                     return;
                 }
-                console.log("removing " + currentRoomId + " from waiting room");
+                console.log("WaitngingRoomSocket: removing " + currentRoomId + " from waiting room");
                 matchmaking.remove(currentRoomId);
             });
 
@@ -53,6 +53,9 @@ function createSocket(io) {
             console.log("user not found");
             return;
         }
+        console.log("user", user);
+        let payload = decodeJWTPayload(token);
+        console.log("payload", payload);
         socket.join(user._id);
         let match = await matchmaking.joinWaitingRoom(user._id, user.username);
         if (!match) {

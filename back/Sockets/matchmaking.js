@@ -14,7 +14,7 @@ async function joinWaitingRoom(id, username) {
 }
 
 function remove(id) {
-    console.log("removing " + id + " from waiting room");
+    console.log("Matchmaking: removing " + id + " from waiting room");
     console.log("current waiting room: " + waitingPlayers);
     for (let i = 0; i < waitingPlayers.length; i++) {
         if (waitingPlayers[i].id === id) {
