@@ -1,16 +1,37 @@
-// create a room for waiting
-// waiting room is a room where players wait for the game to start
 
-// au chargement de la page, on emet un socket pour dire qu'on est dans la waiting room
+const socket = io.connect('/api/waitingRoom');
 
-const socket = io('/api/game1v1');
+export function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
 
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded');
-    socket.emit('waiting_room');
+// on recupere le token jwt stocké dans le cookie
+const token = getCookie('jwt');
+
+document.addEventListener('DOMContentLoaded', init, false);
+
+function init() {
+    console.log('connected to the waiting room');
+    socket.emit('waiting_room', token);
+    socket.on('matchFound', (matchInfo) => onMatchFound(matchInfo));
+}
+
+function onMatchFound(matchInfo) {
+    console.log('match found', matchInfo);
+    setTimeout(() => {
+        localStorage.setItem('room', matchInfo.room);
+        localStorage.setItem('opponent', matchInfo.opponent);
+        localStorage.setItem('opponentId', matchInfo.opponentId);
+        window.location.href = `/1v1game.html`;
+    }, 2000);
+    console.log('message received');
+}
+
+/*
+socket.on('matchFound', () => {
+    console.log('message received');
+    window.location.href = `/1v1game.html`;
 });
-
-socket.on('startGame', (room) => {
-    console.log('message received', room);
-    window.location.href = `/1v1game.html?room=${room}`;
-});
+*/

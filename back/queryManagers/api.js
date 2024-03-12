@@ -90,14 +90,15 @@ function login(request, response) {
 
             // generate token
             let token = jwt.sign({ email: user.email}, 'secret', { expiresIn: '2h' });
-            console.log(token);
+            console.log("email", user.email, "password", user.password);
+            console.log("token", token);
             token = JSON.stringify(token);
             response.setHeader('Set-Cookie', token);
             response.setHeader("Nameaccount", user.username);
 
             // on envoie un token
-            response.writeHead(200, {'Content-Type': 'text/plain'});
-            response.end('Token envoyé et sauvegardé dans le cookie.');
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({token: token}));
         });
     });
 }

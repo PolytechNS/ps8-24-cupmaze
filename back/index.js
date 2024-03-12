@@ -4,7 +4,8 @@ const apiQuery = require('./queryManagers/api.js')
 
 //Import the module for the socket
 const SocketGameBotCreator = require("./Sockets/socketGameBot.js");
-const SocketGame1v1Creator = require("./Sockets/socketGame1v1.js");
+const SocketWaitingRoomCreator = require("./Sockets/socketWaitingRoom.js");
+const SocketGameOnlineCreator = require("./Sockets/socketGameOnline.js");
 const {Server} = require("socket.io");
 
 /* The http module contains a createServer function, which takes one argument, which is the function that
@@ -40,4 +41,5 @@ const io = new Server(server, {
 });
 
 SocketGameBotCreator.createSocket(io);
-SocketGame1v1Creator.createSocket(io);
+SocketWaitingRoomCreator.createSocket(io);
+SocketGameOnlineCreator.createSocket(io);

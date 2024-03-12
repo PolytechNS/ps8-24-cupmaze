@@ -88,8 +88,27 @@ async function clearGames(userEmail){
   return userEmail;
 }
 
+
+async function clearGameDb() {
+  const db = await getDb();
+  const games = db.collection('games');
+  await games.deleteMany({});
+  return games;
+}
+
+function decodeJWTPayload(token) {
+  const payload = token.split('.')[1];
+  const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+}
+
 exports.createUser = createUser;
 exports.getUser = getUser;
 exports.createGame = createGame;
 exports.getGame = getGame;
 exports.clearGames = clearGames;
+exports.clearGameDb = clearGameDb;
+exports.decodeJWTPayload = decodeJWTPayload;

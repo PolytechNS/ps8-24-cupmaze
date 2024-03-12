@@ -30,11 +30,25 @@ document.getElementById("login-form").addEventListener("submit", async function 
                     return;
                 }
             } else {
-                alert("Utilisateur bien présent !");
+                response.json().then((data) => {
+                    console.log(data);
+                    let token = data.token;
+                    // on retire les guillemets
+                    token = token.replace(/['"]+/g, '');
+                    alert("Utilisateur bien présent !" + token);
+                    console.log('token', token);
+                    setCookie('jwt', token, 2);
+                    setCookie('Nameaccount', response.headers.get('Nameaccount'), 2);
+                    window.location.href = "http://localhost:8000/mainMenu.html";
+                });
+                /*
                 const token = response.headers.get('Set-Cookie');
+                alert("Utilisateur bien présent !" + token);
+                console.log('token', token);
                 setCookie('jwt', token, 2);
                 setCookie('Nameaccount', response.headers.get('Nameaccount'), 2);
                 window.location.href = "http://localhost:8000/mainMenu.html";
+                */
             }
         })
         .then(data => {

@@ -35,6 +35,7 @@ class Game {
         this.gameState = {};
     }
 
+
     assignGameContext(savedGame) {
         this.userEmail = savedGame.userEmail;
         this.currentPlayer = savedGame.currentPlayer;
