@@ -3,8 +3,7 @@ import {removePlayerCircle, addPlayerCircle} from "../game_1vbot/movePlayerUtils
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
-import {getCookie} from "./waiting_room.js";
-
+import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 
 let socket;
 let lastActionType = "";
@@ -14,6 +13,9 @@ let possibleMoves=[];
 document.addEventListener("DOMContentLoaded", main,false);
 
 let gameInformation;
+let player1_name;
+let player2_name;
+
 function searchToObject() {
     gameInformation = {
         'roomName': localStorage.getItem('room'),
@@ -30,19 +32,19 @@ function main() {
     socket.emit("setupGame", getCookie("jwt"));
     socket.emit("joinRoom", gameInformation.roomName);
 
+    socket.on("gameInformation", (gameInformation) => {
+        console.log("gameInformation", gameInformation);
+        player1_name = decodeJWTPayload(getCookie("jwt")).username;
+        player2_name = gameInformation.opponent;
+    });
+    console.log("player1_name", player1_name);
+    console.log("player2_name", player2_name);
+
     board = document.getElementById("grid");
-
-    //On ajoute un event listener sur l'écran anti triche
     document.getElementById("popup-button").addEventListener("click",startNewRound);
-
-    //On ajoute un event listener pour valider le round
     document.getElementById("button-validate-action").addEventListener("click",validateRound);
-
-    //On ajoute un event listener pour undo l'action
     document.getElementById("button-undo-action").addEventListener("click",undoAction);
-
     initializeTable();
-    //Mettre le brouillard de guerre
     //Mettre le brouillard de guerre
     //setVisionForPlayer(1, {player1: null, player2: null});
     //On setup les différents textes nécessaires
@@ -100,11 +102,9 @@ function initializeTable() {
  * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
  */
 function validateRound() {
-
     isGameOver();
     // on envoie un message au serveur pour lui dire de valider le round
     socket.emit("validateRound");
-
     socket.on("numberTour", (numberTour) => {
         if (numberTour > 1) {
             possibleMoves.forEach(cell => {
@@ -311,7 +311,11 @@ function wallLaid(event) {
  * et ensuite on change de listener pour le tour suivant car le comportement change
  */
 function choosePositionToBegin(event) {
-    socket.emit("choosePositionToBegin", event.target.id);
+    socket.emit("choosePositionToBegin", {
+        'roomId': gameInformation.roomName,
+        'cellId': event.target.id,
+        'tokens': getCookie("jwt")
+    });
     socket.on("beginningPositionIsValid", (res) => {
         if (!res) {
             alert("Vous devez commencez par la première ligne");
