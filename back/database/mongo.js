@@ -38,6 +38,12 @@ async function getUser(email) {
   return users.findOne({ email: email });
 }
 
+async function getUserByName(username) {
+  const db = await getDb();
+  const users = db.collection('users');
+  return users.findOne({ username: username });
+}
+
 async function createGame(game) {
   const db = await getDb();
   //console.log(game);
@@ -112,3 +118,4 @@ exports.getGame = getGame;
 exports.clearGames = clearGames;
 exports.clearGameDb = clearGameDb;
 exports.decodeJWTPayload = decodeJWTPayload;
+exports.getUserByName = getUserByName;

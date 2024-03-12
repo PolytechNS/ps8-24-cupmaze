@@ -1,4 +1,4 @@
-const { createUser, getUser, createGame, getGame } = require('../database/mongo');
+const { createUser, getUser, createGame, getGame, getUserByName } = require('../database/mongo');
 
 const jwt = require('jsonwebtoken');
 
@@ -32,9 +32,20 @@ function manageRequest(request, response) {
 }
 
 function searchAccountOnDB(request, response) {
-    response.statusCode = 200;
-    response.end("Bien reçu");
-    return;
+    /*Récupération du paramètre*/
+    let username = (request.url).toString().split("=")[1];
+    //console.log("Nom d'utilisateur:", username);
+
+    getUserByName(username).then((user) => {
+        if (!user) {
+            response.statusCode = 401;
+            response.end('Utilisateur inconnu');
+        } else {
+            console.log(user);
+            response.statusCode = 200;
+            response.end(`Email de l'utilisateur trouvé : ${user.email}`);
+        }
+    });
 }
 
 // Methode pour gerer l'inscription
