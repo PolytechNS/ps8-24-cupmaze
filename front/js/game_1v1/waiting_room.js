@@ -21,11 +21,11 @@ function init() {
 function onMatchFound(matchInfo) {
     console.log('match found', matchInfo);
     setTimeout(() => {
-        localStorage.setItem('room', matchInfo.roomName);
+        localStorage.setItem('room', matchInfo.room);
         localStorage.setItem('opponent', matchInfo.opponent);
         localStorage.setItem('opponentId', matchInfo.opponentId);
         window.location.href = `/1v1game.html`;
-    }, 1000);
+    }, 2000);
     console.log('message received');
 }
 

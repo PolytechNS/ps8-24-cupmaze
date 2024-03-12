@@ -24,7 +24,7 @@ function searchToObject() {
 
 
 function main() {
-    socket = io("/api/onlineGame");
+    socket = io("/api/waitingRoom");
     searchToObject();
     console.log("gameInformation", gameInformation);
     socket.emit("setupGame", getCookie("jwt"));
