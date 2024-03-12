@@ -22,15 +22,19 @@ function manageRequest(request, response) {
         case 'saveGame':
             saveGame(request, response);
             break;
+        case 'searchAccount':
+            searchAccountOnDB(request,response);
+            break;
         default:
             response.statusCode = 404;
             response.end('Not Found');
     }
+}
 
-    /*
+function searchAccountOnDB(request, response) {
     response.statusCode = 200;
-    response.end(`Thanks for calling ${request.url}`);
-     */
+    response.end("Bien reçu");
+    return;
 }
 
 // Methode pour gerer l'inscription
