@@ -34,19 +34,28 @@ function manageRequest(request, response) {
 function searchAccountOnDB(request, response) {
     /*Récupération du paramètre*/
     let username = (request.url).toString().split("=")[1];
-    //console.log("Nom d'utilisateur:", username);
-
     getUserByName(username).then((user) => {
         if (!user) {
             response.statusCode = 401;
             response.end('Utilisateur inconnu');
         } else {
             console.log(user);
-            response.statusCode = 200;
-            response.end(`Email de l'utilisateur trouvé : ${user.email}`);
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ username: user.username }));
         }
+    }).catch((error) => {
+        response.statusCode = 500;
+        response.end('Erreur interne du serveur');
+        console.error('Erreur lors de la recherche de l\'utilisateur:', error);
     });
 }
+
+function addPlayerFriendList(request, response){
+    let usernameAdder = (request.url).toString().split("=")[1];
+    let usernameToAdd = (request.url).toString().split("=")[2];
+
+}
+
 
 // Methode pour gerer l'inscription
 // je code tout en early return pour éviter les if else
