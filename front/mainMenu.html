@@ -11,6 +11,7 @@
     <button id="button-launch-localGame">Lancer une partie locale</button>
     <button id="button-retrieveGame">Récupérer la dernière partie sauvegardée</button>
     <button id="button-1v1game">Lancer une partie en ligne</button>
+    <button id="searchFriends">Gestion des amis</button>
 
     <script src="./js/socket.io.js"></script>
     <script>
@@ -31,6 +32,9 @@
         });
         console.log(username);
         document.getElementById('nameCurrentPlayer').innerText = "Bienvenue "+username+" :";
+        document.getElementById('searchFriends').addEventListener('click', function () {
+            window.location.href = 'http://localhost:8000/searchFriends.html';
+        });
     </script>
 </body>
 </html>
