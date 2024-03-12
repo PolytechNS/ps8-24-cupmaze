@@ -5,7 +5,7 @@ const {Game} = require("../logic/Game");
 
 const rooms = [];
 let playersWithRooms = {};
-let boardState = {};
+let GameState = {};
 function createSocket(io) {
     //const io = new Server(server);
     //let waitingPlayers = new Map();
@@ -17,12 +17,13 @@ function createSocket(io) {
 
             socket.on("waiting_room", async (playerToken) => {
                 console.log("user " + socket.id + " is in the waiting room");
-                const user = await getUser(jwt.verify(playerToken, 'secret').email);
-                if (!user) {
+                const userDB = await getUser(jwt.verify(playerToken, 'secret').email);
+                if (!userDB) {
                     console.log("user not found");
                     return;
                 }
-                currentRoomId = user._id;
+                const user = decodeJWTPayload(playerToken);
+                currentRoomId = user.id;
                 await initMatchmaking(socket, playerToken);
             });
 
@@ -47,35 +48,32 @@ function createSocket(io) {
 
     // cherche a associer un joueur a une room
     async function initMatchmaking(socket, token) {
-        console.log("setupGame", token);
-        const user = await getUser(jwt.verify(token, 'secret').email);
-        if (!user) {
+        const userDB = await getUser(jwt.verify(token, 'secret').email);
+        if (!userDB) {
             console.log("user not found");
             return;
         }
-        console.log("user", user);
-        let payload = decodeJWTPayload(token);
-        console.log("payload", payload);
-        socket.join(user._id);
-        let match = await matchmaking.joinWaitingRoom(user._id, user.username);
+        let user = decodeJWTPayload(token);
+        socket.join(user.id);
+        let match = await matchmaking.joinWaitingRoom(user.id, user.username);
         if (!match) {
             console.log("no match found");
             return;
         }
 
         console.log("match found " + match.username + " vs " + user.username);
-        WaitingRoomNamespace.to(user._id).emit('matchFound', {
+        WaitingRoomNamespace.to(user.id).emit('matchFound', {
             'opponent': match.username,
             'opponentId': match.id,
-            'room' : user._id
+            'room' : user.id
         });
         WaitingRoomNamespace.to(match.id).emit('matchFound', {
             'opponent': user.username,
-            'opponentId': user._id,
-            'room' : user._id
+            'opponentId': user.id,
+            'room' : user.id
         });
-        playersWithRooms[user._id] = {
-            'player1': user._id,
+        playersWithRooms[user.id] = {
+            'player1': user.id,
             'player2': match.id
         };
     }
@@ -95,22 +93,21 @@ function createSocket(io) {
             console.log("user not found");
             return;
         }
-        console.log("user", user._id);
         // on a verifier que le joueur est bien dans la room maintenant on peut initialiser le jeu
-        if (!boardState[roomId]) {
-            boardState[roomId] = {
+        if (!GameState[roomId]) {
+            GameState[roomId] = {
                 'player1': null,
                 'player2': null,
                 'game': new Game()
             };
         }
-        WaitingRoomNamespace.to(roomId).emit('gameInitialized', boardState[roomId]);
+        WaitingRoomNamespace.to(roomId).emit('gameInformation', GameState[roomId]);
     }
 
     // on ecoute les evenements du jeu
     function playGame(socket) {
-        socket.on("choosePositionToBegin", (position) => {
-            console.log("choosePositionToBegin", position);
+        socket.on("choosePositionToBegin", (data) => {
+            console.log("choosePositionToBegin", data);
         });
 
         socket.on("movePlayer", (position) => {

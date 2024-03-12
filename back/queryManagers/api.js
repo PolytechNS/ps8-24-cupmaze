@@ -89,9 +89,11 @@ function login(request, response) {
             }
 
             // generate token
-            let token = jwt.sign({ email: user.email}, 'secret', { expiresIn: '2h' });
-            console.log("email", user.email, "password", user.password);
-            console.log("token", token);
+            let token = jwt.sign({
+                id: user._id,
+                email: user.email,
+                username: user.username
+            }, 'secret', { expiresIn: '2h' });
             token = JSON.stringify(token);
             response.setHeader('Set-Cookie', token);
             response.setHeader("Nameaccount", user.username);

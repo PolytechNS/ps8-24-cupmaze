@@ -1,13 +1,5 @@
-
+import { getCookie } from '../tokenUtils.js';
 const socket = io.connect('/api/waitingRoom');
-
-export function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-}
-
-// on recupere le token jwt stocké dans le cookie
 const token = getCookie('jwt');
 
 document.addEventListener('DOMContentLoaded', init, false);
@@ -28,10 +20,3 @@ function onMatchFound(matchInfo) {
     }, 2000);
     console.log('message received');
 }
-
-/*
-socket.on('matchFound', () => {
-    console.log('message received');
-    window.location.href = `/1v1game.html`;
-});
-*/
