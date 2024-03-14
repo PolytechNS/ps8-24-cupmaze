@@ -18,10 +18,7 @@ function createSocket(io) {
             socket.on("waiting_room", async (playerToken) => {
                 console.log("user " + socket.id + " is in the waiting room");
                 const userDB = await getUser(jwt.verify(playerToken, 'secret').email);
-                if (!userDB) {
-                    console.log("user not found");
-                    return;
-                }
+                if (!userDB) { return; }
                 const user = decodeJWTPayload(playerToken);
                 currentRoomId = user.id;
                 await initMatchmaking(socket, playerToken);
@@ -29,10 +26,8 @@ function createSocket(io) {
 
             socket.on("disconnect", () => {
                 console.log("user " + socket.id + " disconnected from waiting room " + currentRoomId);
-                if (currentRoomId === null) {
-                    return;
-                }
-                console.log("WaitngingRoomSocket: removing " + currentRoomId + " from waiting room");
+                if (currentRoomId === null) { return; }
+                console.log("WaitingRoomSocket: removing " + currentRoomId + " from waiting room");
                 matchmaking.remove(currentRoomId);
             });
 
@@ -43,23 +38,18 @@ function createSocket(io) {
                         console.log('room joined', room);
                     });
             }));
+
             playGame(socket);
         });
 
     // cherche a associer un joueur a une room
     async function initMatchmaking(socket, token) {
         const userDB = await getUser(jwt.verify(token, 'secret').email);
-        if (!userDB) {
-            console.log("user not found");
-            return;
-        }
+        if (!userDB) { return; }
         let user = decodeJWTPayload(token);
         socket.join(user.id);
         let match = await matchmaking.joinWaitingRoom(user.id, user.username);
-        if (!match) {
-            console.log("no match found");
-            return;
-        }
+        if (!match) { return; }
 
         console.log("match found " + match.username + " vs " + user.username);
         WaitingRoomNamespace.to(user.id).emit('matchFound', {
@@ -78,6 +68,7 @@ function createSocket(io) {
         };
     }
 
+
     // initialise le jeu pour une id de room donnée
     async function initRoom(socket, token, roomId) {
         socket.join(roomId);
@@ -94,20 +85,51 @@ function createSocket(io) {
             return;
         }
         // on a verifier que le joueur est bien dans la room maintenant on peut initialiser le jeu
+        let playerNumber;
         if (!GameState[roomId]) {
+            playerNumber = 1;
             GameState[roomId] = {
-                'player1': null,
+                'player1': user.id,
                 'player2': null,
                 'game': new Game()
             };
+        } else {
+            playerNumber = 2;
+            GameState[roomId].player2 = user.id;
         }
-        WaitingRoomNamespace.to(roomId).emit('gameInformation', GameState[roomId]);
+        // on envoie les informations du jeu a tout les joueurs dans la room
+        WaitingRoomNamespace.to(roomId).emit('game', GameState[roomId], playerNumber);
     }
 
     // on ecoute les evenements du jeu
     function playGame(socket) {
+
+        socket.on("askForPlayerNumber", (token) => {
+            let user = decodeJWTPayload(token);
+            console.log("askForPlayerNumber: ", user);
+            let room = playersWithRooms[user.id];
+            let playerNumber;
+            if (!room) {
+                playerNumber = 1;
+                console.log("askForPlayerNumber", playerNumber);
+                WaitingRoomNamespace.to(user.id).emit("playerNumber", playerNumber);
+                return;
+            }
+            playerNumber = 2;
+            console.log("askForPlayerNumber", playerNumber);
+            // on envoie le numero du joueur a tout les joueurs dans la room
+            WaitingRoomNamespace.to(room.player1).emit('playerNumber', playerNumber);
+        })
+
         socket.on("choosePositionToBegin", (data) => {
             console.log("choosePositionToBegin", data);
+            let roomId = data.roomId; // room id
+            let cellId = data.cellId; // cell id
+            let gameState = GameState[roomId];
+            if (!gameState || !roomId || !cellId) { return; }
+
+            let token = data.token;
+
         });
 
         socket.on("movePlayer", (position) => {

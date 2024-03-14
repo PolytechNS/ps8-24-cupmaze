@@ -9,13 +9,13 @@ let socket;
 let lastActionType = "";
 let victoryAnswer = "";
 let board;
-let possibleMoves=[];
+let possibleMoves= [];
 document.addEventListener("DOMContentLoaded", main,false);
 
 let gameInformation;
 let player1_name;
 let player2_name;
-
+let player_number;
 function searchToObject() {
     gameInformation = {
         'roomName': localStorage.getItem('room'),
@@ -28,40 +28,31 @@ function searchToObject() {
 function main() {
     socket = io("/api/waitingRoom");
     searchToObject();
-    console.log("gameInformation", gameInformation);
     socket.emit("setupGame", getCookie("jwt"));
     socket.emit("joinRoom", gameInformation.roomName);
 
-    socket.on("gameInformation", (gameInformation) => {
-        console.log("gameInformation", gameInformation);
+    socket.on("game", (gameInformation, playerNumber) => {
+        console.log("playerNumber", playerNumber);
+        player_number = playerNumber;
+        console.log("gameInformation", player_number);
         player1_name = decodeJWTPayload(getCookie("jwt")).username;
         player2_name = gameInformation.opponent;
-    });
-    console.log("player1_name", player1_name);
-    console.log("player2_name", player2_name);
 
-    board = document.getElementById("grid");
-    document.getElementById("popup-button").addEventListener("click",startNewRound);
-    document.getElementById("button-validate-action").addEventListener("click",validateRound);
-    document.getElementById("button-undo-action").addEventListener("click",undoAction);
-    initializeTable();
-    //Mettre le brouillard de guerre
-    //setVisionForPlayer(1, {player1: null, player2: null});
-    //On setup les différents textes nécessaires
-    //setUpNewRound(1,10,10,1);
+        board = document.getElementById("grid");
+        document.getElementById("popup-button").addEventListener("click",startNewRound);
+        document.getElementById("button-validate-action").addEventListener("click",validateRound);
+        document.getElementById("button-undo-action").addEventListener("click",undoAction);
+        initializeTable();
+        //Mettre le brouillard de guerre
+        setVisionForPlayer(player_number, {player1: null, player2: null});
+        //On setup les différents textes nécessaires
+        setUpNewRound(player1_name,10,10,1);
+        socket.off("game");
+    });
 }
 
-/*
-    * Fonction qui initialise le plateau de jeu
-    * Elle va generer toute les cases du plateau, cellules, mur vertical et horizontal et les espace entre les murs
-    *
-    * Pour generer on utilise une boucle for qui va creer les elements et les ajouter au html,
-    * precisement en fils de la balise avec l'id "grid"
-    *
-    * on ajoute au élement un event listener, c'est a dire une fonction qui sera executer quand on clique sur l'element
-    * absolument tout est modifiable, on peut changer le type d'element, les classes, les id, les event listener, etc...
-    *
- */
+
+
 function initializeTable() {
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
@@ -95,12 +86,7 @@ function initializeTable() {
     }
 }
 
-/** #############################################  ROUND METHODS  ############################################# **/
 
-/**
- * Cette fonction est appelée à chaque fois qu'un utilisateur va valider un round
- * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
- */
 function validateRound() {
     isGameOver();
     // on envoie un message au serveur pour lui dire de valider le round
@@ -149,10 +135,7 @@ function validateRound() {
     });
 }
 
-/**
- * Fonction qui analyse si un joueur à fini une partie ou pas
- * @returns {boolean}
- */
+
 function isGameOver(){
     socket.emit("isGameOver", null);
     socket.on("gameOver", function(isGameOver, numberWinner){
@@ -262,10 +245,6 @@ function wallListener(event) {
     });
 }
 
-/**
- * EventListener qui se déclenche quand on va vouloir poser un mur
- * On va ajouter ce listener sur tous les murs qui sont posés
- */
 function wallLaid(event) {
     //On va récupérer le premier mur
     const firstWallToColor = event.target;
@@ -304,12 +283,7 @@ function wallLaid(event) {
 
 /** #############################################  MOVE PLAYER METHODS  ############################################# **/
 
-/**
- * Fonction qui gere le placement des pions la 1er fois :
- * Chaque joueur doit placer un pion sur la 1er ligne pour le joueur 1
- * et sur la derniere ligne pour le joueur 2 sinon on affiche un message d'erreur
- * et ensuite on change de listener pour le tour suivant car le comportement change
- */
+
 function choosePositionToBegin(event) {
     socket.emit("choosePositionToBegin", {
         'roomId': gameInformation.roomName,
@@ -386,12 +360,6 @@ function movePlayer(event) {
 
 /** #############################################  UNDO METHODS  ############################################# **/
 
-/**
- * Cette fonction est appelée quand un joueur veut annuler l'action qu'il vient d'effectuer
- * On va donc regarder la variable lastActionType pour savoir qu'elle est la dernière action utilisée
- * Si la dernière action est la pose d'un mur, alors la variable ressemble à ceci : lastActionType = "wall "+firstWallToColor.id+" "+spaceToColor.id+" "+secondWallToColor.id;
- * Si la dernière action est la mouvement d'un pion, alors on va regarder dans les données sauvegardées au début du tour pour replacer le pion correctement
- */
 function undoAction(){
     //On re-cache les boutons
     document.getElementById("button-validate-action").style.display = "none";
