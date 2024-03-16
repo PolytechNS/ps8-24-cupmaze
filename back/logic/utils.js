@@ -1,10 +1,3 @@
-/*
-inutile puisque un wall est un objet
-
-function extractWallInfo(wallId) {
-
-}
-*/
 const {Wall} = require("./Wall");
 const {Case} = require("./Case");
 const {Space} = require("./Space");
@@ -29,7 +22,6 @@ function findSpace(pos_x, pos_y, elements) {
         element instanceof Space &&
         element.pos_x === pos_x &&
         element.pos_y === pos_y);
-
 }
 
 function findAdjacentWall(wall, elements) {
@@ -70,8 +62,5 @@ function highlightElements(firstWall, secondWall, space) {
     space.setIsLaid(true);
 }
 
-function updateNumberAction(nombreAction){
-
-}
 
 module.exports = { findWall, findCase, findSpace, findAdjacentWall, findAdjacentSpace, highlightElements, updateNumberAction };

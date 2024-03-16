@@ -112,7 +112,6 @@ class Game {
 
     movePlayer(number, caseWanted, playerCurrentPosition) {
         console.log("caseWanted", caseWanted);
-
         const coordinates = [caseWanted.getPos_x(), caseWanted.getPos_y()];
         this.lastPlayerPosition[`player${number}`] = this.playerPosition[`player${number}`];
         this.playerPosition[`player${number}`] = coordinates
@@ -128,7 +127,6 @@ class Game {
 
     layWall(firstCase, secondCase, space) {
         // on chercher les mur et le space dans les elements
-        console.log("firstCase", firstCase);
         for (let i = 0; i < this.elements.length; i++) {
             if (this.elements[i] instanceof Wall) {
                 if (this.elements[i].equals(firstCase) || this.elements[i].equals(secondCase)) {
