@@ -1,3 +1,4 @@
+
 function searchAccountOnDB(){
     const usernameWanted = document.getElementById("searchInput").value;
     const params = {
@@ -47,6 +48,7 @@ function addFriendRequest(usernameToAdd) {
                 alert("ERROR"+response.status);
             }else{
                 console.log("Invitation d'ami bien envoyée");
+                socketNotifications.emit('friendRequestNotification', { sender: myUsername, receiver: usernameToAdd });
             }
         })
         .catch(error => {

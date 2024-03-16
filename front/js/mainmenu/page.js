@@ -72,3 +72,16 @@ fetch("http://localhost:8000/api/getFriends?$"+queryString, {
         console.error('Erreur:', error);
     });
 
+
+let socketNotifications = io("/notifications");
+socketNotifications.emit('joinRoom', username);
+socketNotifications.on('friendRequestNotification', (data) => {
+    alert(`You have a friend request from ${data.sender}`);
+});
+
+// On va fermer la connexion du socket lorsque l'utilisateur quitte la page principale
+window.addEventListener('beforeunload', () => {
+    socketNotifications.disconnect();
+});
+
+window.socketNotifications = socketNotifications;
