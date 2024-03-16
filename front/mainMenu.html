@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Menu principal :</title>
+    <link rel="stylesheet" href="./mainMenu.css">
 </head>
 <body>
     <h1>Bienvenue sur le menu principal du jeu !</h1>
@@ -13,28 +14,20 @@
     <button id="button-1v1game">Lancer une partie en ligne</button>
     <button id="searchFriends">Gestion des amis</button>
 
+    <p>
+    </p>
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close" id="closePopup">&times;</span>
+            <p id="popup-namePlayer"></p>
+            <p id="popup-eloPlayer"></p>
+        </div>
+    </div>
+
+    <ul id='friend-list'>Liste d'amis :
+    </ul>
+
     <script src="./js/socket.io.js"></script>
-    <script>
-        let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
-        let socket=io("/api/game");
-        //socket.emit("clearGames",username);
-        document.getElementById('button-launch-botGame').addEventListener('click', function() {
-            window.location.href = 'http://localhost:8000/botgame.html';
-        });
-        document.getElementById('button-launch-localGame').addEventListener('click', function() {
-            window.location.href = 'http://localhost:8000/index.html'; //Changer le nom de index.html
-        });
-        document.getElementById('button-retrieveGame').addEventListener('click', function() {
-            window.location.href = 'http://localhost:8000/botgame.html?intent=retrieveGame'; //Changer le nom de index.html
-        });
-        document.getElementById('button-1v1game').addEventListener('click', function() {
-            window.location.href = 'http://localhost:8000/waiting_room.html';
-        });
-        console.log(username);
-        document.getElementById('nameCurrentPlayer').innerText = "Bienvenue "+username+" :";
-        document.getElementById('searchFriends').addEventListener('click', function () {
-            window.location.href = 'http://localhost:8000/searchFriends.html';
-        });
-    </script>
+    <script src="./js/mainmenu/page.js"></script>
 </body>
 </html>
