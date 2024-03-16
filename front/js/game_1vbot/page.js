@@ -194,7 +194,7 @@ function validateRound() {
     });
     socket.on("positionAI", (AIPosition, currentplayer,playerPosition) => {
         //console.log("debug positionAI");
-        dconsole.log("newAIPosition", AIPosition, currentplayer, playerPosition);
+        console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
         if (playerPosition["player2"] !== null){
             const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
             console.log("htmlOldPosition", htmlOldPosition);
