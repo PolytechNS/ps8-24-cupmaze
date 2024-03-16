@@ -29,6 +29,34 @@ async function createUser(user) {
   return user;
 }
 
+async function acceptFriendRequest(usernameReceveur, usernameAddeur) {
+  try {
+    const db = await getDb();
+    const users = db.collection('users');
+
+    await users.updateOne(
+        { username: usernameReceveur },
+        { $push: { friendsList: usernameAddeur } }
+    );
+
+    await users.updateOne(
+        { username: usernameAddeur },
+        { $push: { friendsList: usernameReceveur } }
+    );
+
+    await users.updateOne(
+        { username: usernameReceveur },
+        { $pull: { friendsRequests: usernameAddeur } }
+    );
+
+    console.log('Opérations de mise à jour réussies');
+    return 'Opérations de mise à jour réussies';
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour des données :', error);
+    throw error;
+  }
+}
+
 async function addFriendRequest(usernameAdder, usernameToAdd){
   const db = await getDb();
   const users = db.collection('users');
@@ -128,6 +156,13 @@ function decodeJWTPayload(token) {
     return JSON.parse(jsonPayload);
 }
 
+async function clearUsersDb() {
+  const db = await getDb();
+  const users = db.collection('users');
+  await users.deleteMany({});
+  return users;
+}
+
 exports.createUser = createUser;
 exports.getUser = getUser;
 exports.createGame = createGame;
@@ -137,3 +172,5 @@ exports.clearGameDb = clearGameDb;
 exports.decodeJWTPayload = decodeJWTPayload;
 exports.getUserByName = getUserByName;
 exports.addFriendRequest = addFriendRequest;
+exports.acceptFriendRequest = acceptFriendRequest;
+exports.clearUsersDb = clearUsersDb;

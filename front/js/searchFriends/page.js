@@ -55,12 +55,36 @@ function addFriendRequest(usernameToAdd) {
 }
 
 function main(){
-    // On va retrouver la liste des demandes qui attendent le joueur
     let myUsername = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
     const params = {
         username: myUsername
     };
-    const queryString = new URLSearchParams(params).toString();
+    //On va mettre a jour notre liste d'amis
+    let queryString = new URLSearchParams(params).toString();
+    fetch("http://localhost:8000/api/getFriends?$"+queryString, {
+        method: "GET",
+    })
+        .then(async response => {
+            if (!response.ok) {
+                alert("ERROR"+response.status);
+            }else{
+                let ret = await response.json();
+                console.log("myFriends succes");
+                console.log(ret);
+                for (friend of ret){
+                    const resultDiv = document.getElementById("friendsList");
+                    const usernameParagraph = document.createElement("p");
+                    usernameParagraph.textContent = `Nom d'utilisateur : ${friend}`;
+                    resultDiv.appendChild(usernameParagraph);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });
+
+    // On va retrouver la liste des demandes qui attendent le joueur
+    queryString = new URLSearchParams(params).toString();
     fetch("http://localhost:8000/api/getWaitingFriendsRequests?$"+queryString, {
         method: "GET",
     })
@@ -70,6 +94,7 @@ function main(){
             }else{
                 let ret = await response.json();
                 console.log("myWaitingFriendsRequests succes");
+                console.log(ret);
                 for (friendsRequest of ret){
                     const resultDiv = document.getElementById("friendsRequests");
                     const usernameParagraph = document.createElement("p");
@@ -90,8 +115,27 @@ function main(){
         });
 }
 
-function acceptFriendRequest(splitElement) {
-    console.log("acceptFriendRequest");
+function acceptFriendRequest(usernameAdder) {
+    let myUsername = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+    const params = {
+        usernameAdder: myUsername,
+        usernameToAdd: usernameAdder
+    };
+    const queryString = new URLSearchParams(params).toString();
+    fetch("http://localhost:8000/api/acceptFriendRequest?$"+queryString, {
+        method: "GET",
+    })
+        .then(async response => {
+            if (!response.ok) {
+                alert("ERROR"+response.status);
+            }else{
+                alert("Ajout de l'ami validé");
+                console.log("Ajout de l'ami bon");
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });
 }
 
 // Appeler main() lorsque le DOM est complètement chargé

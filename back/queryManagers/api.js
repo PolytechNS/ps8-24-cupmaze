@@ -1,4 +1,4 @@
-const { createUser, getUser, createGame, getGame, getUserByName, addFriendRequest } = require('../database/mongo');
+const { createUser, getUser, createGame, getGame, getUserByName, addFriendRequest, acceptFriendRequest, clearUsersDb } = require('../database/mongo');
 
 const jwt = require('jsonwebtoken');
 
@@ -31,14 +31,50 @@ function manageRequest(request, response) {
         case 'getWaitingFriendsRequests':
             getWaitingFriendsRequests(request,response);
             break;
+        case 'acceptFriendRequest':
+            acceptFriendRequestAPI(request,response);
+            break;
+        case 'getFriends':
+            getFriends(request,response);
+            break;
         default:
             response.statusCode = 404;
             response.end('Not Found');
     }
 }
 
+function getFriends(request, response){
+    let username = (request.url).toString().split("=")[1].split("&")[0];
+    getUserByName(username)
+        .then((user) => {
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify(user.friendsList));
+        })
+        .catch((error) => {
+            console.error("Erreur lors de la récupération des amis :", error);
+            response.writeHead(401, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "ErrorGetFriends" }));
+        });
+}
+
+function acceptFriendRequestAPI(request, response){
+    let usernameReceveur = (request.url).toString().split("=")[1].split("&")[0];
+    let usernameAddeur = (request.url).toString().split("=")[2].split("&")[0];
+    acceptFriendRequest(usernameReceveur, usernameAddeur)
+        .then(() => {
+            console.log("Demande d'ami acceptée avec succès");
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "AcceptFriendRequestDone" }));
+        })
+        .catch((error) => {
+            console.error("Erreur lors de l'acceptation de la demande d'ami :", error);
+            response.writeHead(401, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "ErrorAcceptFriendRequest" }));
+        });
+}
+
 function getWaitingFriendsRequests(request, response){
-    let username = (request.url).toString().split("=")[1];
+    let username = (request.url).toString().split("=")[1].split("&")[0];
     getUserByName(username)
         .then((requests) => {
             response.writeHead(200, {'Content-Type': 'application/json'});
@@ -53,7 +89,7 @@ function getWaitingFriendsRequests(request, response){
 
 function searchAccountOnDB(request, response) {
     /*Récupération du paramètre*/
-    let username = (request.url).toString().split("=")[1];
+    let username = (request.url).toString().split("=")[1].split("&")[0];
     getUserByName(username).then((user) => {
         if (!user) {
             response.statusCode = 401;
@@ -71,8 +107,8 @@ function searchAccountOnDB(request, response) {
 }
 
 function addPlayerFriendList(request, response){
-    let usernameAdder = (request.url).toString().split("=")[1];
-    let usernameToAdd = (request.url).toString().split("=")[2];
+    let usernameAdder = (request.url).toString().split("=")[1].split("&")[0];
+    let usernameToAdd = (request.url).toString().split("=")[2].split("&")[0];
 
     addFriendRequest(usernameAdder, usernameToAdd)
         .then(() => {
