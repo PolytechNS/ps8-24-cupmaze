@@ -33,7 +33,7 @@ async function addFriendRequest(usernameAdder, usernameToAdd){
   const db = await getDb();
   const users = db.collection('users');
   users.updateOne(
-      { $username: usernameToAdd},
+      { username: usernameToAdd},
       { $push: { friendsRequests: usernameAdder}},
       function(err, result) {
         if (err) {

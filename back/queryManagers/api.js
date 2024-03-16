@@ -28,10 +28,27 @@ function manageRequest(request, response) {
         case 'addFriend':
             addPlayerFriendList(request,response);
             break;
+        case 'getWaitingFriendsRequests':
+            getWaitingFriendsRequests(request,response);
+            break;
         default:
             response.statusCode = 404;
             response.end('Not Found');
     }
+}
+
+function getWaitingFriendsRequests(request, response){
+    let username = (request.url).toString().split("=")[1];
+    getUserByName(username)
+        .then((requests) => {
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify(requests.friendsRequests));
+        })
+        .catch((error) => {
+            console.error("Erreur lors de la récupération des demandes d'ami :", error);
+            response.writeHead(401, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "ErrorGetFriendRequest" }));
+        });
 }
 
 function searchAccountOnDB(request, response) {
@@ -57,7 +74,7 @@ function addPlayerFriendList(request, response){
     let usernameAdder = (request.url).toString().split("=")[1];
     let usernameToAdd = (request.url).toString().split("=")[2];
 
-    addFriendRequest("nom_utilisateur_demandeur", "nom_utilisateur_demandé")
+    addFriendRequest(usernameAdder, usernameToAdd)
         .then(() => {
             console.log("Demande d'ami ajoutée avec succès");
             response.writeHead(200, {'Content-Type': 'application/json'});

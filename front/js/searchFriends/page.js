@@ -54,3 +54,47 @@ function addFriendRequest(usernameToAdd) {
         });
 }
 
+function main(){
+    // On va retrouver la liste des demandes qui attendent le joueur
+    let myUsername = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+    const params = {
+        username: myUsername
+    };
+    const queryString = new URLSearchParams(params).toString();
+    fetch("http://localhost:8000/api/getWaitingFriendsRequests?$"+queryString, {
+        method: "GET",
+    })
+        .then(async response => {
+            if (!response.ok) {
+                alert("ERROR"+response.status);
+            }else{
+                let ret = await response.json();
+                console.log("myWaitingFriendsRequests succes");
+                for (friendsRequest of ret){
+                    const resultDiv = document.getElementById("friendsRequests");
+                    const usernameParagraph = document.createElement("p");
+                    usernameParagraph.textContent = `Nom d'utilisateur : ${friendsRequest.split('&')[0]}`;
+                    resultDiv.appendChild(usernameParagraph);
+                    const addButton = document.createElement("button");
+                    addButton.textContent = "Accepter la demande";
+                    addButton.addEventListener("click", () => {
+                        acceptFriendRequest(friendsRequest.split('&')[0]);
+                        alert(`L'utilisateur ${friendsRequest.split('&')[0]} a été ajouté à votre liste d'amis.`);
+                    });
+                    resultDiv.appendChild(addButton);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });
+}
+
+function acceptFriendRequest(splitElement) {
+    console.log("acceptFriendRequest");
+}
+
+// Appeler main() lorsque le DOM est complètement chargé
+document.addEventListener("DOMContentLoaded", function() {
+    main();
+});
