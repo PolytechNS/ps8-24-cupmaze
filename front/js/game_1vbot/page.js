@@ -194,7 +194,7 @@ function validateRound() {
     });
     socket.on("positionAI", (AIPosition, currentplayer,playerPosition) => {
         //console.log("debug positionAI");
-        //console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
+        dconsole.log("newAIPosition", AIPosition, currentplayer, playerPosition);
         if (playerPosition["player2"] !== null){
             const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
             console.log("htmlOldPosition", htmlOldPosition);
@@ -381,6 +381,7 @@ function wallListener(event) {
 function wallLaid(event) {
     //On va récupérer le premier mur
     const firstWallToColor = event.target;
+    console.log(firstWallToColor);
 
     // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
@@ -392,7 +393,12 @@ function wallLaid(event) {
         return;
     }
 
-    socket.emit("wallLaid", firstWallToColor, wallType, wallPosition, wallId);
+    const backendCoords = (parseInt(wallPosition[0])-1)+"-"+(parseInt(wallPosition[2])-1);
+
+    console.log("backendCoords : ",backendCoords);
+    console.log("wallPosition : ",wallPosition);
+
+    socket.emit("wallLaid", wallType, backendCoords, wallId);
     socket.on("laidWall", (wallType, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
         if (currentPlayer === null) {
             alert("Vous n'avez plus d'actions disponibles");
@@ -424,7 +430,12 @@ function wallLaid(event) {
  */
 function choosePositionToBegin(event) {
     //console.log("choosePositionToBegin");
-    socket.emit("choosePositionToBegin", event.target.id);
+    const cellId = event.target.id;
+    const backendCoords = (parseInt(cellId[0])-1)+"-"+(parseInt(cellId[2])-1);
+
+    console.log("backendCoords : ",backendCoords+"~cell");
+    console.log("cellId : ",cellId);
+    socket.emit("choosePositionToBegin", backendCoords+"~cell");
     socket.on("beginningPositionIsValid", (res) => {
         if (!res) {
             alert("Vous devez commencez par la première ligne");
@@ -477,7 +488,12 @@ function movePlayer(event) {
     }
     const clickedCell=document.getElementById(cellId);
 
-    socket.emit("newMoveHumanIsPossible", clickedCell.id);
+    const clickedCellId = clickedCell.id;
+    const backendCoords = (parseInt(clickedCellId[0])-1)+"-"+(parseInt(clickedCellId[2])-1);
+
+    console.log("backendCoords : ",backendCoords+"~cell");
+    console.log("cellId : ",clickedCell);
+    socket.emit("newMoveHumanIsPossible", backendCoords+"~cell");
     socket.on("isNewMoveHumanIsPossible", (isPossible, lastPosition) => {
         if (isPossible) {
             //console.log("move valid");

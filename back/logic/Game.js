@@ -24,7 +24,6 @@ class Game {
         this.elements = [];
         this.lastActionType = "";
         this.init();
-
         this.lastWallsLaid = [];
         this.lastWallLaidsIDHtml = [];
 
@@ -52,14 +51,14 @@ class Game {
     }
 
     init() {
-        for (let i = 0; i <= 9; i++) {
-            for (let j = 0; j <= 9; j++) {
+        for (let i = 0; i < 9; i++) {
+            for (let j = 0; j < 9; j++) {
                 this.elements.push(new Case(j, i, false));
                 if(j<8) {
                     this.elements.push(new Wall(j, i, false, "vertical"));
                 }
             }
-            for(let j = 0; j <= 9; j++){
+            for(let j = 0; j < 9; j++){
                 this.elements.push(new Wall(j, i, false, "horizontal"));
                 if (j < 8) {
                     this.elements.push(new Space(j, i, true));
@@ -77,13 +76,13 @@ class Game {
             console.error("ATTENTION UNE DES DEUX POSITIONS EST NULL DANS LE BACK");
             return [false, -1];
         }
-        if(this.playerPosition.player1[1] === 9 && this.playerPosition.player2[1] === 1){
+        if(this.playerPosition.player1[1] === 8 && this.playerPosition.player2[1] === 0){
             return [true, 0];
         }
-        if(this.playerPosition.player1[1] === 9 && this.playerPosition.player2[1] !== 1){
+        if(this.playerPosition.player1[1] === 8 && this.playerPosition.player2[1] !== 0){
             return [true, 1];
         }
-        if(this.playerPosition.player1[1] !== 9 && this.playerPosition.player2[1] === 1){
+        if(this.playerPosition.player1[1] !== 8 && this.playerPosition.player2[1] === 0){
             return [true, 2];
         }
         return [false, -1];

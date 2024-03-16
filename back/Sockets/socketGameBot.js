@@ -87,13 +87,14 @@ function createSocket(io) {
 
             if (isPossible && game.actionsToDo===1) {
                 let saveOldPosition = game.getPlayerCurrentPosition(1);
-                let htmlOldPosition=saveOldPosition[0]+"-"+saveOldPosition[1]+"~cell";
-                let htmlNewPosition=caseWanted.getPos_x()+"-"+caseWanted.getPos_y()+"~cell";
+                let htmlOldPosition=(saveOldPosition[0]+1)+"-"+(saveOldPosition[1]+1)+"~cell";
+                //let htmlNewPosition=caseWanted.getPos_x()+"-"+caseWanted.getPos_y()+"~cell";
                 game.graph.updateNodeState(saveOldPosition[0], saveOldPosition[1], -1);
                 game.graph.updateNodeState(caseWanted.getPos_x(), caseWanted.getPos_y(), 1);
                 game.movePlayer(1, caseWanted, game.getPlayerCurrentPosition(1));
-                if (saveOldPosition !== null) BotGameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
-                else BotGameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
+                if (saveOldPosition !== null) BotGameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition);
+                //if (saveOldPosition !== null) BotGameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
+                else BotGameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition);
             }else{
                 BotGameNamespace.emit("isNewMoveHumanIsPossible", false, null, null);
             }
@@ -192,8 +193,8 @@ function createSocket(io) {
         });
 
 
-        socket.on("wallLaid",(firstWallToColor, wallType, wallPosition, wallId) => {
-            console.log("wallLaid", firstWallToColor, wallType, wallPosition);
+        socket.on("wallLaid",(wallType, wallPosition, wallId) => {
+            console.log("wallLaid", wallType, wallPosition);
             if (game.actionsToDo === 0) {
                 BotGameNamespace.emit("laidWall", null, true, true);
                 return;
@@ -204,12 +205,12 @@ function createSocket(io) {
             const colonne = parseInt(wallPosition[0]);
             const ligne = parseInt(wallPosition[2]);
             let wallInclinaison;
-            if (firstWallToColor === null) { return;}
 
             if (wallType === "wv") { wallInclinaison = "vertical"; }
             else { wallInclinaison = "horizontal"; }
 
             const wall = findWall(colonne,ligne, wallInclinaison, game.elements);
+            console.log("findWall params : ",colonne," ",ligne," ",wallInclinaison," ",game.elements);
             const adjacentWall =
                 (wallInclinaison === "vertical")
                     ? findWall(colonne, ligne-1, wallInclinaison, game.elements)
@@ -220,6 +221,7 @@ function createSocket(io) {
             if (game.actionsToDo > 0 && ((game.currentPlayer === 1 && game.nbWallsPlayer1 > 0) || (game.currentPlayer === 2 && game.nbWallsPlayer2 > 0))) {
                 console.log("AVANT layWall");
                 game.layWall(wall,adjacentWall,adjacentSpace);
+                console.log("layWall params : ",wall);
                 game.graph.placeWall(colonne,ligne, (wallInclinaison === "vertical") ? 0 : 1)
                 game.actionsToDo--;
                 game.lastActionType = "wall";

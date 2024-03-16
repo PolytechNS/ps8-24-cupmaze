@@ -1,7 +1,7 @@
 const utils = require("./utils");
 
 function beginningPositionIsValid(currentPlayer, position) {
-    return (currentPlayer === 1) ? position === 1 : position === 9;
+    return (currentPlayer === 1) ? position === 0 : position === 8;
 }
 
 function getPossibleMoves(playerPosition, elements) {
@@ -12,7 +12,7 @@ function getPossibleMoves(playerPosition, elements) {
     console.log("colonne", colonne, "line", ligne);
 
     function checkMove(newColonne, newLigne, possibleMoves, direction) {
-        if (newColonne < 1 || newColonne > 9 || newLigne < 1 || newLigne > 9) {
+        if (newColonne < 0 || newColonne > 8 || newLigne < 0 || newLigne > 8) {
             return;
         }
         const wall = wallFinder(newColonne, newLigne, colonne, ligne, direction, elements);

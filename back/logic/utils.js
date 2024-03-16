@@ -37,9 +37,9 @@ function findAdjacentWall(wall, elements) {
     const colonne = wall.pos_x;
     const ligne = wall.pos_y;
     const inclinaison = wall.inclinaison;
-    if (inclinaison === "vertical" && colonne < 9) {
+    if (inclinaison === "vertical" && colonne < 8) {
         return findWall(colonne, ligne-1, inclinaison, elements);
-    } else if (inclinaison === "horizontal" && ligne < 9) {
+    } else if (inclinaison === "horizontal" && ligne < 8) {
         return findWall(colonne+1, ligne, inclinaison, elements);
     } else {
         if (inclinaison === "vertical") {

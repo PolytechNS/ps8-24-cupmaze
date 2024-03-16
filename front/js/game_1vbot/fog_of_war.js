@@ -136,7 +136,7 @@ function setVisionForPlayer(currentPlayer,playerPositions){
                     player1circle.style.display="block";
                 }
             }
-            console.log("cell : "+cell.id+" /// visibility : "+cell.visibility);
+            //console.log("cell : "+cell.id+" /// visibility : "+cell.visibility);
         }
     )
 }
