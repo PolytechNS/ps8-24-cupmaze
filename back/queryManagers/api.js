@@ -37,10 +37,21 @@ function manageRequest(request, response) {
         case 'getFriends':
             getFriends(request,response);
             break;
+        case 'clearUsersDb':
+            clearUsersDb(request, response);
+            break;
         default:
             response.statusCode = 404;
             response.end('Not Found');
     }
+}
+
+function clearUsersDbAPI(request, response) {
+    clearUsersDb().then(() => {
+        console.log("Utilisateurs supprimés avec succès");
+        response.statusCode = 200;
+        response.end('Utilisateurs supprimés');
+    });
 }
 
 function getFriends(request, response){
