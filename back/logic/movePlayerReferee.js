@@ -76,7 +76,7 @@ function findJumpCell(colonne, ligne, direction, elements) {
             break;
     }
 
-    const inBoard = jumpColonne >= 0 && jumpColonne <= 8 && jumpLigne >= 0 && jumpLigne <= 8;
+    const inBoard = jumpColonne >= 1 && jumpColonne <= 9 && jumpLigne >= 1 && jumpLigne <= 9;
 
     if (inBoard && !isWall) {
         return utils.findCase(jumpColonne, jumpLigne, elements);

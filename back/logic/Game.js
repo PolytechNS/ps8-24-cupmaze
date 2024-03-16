@@ -111,17 +111,16 @@ class Game {
     }
 
     movePlayer(number, caseWanted, playerCurrentPosition) {
-
-        console.log("ancientV1", this.lastPlayerPosition[`player${number}`])
-        console.log("movePlayerV1", this.playerPosition[`player${number}`])
+        console.log("caseWanted", caseWanted);
 
         const coordinates = [caseWanted.getPos_x(), caseWanted.getPos_y()];
         this.lastPlayerPosition[`player${number}`] = this.playerPosition[`player${number}`];
         this.playerPosition[`player${number}`] = coordinates
-
-        console.log("ancientV2", this.lastPlayerPosition[`player${number}`])
-        console.log("movePlayerV2", this.playerPosition[`player${number}`])
         caseWanted.setIsOccupied(true);
+        if (playerCurrentPosition === null) {
+            this.actionsToDo = 0;
+            return;
+        }
         const lastCase = this.getCase(this.lastPlayerPosition[`player${number}`][1], this.lastPlayerPosition[`player${number}`][0]);
         lastCase.setIsOccupied(false);
         this.actionsToDo=0;

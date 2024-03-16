@@ -78,15 +78,14 @@ function createSocket(io) {
         });
 
         socket.on("isGameOver", () => {
-            console.log("On demande à l'IA si la partie est terminée");
             let answer = game.isGameOver();
-            console.log("La partie est terminée : ", answer[0], " et le gagnant est : ", answer[1]);
             BotGameNamespace.emit("gameOver", answer[0], answer[1]);
         });
 
         socket.on("newMoveHumanIsPossible", async (clickedCellId) => {
 
             let possibleMoves = game.getPossibleMoves(game.playerPosition.player1);
+            console.log("possibleMoves", possibleMoves);
             const colonne = parseInt(clickedCellId.split("-")[0]);
             const ligne = parseInt(clickedCellId.split("-")[1]);
             let caseWanted = await game.getCase(ligne, colonne);
@@ -152,18 +151,18 @@ function createSocket(io) {
 
             BotGameNamespace.emit("numberTour", numberTour, possibleMoves);
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
-            if (newAIPosition instanceof Case) {
-                newAIPosition = [newAIPosition.getPos_x(), newAIPosition.getPos_y()]
+            if (!(newAIPosition instanceof Case)) {
+                newAIPosition = game.getCase(newAIPosition[1], newAIPosition[0])
             }
 
 
             game.currentPlayer = 2
             game.actionsToDo = 1;
-            const cellId = newAIPosition[0] + "-" + newAIPosition[1] + "~cell";
+            const cellId = newAIPosition.getPos_x() + "-" + newAIPosition.getPos_y() + "~cell";
             game.graph.updateNodeState(newAIPosition[0], newAIPosition[1], 2);
             if(game.actionsToDo === 1){
                 BotGameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
-                game.playerPosition.player2 = newAIPosition;
+                game.movePlayer(2, newAIPosition, game.getPlayerCurrentPosition(2));
                 game.actionsToDo=0;
             }
 
