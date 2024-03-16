@@ -63,4 +63,4 @@ function highlightElements(firstWall, secondWall, space) {
 }
 
 
-module.exports = { findWall, findCase, findSpace, findAdjacentWall, findAdjacentSpace, highlightElements, updateNumberAction };
+module.exports = { findWall, findCase, findSpace, findAdjacentWall, findAdjacentSpace };

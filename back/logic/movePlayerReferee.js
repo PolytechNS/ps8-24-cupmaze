@@ -18,6 +18,7 @@ function getPossibleMoves(playerPosition, elements) {
         const cell = utils.findCase(newColonne, newLigne, elements);
         if (!wall || !wall.isLaid) {
             if (cell.isOccupied) {
+                console.log("cell is occupied", newColonne, newLigne);
                 const jumpCell = findJumpCell(newColonne, newLigne, direction, elements);
                 if (jumpCell) {
                     possibleMoves.push(jumpCell);
@@ -54,19 +55,23 @@ function findJumpCell(colonne, ligne, direction, elements) {
     switch (direction) {
         case "A":
             jumpColonne--;
-            isWall = utils.findWall(jumpColonne, ligne, "horizontal", elements)?.isLaid || false;
+            console.log("A : wall to find", jumpColonne, ligne, "horizontal");
+            isWall = utils.findWall(jumpColonne, ligne, "vertical", elements)?.isLaid || false;
             break;
         case "B":
             jumpColonne++;
-            isWall = utils.findWall(colonne, ligne, "horizontal", elements)?.isLaid || false;
+            console.log("B : wall to find", jumpColonne, ligne, "horizontal");
+            isWall = utils.findWall(colonne, ligne, "vertical", elements)?.isLaid || false;
             break;
         case "L":
-            jumpLigne--;
-            isWall = utils.findWall(colonne, jumpLigne, "vertical", elements)?.isLaid || false;
+            //jumpLigne--;
+            console.log("L : wall to find", colonne, jumpLigne, "vertical");
+            isWall = utils.findWall(colonne, jumpLigne, "horizontal", elements)?.isLaid || false;
             break;
         case "R":
             jumpLigne++;
-            isWall = utils.findWall(colonne, ligne, "vertical", elements)?.isLaid || false;
+            console.log("R : wall to find", colonne, jumpLigne, "horizontal");
+            isWall = utils.findWall(colonne, jumpLigne, "horizontal", elements)?.isLaid || false;
             break;
     }
     const inBoard = jumpColonne >= 1 && jumpColonne <= 9 && jumpLigne >= 1 && jumpLigne <= 9;

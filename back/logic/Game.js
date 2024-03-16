@@ -53,16 +53,16 @@ class Game {
     }
 
     init() {
-        for (let i = 0; i <= 9; i++) {
-            for (let j = 0; j <= 9; j++) {
+        for (let i = 1; i <= 9; i++) {
+            for (let j = 1; j <= 9; j++) {
                 this.elements.push(new Case(j, i, false));
-                if(j<8) {
+                if(j<=8) {
                     this.elements.push(new Wall(j, i, false, "vertical"));
                 }
             }
-            for(let j = 0; j <= 9; j++){
+            for(let j = 1; j <= 9; j++){
                 this.elements.push(new Wall(j, i, false, "horizontal"));
-                if (j < 8) {
+                if (j <= 8) {
                     this.elements.push(new Space(j, i, true));
                 }
             }

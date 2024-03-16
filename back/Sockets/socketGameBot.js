@@ -79,9 +79,10 @@ function createSocket(io) {
         socket.on("newMoveHumanIsPossible", async (clickedCellId) => {
 
             let possibleMoves = game.getPossibleMoves(game.playerPosition.player1);
+            console.log("possibleMoves", possibleMoves);
             const colonne = parseInt(clickedCellId.split("-")[0]);
             const ligne = parseInt(clickedCellId.split("-")[1]);
-            let caseWanted = await game.getCase(ligne, colonne);
+            let caseWanted = game.getCase(ligne, colonne);
             let isPossible = possibleMoves.includes(caseWanted);
 
             if (isPossible && game.actionsToDo===1) {
@@ -143,6 +144,7 @@ function createSocket(io) {
 
             BotGameNamespace.emit("numberTour", numberTour, possibleMoves);
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
+            console.log("newAIPosition", newAIPosition);
             if (!(newAIPosition instanceof Case)) {
                 newAIPosition = game.getCase(newAIPosition[1], newAIPosition[0])
             }
@@ -193,6 +195,7 @@ function createSocket(io) {
 
             const colonne = parseInt(wallPosition[0]);
             const ligne = parseInt(wallPosition[2]);
+            console.log("colonne", colonne, "ligne", ligne);
             let wallInclinaison;
             if (firstWallToColor === null) { return;}
 
