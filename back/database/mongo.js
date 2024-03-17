@@ -163,6 +163,51 @@ async function clearUsersDb() {
   return users;
 }
 
+async function addNotification(username, notification){
+  const db = await getDb();
+  const users = db.collection('users');
+  users.update(
+        { username: username},
+        { $push: { notifications: notification}},
+        function(err, result) {
+            if (err) {
+            console.error('Erreur lors de la mise à jour des données :', err);
+            return;
+            }
+            console.log('Notification ajoutée avec succès');
+            client.close();
+        }
+    );
+}
+
+async function removeNotification(username, notification){
+    const db = await getDb();
+    const users = db.collection('users');
+    users.update(
+            { username: username},
+            { $pull: { notifications: notification}},
+            function(err, result) {
+                if (err) {
+                console.error('Erreur lors de la mise à jour des données :', err);
+                return;
+                }
+                console.log('Notification retirée avec succès');
+                client.close();
+            }
+        );
+}
+
+async function getNotifications(username) {
+  const db = await getDb();
+  const users = db.collection('users');
+  return users.findOne(
+      { username: username },
+      { projection: { notifications: 1, _id: 0, email: 0, username: 0, password: 0, friendsList: 0, friendsRequests: 0 } }
+  );
+}
+
+
+
 exports.createUser = createUser;
 exports.getUser = getUser;
 exports.createGame = createGame;
