@@ -150,18 +150,20 @@ function createSocket(io) {
                 caseWanted.setIsOccupied(true);
                 console.log("caseWanted", caseWanted +" current player", gameState.game.currentPlayer);
 
-                socket.emit('actionResult', {
+                WaitingRoomNamespace.to(roomId).emit('actionResult', {
                     valid: true,
                     message: "Position choisie",
                     current: gameState.game.currentPlayer,
                     playerPositions: gameState.game.playerPosition.player2
                 });
 
-                WaitingRoomNamespace.to(roomId).emit('currentPlayer', gameState.game.currentPlayer, gameState.game.playerPosition.player2);
                 gameState.game.actionsToDo--;
                 gameState.game.lastPlayerPosition = "position";
             } else {
-                socket.emit('notYourTurn', true);
+                socket.emit('actionResult', {
+                    valid: false,
+                    message: "Ce n'est pas votre tour"
+                });
             }
         });
 
