@@ -15,11 +15,10 @@ document.addEventListener("DOMContentLoaded", main,false);
 let gameInformation;
 let player1_name;
 let player2_name;
-let player_number;
 function searchToObject() {
     gameInformation = {
         'roomName': localStorage.getItem('room'),
-        'opponent': localStorage.getItem('opponent'),
+        'opponentName': localStorage.getItem('opponentName'),
         'opponentId': localStorage.getItem('opponentId'),
     }
 }
@@ -31,22 +30,29 @@ function main() {
     socket.emit("setupGame", getCookie("jwt"));
     socket.emit("joinRoom", gameInformation.roomName);
 
-    socket.on("game", (gameInformation, playerNumber) => {
-        console.log("playerNumber", playerNumber);
-        player_number = playerNumber;
-        console.log("gameInformation", player_number);
-        player1_name = decodeJWTPayload(getCookie("jwt")).username;
-        player2_name = gameInformation.opponent;
+    socket.on("game", (gameState) => {
+
+        let firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
+        if (firstPlayer) {
+            player1_name = decodeJWTPayload(getCookie("jwt")).username;
+            player2_name = gameInformation.opponentName;
+            console.log("player1_name", player1_name, "player2_name", player2_name);
+            setUpNewRound(player1_name,10,10,1)
+        } else {
+            player2_name = decodeJWTPayload(getCookie("jwt")).username;
+            player1_name = gameInformation.opponentName;
+            console.log("player1_name", player1_name, "player2_name", player2_name);
+            setUpNewRound(player2_name,10,10,1)
+        }
 
         board = document.getElementById("grid");
         document.getElementById("popup-button").addEventListener("click",startNewRound);
         document.getElementById("button-validate-action").addEventListener("click",validateRound);
         document.getElementById("button-undo-action").addEventListener("click",undoAction);
         initializeTable();
-        //Mettre le brouillard de guerre
+
         //setVisionForPlayer(player_number, {player1: null, player2: null});
-        //On setup les différents textes nécessaires
-        setUpNewRound(player1_name,10,10,1);
+        //setUpNewRound(player1_name,10,10,1);
         socket.off("game");
     });
 }

@@ -14,7 +14,6 @@ function removePlayerCircle(oldPosition,currentPlayer) {
 
 function addPlayerCircle(cellTarget,currentPlayer) {
     console.log("addPlayerCircle", cellTarget);
-    //console.log(cellTarget.id);
     const circle = document.createElement("div");
     circle.classList.add("player" + currentPlayer + "-circle");
     circle.id="player" + currentPlayer + "-circle";

@@ -54,12 +54,12 @@ function createSocket(io) {
 
         console.log("match found " + match.username + " vs " + user.username);
         WaitingRoomNamespace.to(user.id).emit('matchFound', {
-            'opponent': match.username,
+            'opponentName': match.username,
             'opponentId': match.id,
             'room' : user.id
         });
         WaitingRoomNamespace.to(match.id).emit('matchFound', {
-            'opponent': user.username,
+            'opponentName': user.username,
             'opponentId': user.id,
             'room' : user.id
         });
@@ -87,20 +87,20 @@ function createSocket(io) {
         }
         // on a verifier que le joueur est bien dans la room maintenant on peut initialiser le jeu
         user = decodeJWTPayload(token);
-        let playerNumber;
+        //let playerNumber;
         if (!GameState[roomId]) {
-            playerNumber = 1;
+            //playerNumber = 1;
             GameState[roomId] = {
                 'player1': user.id,
                 'player2': null,
                 'game': new Game()
             };
         } else {
-            playerNumber = 2;
+            //playerNumber = 2;
             GameState[roomId].player2 = user.id;
         }
         // on envoie les informations du jeu a tout les joueurs dans la room
-        WaitingRoomNamespace.to(roomId).emit('game', GameState[roomId], playerNumber);
+        WaitingRoomNamespace.to(roomId).emit('game', GameState[roomId]);
     }
 
     // on ecoute les evenements du jeu

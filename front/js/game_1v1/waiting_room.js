@@ -14,7 +14,7 @@ function onMatchFound(matchInfo) {
     console.log('match found', matchInfo);
     setTimeout(() => {
         localStorage.setItem('room', matchInfo.room);
-        localStorage.setItem('opponent', matchInfo.opponent);
+        localStorage.setItem('opponentName', matchInfo.opponentName);
         localStorage.setItem('opponentId', matchInfo.opponentId);
         window.location.href = `/1v1game.html`;
     }, 2000);
