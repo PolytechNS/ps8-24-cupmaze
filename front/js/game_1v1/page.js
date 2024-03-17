@@ -31,10 +31,10 @@ function main() {
     socket.emit("setupGame", getCookie("jwt"));
     socket.emit("joinRoom", gameInformation.roomName);
 
-    socket.on("game", (gameInformation, playerNumber) => {
+    socket.on("game", (gameState, playerNumber) => {
         console.log("playerNumber", playerNumber);
         player_number = playerNumber;
-        console.log("gameInformation", player_number);
+        console.log("gameInformation", gameState);
         player1_name = decodeJWTPayload(getCookie("jwt")).username;
         player2_name = gameInformation.opponent;
 
@@ -44,7 +44,7 @@ function main() {
         document.getElementById("button-undo-action").addEventListener("click",undoAction);
         initializeTable();
         //Mettre le brouillard de guerre
-        setVisionForPlayer(player_number, {player1: null, player2: null});
+        //setVisionForPlayer(player_number, {player1: null, player2: null});
         //On setup les différents textes nécessaires
         setUpNewRound(player1_name,10,10,1);
         socket.off("game");
@@ -60,7 +60,7 @@ function initializeTable() {
             const cell = document.createElement("div");
             cell.id = cellId+"~cell";
             cell.classList.add("cell");
-            cell.addEventListener("click", choosePositionToBegin);
+            cell.addEventListener("click", movePlayer);
             board.appendChild(cell);
             if(j !== 8) {
                 const wall = document.createElement("div");
@@ -90,7 +90,10 @@ function initializeTable() {
 function validateRound() {
     isGameOver();
     // on envoie un message au serveur pour lui dire de valider le round
-    socket.emit("validateRound");
+    socket.emit("validateRound", ({
+        'roomId': gameInformation.roomName,
+        'tokens': getCookie("jwt"),
+    }));
     socket.on("numberTour", (numberTour) => {
         if (numberTour > 1) {
             possibleMoves.forEach(cell => {
@@ -99,6 +102,7 @@ function validateRound() {
         }
         socket.off("numberTour");
     });
+    /*
     socket.on("positionOpp", (OpponentPosition, currentplayer,playerPosition) => {
         if (playerPosition["player2"] !== null){
             const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
@@ -111,9 +115,10 @@ function validateRound() {
         addPlayerCircle(circle_opp, currentplayer);
         socket.off("positionOpp");
     });
+     */
     socket.on("gameOver", (winner) => {
         if (winner !== null) {
-            document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + winner + " !! Félicitations ! ";$
+            document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + winner + " !! Félicitations ! ";
             document.getElementById("popup").style.display = 'flex';
             document.getElementById("popup-button").style.display = "none";
         }
@@ -184,14 +189,11 @@ function findAdjacentSpace(wallPosition) {
 
     var space = `${colonne}-${ligne}-space`;
     if (colonne < 9  && ligne <= 9) {
-        console.log("space", space);
         return document.getElementById(space);
     } else {
         if (ligne === 9) {
-            console.log("space", `${colonne-1}-${ligne}-space`);
             return document.getElementById(`${colonne}-${ligne-1}-space`);
         } else {
-            console.log("space", `${colonne}-${ligne-1}-space`);
             return document.getElementById(`${colonne-1}-${ligne}-space`);
         }
     }
@@ -222,7 +224,6 @@ function wallListener(event) {
     // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
-    console.log(wallType, wallPosition);
     if (wallPosition[0] === "9" || wallPosition[2] === "1") {
         return;
     }
@@ -310,6 +311,7 @@ function choosePositionToBegin(event) {
         addPlayerCircle(event.target, currentPlayer);
         lastActionType = "position";
         if (playerposition) {
+            console.log("playerposition", playerposition);
             const cells = document.querySelectorAll(".cell");
             cells.forEach(cell => {
                 cell.removeEventListener("click", choosePositionToBegin);
@@ -328,10 +330,12 @@ function choosePositionToBegin(event) {
 
 function movePlayer(event) {
     const target = event.target;
-    console.log(target);
-    console.log(target.id);
     let cellId=target.id;
-    // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
+    socket.on("movePlayer", {
+        'roomId': gameInformation.roomName,
+        'cellId': cellId,
+        'tokens': getCookie("jwt")
+    })
     if(target.id.includes("circle")){
         alert("occupied");
         return;

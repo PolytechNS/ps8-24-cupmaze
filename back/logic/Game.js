@@ -24,12 +24,12 @@ class Game {
         this.elements = [];
         this.lastActionType = "";
         this.init();
-
         this.lastWallsLaid = [];
         this.lastWallLaidsIDHtml = [];
 
-        this.graph = new Graph(9, 9);
+        this.lastPlayer = null;
 
+        this.graph = new Graph(9, 9);
         this.casePosition = [];
         this.wallPossible = [];
         this.gameState = {};
@@ -74,7 +74,7 @@ class Game {
     }
 
     isGameOver() {
-        if(this.playerPosition.player1 ===null || this.playerPosition.player2===null){
+        if(this.playerPosition.player1 === null || this.playerPosition.player2===null){
             console.error("ATTENTION UNE DES DEUX POSITIONS EST NULL DANS LE BACK");
             return [false, -1];
         }
@@ -91,7 +91,6 @@ class Game {
     }
 
     getCase(y, x) {
-        console.log("On cherche la case : ", x, y);
         for (let i = 0; i < this.elements.length; i++) {
             if(this.elements[i] instanceof Case){
                 if(this.elements[i].getPos_x()===parseInt(x) && this.elements[i].getPos_y()===parseInt(y)){

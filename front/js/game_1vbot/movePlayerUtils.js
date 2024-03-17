@@ -21,6 +21,4 @@ function addPlayerCircle(cellTarget,currentPlayer) {
     //const cell = document.getElementById(newPosition);
     cellTarget.classList.add("occupied");
     cellTarget.appendChild(circle);
-    console.log(cellTarget);
-    console.log(cellTarget.children)
 }
