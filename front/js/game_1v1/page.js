@@ -31,10 +31,10 @@ function main() {
     socket.emit("setupGame", getCookie("jwt"));
     socket.emit("joinRoom", gameInformation.roomName);
 
-    socket.on("game", (gameState, playerNumber) => {
+    socket.on("game", (gameInformation, playerNumber) => {
         console.log("playerNumber", playerNumber);
         player_number = playerNumber;
-        console.log("gameInformation", gameState);
+        console.log("gameInformation", player_number);
         player1_name = decodeJWTPayload(getCookie("jwt")).username;
         player2_name = gameInformation.opponent;
 
@@ -60,7 +60,7 @@ function initializeTable() {
             const cell = document.createElement("div");
             cell.id = cellId+"~cell";
             cell.classList.add("cell");
-            cell.addEventListener("click", movePlayer);
+            cell.addEventListener("click", choosePositionToBegin);
             board.appendChild(cell);
             if(j !== 8) {
                 const wall = document.createElement("div");
@@ -89,7 +89,7 @@ function initializeTable() {
 
 function validateRound() {
     isGameOver();
-    // on envoie un message au serveur pour lui dire de valider le round
+
     socket.emit("validateRound", ({
         'roomId': gameInformation.roomName,
         'tokens': getCookie("jwt"),

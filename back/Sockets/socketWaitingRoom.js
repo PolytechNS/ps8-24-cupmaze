@@ -106,7 +106,6 @@ function createSocket(io) {
     // on ecoute les evenements du jeu
     function playGame(socket) {
 
-        let activePlayer = 1;
         socket.on("choosePositionToBegin", (data) => {
             console.log("choosePositionToBegin");
             let roomId = data.roomId; // room id
@@ -143,6 +142,7 @@ function createSocket(io) {
                 gameState.game.lastPlayerPosition = "position";
             }
         });
+
 
         socket.on("movePlayer", (data) => {
             let roomId = data.roomId; // room id
