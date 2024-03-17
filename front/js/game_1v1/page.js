@@ -297,6 +297,33 @@ function choosePositionToBegin(event) {
         'cellId': event.target.id,
         'tokens': getCookie("jwt")
     });
+    socket.once('actionResult', (result) => {
+        if (result.valid) {
+            event.target.classList.add("occupied");
+            console.log("result.current", result.current);
+            addPlayerCircle(event.target, result.current);
+            if (result.playerPositions) {
+                const cells = document.querySelectorAll(".cell");
+                cells.forEach(cell => {
+                    cell.removeEventListener("click", choosePositionToBegin);
+                    cell.addEventListener("click", movePlayer);
+                });
+                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+                walls.forEach(wall => {
+                    wall.addEventListener("mouseenter", wallListener);
+                    wall.addEventListener("click", wallLaid);
+                })
+            }
+            showButtonVisible();
+        } else {
+            alert(result.message);
+        }
+    });
+    /*
+    socket.on('notYourTurn', (res) => {
+        if (res) { alert("Ce n'est pas votre tour"); return; }
+        socket.off('notYourTurn');
+    });
     socket.on("beginningPositionIsValid", (res) => {
         if (!res) {
             alert("Vous devez commencez par la première ligne");
@@ -332,6 +359,7 @@ function choosePositionToBegin(event) {
         socket.off("currentPlayer");
     });
     showButtonVisible();
+     */
 }
 
 function movePlayer(event) {

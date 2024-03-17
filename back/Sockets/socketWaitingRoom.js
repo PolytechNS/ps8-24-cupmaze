@@ -120,14 +120,26 @@ function createSocket(io) {
                 const colonne = parseInt(cellId.split("-")[0]);
                 const ligne = parseInt(cellId.split("-")[1]);
                 var res = beginningPositionIsValid(gameState.game.currentPlayer, ligne);
-
-                WaitingRoomNamespace.emit('beginningPositionIsValid', res);
+                /*
+                socket.emit('beginningPositionIsValid', res);
                 console.log("beginningPositionIsValid", res);
-                if (res === false) { return; }
-                if (gameState.game.actionsToDo === 0) {
-                    WaitingRoomNamespace.emit('checkAction',true);
+                 */
+                if (res === false) {
+                    socket.emit("actionResult", {
+                        valid: false,
+                        message: "Il faut commencer sur votre ligne de depart"
+                    })
+                    console.log("Il faut commencer sur votre ligne de depart");
                     return;
                 }
+                if (gameState.game.actionsToDo === 0) {
+                    socket.emit('actionResult', {
+                        valid: false,
+                        message: "Vous avez deja joué"
+                    });
+                    return;
+                }
+
                 if (gameState.game.currentPlayer === 1) {
                     gameState.game.playerPosition.player1 = [colonne, ligne];
                 } else {
@@ -137,9 +149,19 @@ function createSocket(io) {
                 const caseWanted = gameState.game.getCase(colonne, ligne);
                 caseWanted.setIsOccupied(true);
                 console.log("caseWanted", caseWanted +" current player", gameState.game.currentPlayer);
+
+                socket.emit('actionResult', {
+                    valid: true,
+                    message: "Position choisie",
+                    current: gameState.game.currentPlayer,
+                    playerPositions: gameState.game.playerPosition.player2
+                });
+
                 WaitingRoomNamespace.to(roomId).emit('currentPlayer', gameState.game.currentPlayer, gameState.game.playerPosition.player2);
                 gameState.game.actionsToDo--;
                 gameState.game.lastPlayerPosition = "position";
+            } else {
+                socket.emit('notYourTurn', true);
             }
         });
 
