@@ -1,3 +1,4 @@
+let socketNotifications;
 
 function searchAccountOnDB(){
     const usernameWanted = document.getElementById("searchInput").value;
@@ -48,7 +49,7 @@ function addFriendRequest(usernameToAdd) {
                 alert("ERROR"+response.status);
             }else{
                 console.log("Invitation d'ami bien envoyée");
-                socketNotifications.emit('friendRequestNotification', { sender: myUsername, receiver: usernameToAdd });
+                socketNotifications.emit('addFriendRequest', { sender: myUsername, receiver: usernameToAdd });
             }
         })
         .catch(error => {
@@ -115,6 +116,12 @@ function main(){
         .catch(error => {
             console.error('Erreur:', error);
         });
+
+    socketNotifications= io("/notifications");
+    socketNotifications.emit('joinRoom', myUsername);
+    window.addEventListener('beforeunload', () => {
+        socketNotifications.disconnect();
+    });
 }
 
 function acceptFriendRequest(usernameAdder) {

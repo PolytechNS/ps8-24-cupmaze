@@ -84,4 +84,3 @@ window.addEventListener('beforeunload', () => {
     socketNotifications.disconnect();
 });
 
-window.socketNotifications = socketNotifications;
