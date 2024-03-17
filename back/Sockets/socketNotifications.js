@@ -1,5 +1,5 @@
 const { Server } = require("socket.io");
-
+const {addNotification, removeNotification, getNotifications} = require("../database/mongo");
 function createSocket(io) {
     console.log("Creating socket for notifications");
 
@@ -13,14 +13,20 @@ function createSocket(io) {
             console.log(`User ${userId} joined their room`);
         });
 
-        socket.on('addFriendRequest', (data) => {
+        socket.on('addFriendRequest', async (data) => {
             notifications.to(data.receiver).emit('friendRequestNotification', data);
+            const ret = await addNotification(data.receiver, 'You have a friend request from '+data.sender);
             console.log(`Friend request notification sent to ${data.receiver}`);
         });
 
         socket.on('challengeFriend', (data) => {
             notifications.to(data.receiver).emit('challengeNotification', data);
             console.log(`Challenge notification sent to ${data.receiver}`);
+        });
+
+        socket.on("getNotifications", async (username) => {
+            const notifications = await getNotifications(username);
+            socket.emit("notifications", notifications);
         });
 
         socket.on('disconnect', () => {

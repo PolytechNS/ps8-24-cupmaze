@@ -91,10 +91,14 @@ socketNotifications.on('friendRequestNotification', (data) => {
 let notificationsButton = document.getElementById('notifications-button');
 notificationsButton.addEventListener('click', () => {
     document.getElementById("popup").style.display = "block";
-    document.getElementById("element1").innerText = "Notif1";
-    document.getElementById("element2").innerText = "Notif2";
-});
 
+    socketNotifications.emit("getNotifications", username);
+    socketNotifications.on("notifications", (notifications) => {
+        console.log(notifications);
+        document.getElementById("element1").innerText = notifications[0];
+        //document.getElementById("element2").innerText = notifications.notifications[1];
+    });
+});
 
 // On va fermer la connexion du socket lorsque l'utilisateur quitte la page principale
 window.addEventListener('beforeunload', () => {
