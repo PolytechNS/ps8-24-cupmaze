@@ -24,6 +24,11 @@ closePopupButton.onclick = function() {
     document.getElementById("popup").style.display = "none";
 }
 
+const closePopupButtonNotif = document.getElementById("closePopup-notif");
+closePopupButtonNotif.onclick = function() {
+    document.getElementById("popup-notif").style.display = "none";
+}
+
 const params = {
     username: username
 };
@@ -47,8 +52,8 @@ fetch("http://localhost:8000/api/getFriends?$"+queryString, {
                 nameDiv.textContent = friend;
                 nameDiv.onclick = function() {
                     document.getElementById("popup").style.display = "block";
-                    document.getElementById("popup-namePlayer").innerText = "Nom d'utilisateur: "+friend;
-                    document.getElementById("popup-eloPlayer").innerText = "Elo de l'utilisateur: "+255;
+                    document.getElementById("element1").innerText = "Nom d'utilisateur: "+friend;
+                    document.getElementById("element2").innerText = "Elo de l'utilisateur: "+255;
                 }
 
                 const buttonChallenge = document.createElement("button");
@@ -76,11 +81,22 @@ fetch("http://localhost:8000/api/getFriends?$"+queryString, {
 let socketNotifications = io("/notifications");
 socketNotifications.emit('joinRoom', username);
 socketNotifications.on('friendRequestNotification', (data) => {
-    alert(`You have a friend request from ${data.sender}`);
+    //alert(`You have a friend request from ${data.sender}`);
+    const popup = document.getElementById('popup-notif');
+    popup.style.display = 'block';
+    const message = document.getElementById('popup-notif-content');
+    message.innerText = `You have a friend request from ${data.sender}`;
 });
+
+let notificationsButton = document.getElementById('notifications-button');
+notificationsButton.addEventListener('click', () => {
+    document.getElementById("popup").style.display = "block";
+    document.getElementById("element1").innerText = "Notif1";
+    document.getElementById("element2").innerText = "Notif2";
+});
+
 
 // On va fermer la connexion du socket lorsque l'utilisateur quitte la page principale
 window.addEventListener('beforeunload', () => {
     socketNotifications.disconnect();
 });
-

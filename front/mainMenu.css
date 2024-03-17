@@ -98,3 +98,31 @@ button:hover {
     text-decoration: none;
     cursor: pointer;
 }
+
+#notifications-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.popup-notif {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+}
+.popup-notif-content {
+    text-align: center;
+}

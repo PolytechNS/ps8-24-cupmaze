@@ -13,14 +13,24 @@
     <button id="button-retrieveGame">Récupérer la dernière partie sauvegardée</button>
     <button id="button-1v1game">Lancer une partie en ligne</button>
     <button id="searchFriends">Gestion des amis</button>
-
     <p>
     </p>
+    <button id="notifications-button">Notifications</button>
     <div id="popup" class="popup">
         <div class="popup-content">
             <span class="close" id="closePopup">&times;</span>
-            <p id="popup-namePlayer"></p>
-            <p id="popup-eloPlayer"></p>
+            <ul id="notifications-list">Notifications :
+                <p id="element1"></p>
+                <p id="element2"></p>
+                <p id="element3"></p>
+            </ul>
+        </div>
+    </div>
+
+    <div id="popup-notif" class="popup-notif">
+        <div class="popup-notif-content">
+            <span class="close" id="closePopup-notif">&times;</span>
+            <p id="popup-notif-content"></p>
         </div>
     </div>
 
