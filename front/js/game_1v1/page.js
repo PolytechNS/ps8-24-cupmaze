@@ -211,10 +211,7 @@ function wallListener(event) {
 }
 
 function wallLaid(event) {
-    //On va récupérer le premier mur
     const firstWallToColor = event.target;
-
-    // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
     const adjacentWall = findAdjacentWall(wallType, wallPosition);
@@ -235,27 +232,6 @@ function wallLaid(event) {
         'adjacentSpace': adjacentSpace.id
     });
 }
-        /*firstWallToColor, wallType, wallPosition, wallId);
-    socket.on("laidWall", (currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
-        if (currentPlayer === null) {
-            alert("Vous n'avez plus d'actions disponibles");
-            return;
-        }
-        adjacentWall.classList.add("wall-laid", "laidBy" + currentPlayer);
-        adjacentWall.removeEventListener("mouseenter", wallListener);
-        adjacentWall.removeEventListener("click", wallLaid);
-
-        adjacentSpace.classList.add("wall-laid", "laidBy" + currentPlayer);
-
-        firstWallToColor.classList.add("wall-laid", "laidBy" + currentPlayer);
-        firstWallToColor.removeEventListener("mouseenter", wallListener);
-        firstWallToColor.removeEventListener("click", wallLaid);
-        showButtonVisible();
-        updateNumberWallsDisplay(currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
-        socket.off("laidWall");
-        lastActionType="wall";
-    });
-         */
 
 /** #############################################  MOVE PLAYER METHODS  ############################################# **/
 
