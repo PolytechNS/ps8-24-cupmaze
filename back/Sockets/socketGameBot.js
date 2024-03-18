@@ -219,7 +219,6 @@ function createSocket(io) {
                 } else {
                     game.nbWallsPlayer2--;
                 }
-                game.lastActionType = "wall";
                 if (adjacentWall === undefined || adjacentSpace === undefined) {
                     BotGameNamespace.emit("laidWall", null, null, null);
                 } else {

@@ -223,8 +223,19 @@ function wallLaid(event) {
     if(isWallPlacementValid(firstWallToColor, adjacentWall, adjacentSpace) === false) {
         return;
     }
-
-    socket.emit("wallLaid", firstWallToColor, wallType, wallPosition, wallId);
+    console.log("wallLaid", firstWallToColor, wallType, wallPosition, wallId, adjacentWall, adjacentSpace);
+    socket.emit("layWall", {
+        'roomId': gameInformation.roomName,
+        'tokens': getCookie("jwt"),
+        'firstWallToColor': firstWallToColor.id,
+        'wallType': wallType,
+        'wallPosition': wallPosition,
+        'wallId': wallId,
+        'adjacentWall': adjacentWall.id,
+        'adjacentSpace': adjacentSpace.id
+    });
+}
+        /*firstWallToColor, wallType, wallPosition, wallId);
     socket.on("laidWall", (currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
         if (currentPlayer === null) {
             alert("Vous n'avez plus d'actions disponibles");
@@ -244,7 +255,7 @@ function wallLaid(event) {
         socket.off("laidWall");
         lastActionType="wall";
     });
-}
+         */
 
 /** #############################################  MOVE PLAYER METHODS  ############################################# **/
 
@@ -260,37 +271,11 @@ function choosePositionToBegin(event) {
 function movePlayer(event) {
     const target = event.target;
     let cellId=target.id;
-    console.log("cellId", cellId);
     socket.emit("movePlayer", {
         'roomId': gameInformation.roomName,
         'cellId': cellId,
         'tokens': getCookie("jwt")
     })
-    /*
-    if(target.id.includes("circle")){
-        alert("occupied");
-        return;
-    }
-    else if(target.classList.contains("fog")){
-        cellId=target.id.split("~")[1]+"~cell";
-        console.log(cellId);
-    }
-    const clickedCell=document.getElementById(cellId);
-
-    socket.emit("newMoveHumanIsPossible", clickedCell.id);
-    socket.on("isNewMoveHumanIsPossible", (isPossible, lastPosition) => {
-        if (isPossible) {
-            console.log("move valid");
-            if(lastPosition!==null) removePlayerCircle(lastPosition, 1);
-            addPlayerCircle(target, 1);
-            lastActionType = "position";
-            showButtonVisible();
-        }else{
-            alert("Mouvement non autorisé");
-        }
-        socket.off("isNewMoveHumanIsPossible");
-    });
-     */
 }
 
 
@@ -357,6 +342,9 @@ function updateUI(action) {
                 break;
             case "movePlayer":
                 move(action);
+                break;
+            case "layWall":
+                wall(action);
                 break;
     }
 }
@@ -429,4 +417,25 @@ function move(action) {
         alert(action.message);
     }
     showButtonVisible();
+}
+
+function wall(action) {
+    if (action.valid) {
+        console.log("wall valid", action.adjacentWall);
+        const adjacentWall = document.getElementById(action.adjacentWall);
+        const adjacentSpace = document.getElementById(action.adjacentSpace);
+        const firstWallToColor = document.getElementById(action.firstWallToColor);
+        adjacentWall.classList.add("wall-laid", "laidBy" + action.currentPlayer);
+        adjacentWall.removeEventListener("mouseenter", wallListener);
+        adjacentWall.removeEventListener("click", wallLaid);
+        adjacentSpace.classList.add("wall-laid", "laidBy" + action.currentPlayer);
+        firstWallToColor.classList.add("wall-laid", "laidBy" + action.currentPlayer);
+        firstWallToColor.removeEventListener("mouseenter", wallListener);
+        firstWallToColor.removeEventListener("click", wallLaid);
+        showButtonVisible();
+        updateNumberWallsDisplay(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2);
+        lastActionType="wall";
+    } else {
+        alert(action.message);
+    }
 }

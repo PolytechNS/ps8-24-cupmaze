@@ -3,6 +3,7 @@ const {getUser, clearGameDb, decodeJWTPayload} = require("../database/mongo");
 const matchmaking = require("./matchmaking.js");
 const {Game} = require("../logic/Game");
 const {beginningPositionIsValid} = require("../logic/movePlayerReferee");
+const {findWall, findSpace} = require("../logic/utils");
 
 const rooms = [];
 let playersWithRooms = {};
@@ -218,8 +219,110 @@ function createSocket(io) {
 
         });
 
-        socket.on("layWall", (position) => {
-            console.log("layWall", position);
+        socket.on("layWall", (data) => {
+            console.log("layWall", data);
+            let roomId = data.roomId; // room id
+            let token = data.tokens; // token
+            let gameState = GameState[roomId];
+            let user = decodeJWTPayload(token);
+            if (!gameState || !roomId) { return; }
+
+            let firstWallToColor = data.firstWallToColor;
+            console.log(data.adjacentWall);
+            let wallType = data.wallType;
+            let wallPosition = data.wallPosition;
+            let wallId = data.wallId;
+
+            if (gameState.game.currentPlayer === 1 && user.id === roomId ||
+                gameState.game.currentPlayer === 2 && user.id !== roomId) {
+
+                if (gameState.game.actionsToDo === 0) {
+                    socket.emit('actionResult', {
+                        valid: false,
+                        message: "Vous avez deja joué",
+                        case: "noMoreActions",
+                        actionType: "layWall"
+                    });
+                    return;
+                }
+
+                if (gameState.game.currentPlayer === 1) {
+                    if (gameState.game.nbWallsPlayer1 === 0) {
+                        socket.emit('actionResult', {
+                            valid: false,
+                            message: "Vous n'avez plus de mur",
+                            case: "noMoreWalls",
+                            actionType: "layWall"
+                        });
+                        return;
+                    }
+                } else {
+                    if (gameState.game.nbWallsPlayer2 === 0) {
+                        socket.emit('actionResult', {
+                            valid: false,
+                            message: "Vous n'avez plus de mur",
+                            case: "noMoreWalls",
+                            actionType: "layWall"
+                        });
+                        return;
+                    }
+                }
+
+                const colonne = parseInt(wallPosition[0]);
+                const ligne = parseInt(wallPosition[2]);
+
+                let wallInclinaison;
+                if (firstWallToColor === null) {
+                    socket.emit('actionResult', {
+                        valid: false,
+                        message: "Vous devez choisir un mur",
+                        case: "noWall",
+                        actionType: "layWall"
+                    });
+                }
+                if (wallType === "wv") { wallInclinaison = "vertical"; }
+                else { wallInclinaison = "horizontal"; }
+
+                const wall = findWall(colonne, ligne, wallInclinaison, gameState.game.elements);
+                const adjacentWall =
+                    (wallInclinaison === "vertical")
+                        ? findWall(colonne, ligne-1, wallInclinaison, gameState.game.elements)
+                        : findWall(colonne+1, ligne, wallInclinaison, gameState.game.elements);
+                const adjacentSpace = findSpace(colonne, ligne, gameState.game.elements);
+
+                gameState.game.layWall(wall, adjacentWall, adjacentSpace);
+                gameState.game.actionsToDo--;
+                gameState.game.lastActionType = "wall";
+                if (gameState.game.currentPlayer === 1) {
+                    gameState.game.nbWallsPlayer1--;
+                } else {
+                    gameState.game.nbWallsPlayer2--;
+                }
+
+                WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                    valid: true,
+                    message: "Mur posé",
+                    wallType: wallType,
+                    currentPlayer: gameState.game.currentPlayer,
+                    nbWallsPlayer1: gameState.game.nbWallsPlayer1,
+                    nbWallsPlayer2: gameState.game.nbWallsPlayer2,
+                    wallId: wallId,
+                    firstWallToColor: data.firstWallToColor,
+                    adjacentWall: data.adjacentWall,
+                    adjacentSpace: data.adjacentSpace,
+                    actionType: "layWall"
+                });
+
+            } else {
+                console.log("Lay Wall : Ce n'est pas votre tour");
+                socket.emit('actionResult', {
+                    valid: false,
+                    message: "Ce n'est pas votre tour",
+                    case: "notYourTurn",
+                    actionType: "layWall"
+                });
+            }
+
         });
 
         socket.on("validateRound", (data) => {
