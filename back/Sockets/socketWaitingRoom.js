@@ -34,11 +34,9 @@ function createSocket(io) {
 
 
             socket.on('setupGame', token =>
-                socket.on('joinRoom', (room) => {
-                    initRoom(socket, token, room).then(r => {
-                        console.log('room joined', room);
-                    });
-            }));
+                socket.on('joinRoom', (room) =>
+                    initRoom(socket, token, room)));
+
 
             playGame(socket);
         });
@@ -49,6 +47,7 @@ function createSocket(io) {
         if (!userDB) { return; }
         let user = decodeJWTPayload(token);
         socket.join(user.id);
+        console.log("user " + user.username + " joined waiting room " + user.id);
         let match = await matchmaking.joinWaitingRoom(user.id, user.username);
         if (!match) { return; }
 
@@ -73,34 +72,18 @@ function createSocket(io) {
     // initialise le jeu pour une id de room donnée
     async function initRoom(socket, token, roomId) {
         socket.join(roomId);
-        console.log('room joined', roomId);
         // on verifie le token founi dans gameParams
-        let user;
-        try {
-            user = await getUser(jwt.verify(token, 'secret').email);
-        } catch (e) {
-            console.log(e);
-        }
-        if (!user) {
+        if (!await getUser(jwt.verify(token, 'secret').email)) {
             console.log("user not found");
             return;
         }
-        // on a verifier que le joueur est bien dans la room maintenant on peut initialiser le jeu
-        user = decodeJWTPayload(token);
-        //let playerNumber;
         if (!GameState[roomId]) {
-            //playerNumber = 1;
             GameState[roomId] = {
-                'player1': user.id,
-                'player2': null,
                 'game': new Game()
             };
-        } else {
-            //playerNumber = 2;
-            GameState[roomId].player2 = user.id;
         }
         // on envoie les informations du jeu a tout les joueurs dans la room
-        WaitingRoomNamespace.to(roomId).emit('game', GameState[roomId]);
+        WaitingRoomNamespace.to(roomId).emit('game', "beginning");
     }
 
     // on ecoute les evenements du jeu
@@ -120,14 +103,12 @@ function createSocket(io) {
                 const colonne = parseInt(cellId.split("-")[0]);
                 const ligne = parseInt(cellId.split("-")[1]);
                 var res = beginningPositionIsValid(gameState.game.currentPlayer, ligne);
-                /*
-                socket.emit('beginningPositionIsValid', res);
-                console.log("beginningPositionIsValid", res);
-                 */
+
                 if (res === false) {
                     socket.emit("actionResult", {
                         valid: false,
-                        message: "Il faut commencer sur votre ligne de depart"
+                        message: "Il faut commencer sur votre ligne de depart",
+                        actionType: "positionBegin"
                     })
                     console.log("Il faut commencer sur votre ligne de depart");
                     return;
@@ -135,7 +116,8 @@ function createSocket(io) {
                 if (gameState.game.actionsToDo === 0) {
                     socket.emit('actionResult', {
                         valid: false,
-                        message: "Vous avez deja joué"
+                        message: "Vous avez deja joué",
+                        actionType: "positionBegin"
                     });
                     return;
                 }
@@ -154,15 +136,19 @@ function createSocket(io) {
                     valid: true,
                     message: "Position choisie",
                     current: gameState.game.currentPlayer,
-                    playerPositions: gameState.game.playerPosition.player2
+                    playerPositions: gameState.game.playerPosition.player2,
+                    cellId: cellId,
+                    actionType: "positionBegin"
                 });
 
                 gameState.game.actionsToDo--;
-                gameState.game.lastPlayerPosition = "position";
+                gameState.game.lastPlayerPosition["player" + gameState.game.currentPlayer] = [colonne, ligne];
             } else {
+                console.log("Begin :Ce n'est pas votre tour");
                 socket.emit('actionResult', {
                     valid: false,
-                    message: "Ce n'est pas votre tour"
+                    message: "Ce n'est pas votre tour",
+                    actionType: "positionBegin"
                 });
             }
         });
@@ -175,6 +161,60 @@ function createSocket(io) {
             let gameState = GameState[roomId];
             let user = decodeJWTPayload(token);
             if (!gameState || !roomId || !cellId) { return; }
+
+            if (gameState.game.currentPlayer === 1 && user.id === roomId ||
+                gameState.game.currentPlayer === 2 && user.id !== roomId) {
+                if (gameState.game.actionsToDo === 0) {
+                    socket.emit('actionResult', {
+                        valid: false,
+                        message: "Vous avez deja joué",
+                        case: "noMoreActions",
+                        actionType: "movePlayer"
+                    });
+                    return;
+                }
+
+                const colonne = parseInt(cellId.split("-")[0]);
+                const ligne = parseInt(cellId.split("-")[1]);
+
+                const playerCurrentPosition = gameState.game.getPlayerCurrentPosition(gameState.game.currentPlayer);
+                console.log("playerCurrentPosition", playerCurrentPosition);
+                const possibleMoves = gameState.game.getPossibleMoves(playerCurrentPosition);
+                console.log("possibleMoves", possibleMoves);
+                console.log("colonne", colonne, "ligne", ligne);
+                const caseWanted = gameState.game.getCase(colonne, ligne);
+
+                if (possibleMoves.find((cell) => cell.getPos_x() === colonne && cell.getPos_y() === ligne)) {
+
+
+                    gameState.game.movePlayer(gameState.game.currentPlayer, caseWanted, playerCurrentPosition);
+                    WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                        valid: true,
+                        message: "Joueur déplacé",
+                        currentPlayer: gameState.game.currentPlayer,
+                        cellId: cellId,
+                        oldPosition:
+                            gameState.game.lastPlayerPosition['player' + gameState.game.currentPlayer][0]+"-"+
+                            +gameState.game.lastPlayerPosition['player' + gameState.game.currentPlayer][1]+"~cell",
+                        actionType: "movePlayer"
+                    });
+                } else {
+                    socket.emit('actionResult', {
+                        valid: false,
+                        message: "Vous ne pouvez pas aller ici",
+                        case: "notPossible",
+                        actionType: "movePlayer"
+                    });
+                }
+            } else {
+                console.log("Move : Ce n'est pas votre tour");
+                socket.emit('actionResult', {
+                    valid: false,
+                    message: "Ce n'est pas votre tour",
+                    case: "notYourTurn",
+                    actionType: "movePlayer"
+                });
+            }
 
         });
 
@@ -193,29 +233,63 @@ function createSocket(io) {
             if (gameState.game.currentPlayer === 1 && user.id === roomId ||
                 gameState.game.currentPlayer === 2 && user.id !== roomId) {
 
-            gameState.game.currentPlayer = gameState.game.currentPlayer === 1 ? 2 : 1;
-            gameState.game.actionsToDo = 1;
-            gameState.game.numberTour++;
+                if (gameState.game.actionsToDo === 1) {
+                    socket.emit('actionResult', {
+                        valid: false,
+                        message: "Vous n'avez pas joué",
+                        case: "notPlayed",
+                        actionType: "validateRound"
+                    });
+                    return;
+                }
 
-            const winner = gameState.game.isGameOver(gameState.game.playerPosition);
-            if (winner[0]) {
-                WaitingRoomNamespace.to(roomId).emit('gameOver', winner);
-                return;
-            }
+                gameState.game.currentPlayer = gameState.game.currentPlayer === 1 ? 2 : 1;
+                gameState.game.actionsToDo = 1;
+                gameState.game.numberTour++;
 
-            WaitingRoomNamespace.to(roomId).emit('numberTourAfter', gameState.game.numberTour);
+                const winner = gameState.game.isGameOver(gameState.game.playerPosition);
+                if (winner[0]) {
+                    WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                        valid: false,
+                        message: "Le joueur " + winner[1] + " a gagné",
+                        winner: winner[1],
+                        case: "victory",
+                        actionType: "validateRound"
+                    });
+                    return;
+                }
 
-            if (gameState.game.numberTour === 101){
-                WaitingRoomNamespace.to(roomId).emit('endGame', "draw");
-            }
+                if (gameState.game.numberTour === 101){
+                    WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                        valid: false,
+                        message: "Egalité",
+                        case: "draw",
+                        actionType: "validateRound"
+                    });
+                }
 
-            let possibleMoves = gameState.game.getPossibleMoves(gameState.game.playerPosition[`player${gameState.game.currentPlayer}`]);
-            WaitingRoomNamespace.to(roomId).emit('updateRound',
-                possibleMoves, gameState.game.numberTour,
-                gameState.game.playerPosition, gameState.game.currentPlayer,
-            gameState.game.nbWallsPlayer1, gameState.game.nbWallsPlayer2);
-            }
+                let possibleMoves = gameState.game.getPossibleMoves(gameState.game.playerPosition[`player${gameState.game.currentPlayer}`]);
 
+                WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                    valid: true,
+                    message: "Tour validé",
+                    possibleMoves: possibleMoves,
+                    numberTour: gameState.game.numberTour,
+                    playerPosition: gameState.game.playerPosition,
+                    currentPlayer: gameState.game.currentPlayer,
+                    nbWallsPlayer1: gameState.game.nbWallsPlayer1,
+                    nbWallsPlayer2: gameState.game.nbWallsPlayer2,
+                    actionType: "validateRound"
+                });
+                } else {
+                    console.log("Valid Turn : Ce n'est pas votre tour");
+                    socket.emit('actionResult', {
+                        valid: false,
+                        message: "Ce n'est pas votre tour",
+                        case: "notYourTurn",
+                        actionType: "validateRound"
+                    });
+                }
         });
     }
 }

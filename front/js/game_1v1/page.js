@@ -27,11 +27,13 @@ function searchToObject() {
 function main() {
     socket = io("/api/waitingRoom");
     searchToObject();
+
     socket.emit("setupGame", getCookie("jwt"));
     socket.emit("joinRoom", gameInformation.roomName);
 
     socket.on("game", (gameState) => {
-
+        console.log("gameState : ", gameState);
+        console.log("gameInformation", gameInformation.roomName);
         let firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
         if (firstPlayer) {
             player1_name = decodeJWTPayload(getCookie("jwt")).username;
@@ -50,9 +52,9 @@ function main() {
         document.getElementById("button-validate-action").addEventListener("click",validateRound);
         document.getElementById("button-undo-action").addEventListener("click",undoAction);
         initializeTable();
-
         //setVisionForPlayer(player_number, {player1: null, player2: null});
         //setUpNewRound(player1_name,10,10,1);
+        socket.on("actionResult", (action) => updateUI(action));
         socket.off("game");
     });
 }
@@ -100,50 +102,6 @@ function validateRound() {
         'roomId': gameInformation.roomName,
         'tokens': getCookie("jwt"),
     }));
-    socket.on("numberTour", (numberTour) => {
-        if (numberTour > 1) {
-            possibleMoves.forEach(cell => {
-                cell.classList.remove("possible-move");
-            });
-        }
-        socket.off("numberTour");
-    });
-    /*
-    socket.on("positionOpp", (OpponentPosition, currentplayer,playerPosition) => {
-        if (playerPosition["player2"] !== null){
-            const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
-            console.log("htmlOldPosition", htmlOldPosition);
-            removePlayerCircle(htmlOldPosition, currentplayer);
-        }
-        console.log("OpponentPosition", OpponentPosition);
-        let circle_opp = document.getElementById(OpponentPosition);
-        console.log("circle_opp", circle_opp);
-        addPlayerCircle(circle_opp, currentplayer);
-        socket.off("positionOpp");
-    });
-     */
-    socket.on("gameOver", (winner) => {
-        if (winner !== null) {
-            document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + winner + " !! Félicitations ! ";
-            document.getElementById("popup").style.display = 'flex';
-            document.getElementById("popup-button").style.display = "none";
-        }
-        socket.off("gameOver");
-    });
-    socket.on("numberTourAfter", (numberTour) => {
-        if (numberTour === 101) {
-            document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
-            document.getElementById("popup").style.display = 'flex';
-            document.getElementById("popup-button").style.display = "none";
-        }
-        socket.off("numberTourAfter");
-    });
-    socket.on("updateRound", (possibleMoves, numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
-        console.log("updateRound", numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
-        //setVisionForPlayer(currentPlayer, playerPosition);
-        //setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
-        socket.off("updateBoard");
-    });
 }
 
 
@@ -297,79 +255,18 @@ function choosePositionToBegin(event) {
         'cellId': event.target.id,
         'tokens': getCookie("jwt")
     });
-    socket.once('actionResult', (result) => {
-        if (result.valid) {
-            event.target.classList.add("occupied");
-            console.log("result.current", result.current);
-            addPlayerCircle(event.target, result.current);
-            if (result.playerPositions) {
-                const cells = document.querySelectorAll(".cell");
-                cells.forEach(cell => {
-                    cell.removeEventListener("click", choosePositionToBegin);
-                    cell.addEventListener("click", movePlayer);
-                });
-                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-                walls.forEach(wall => {
-                    wall.addEventListener("mouseenter", wallListener);
-                    wall.addEventListener("click", wallLaid);
-                })
-            }
-            showButtonVisible();
-        } else {
-            alert(result.message);
-        }
-    });
-    /*
-    socket.on('notYourTurn', (res) => {
-        if (res) { alert("Ce n'est pas votre tour"); return; }
-        socket.off('notYourTurn');
-    });
-    socket.on("beginningPositionIsValid", (res) => {
-        if (!res) {
-            alert("Vous devez commencez par la première ligne");
-            return;
-        }
-        socket.off("beginningPositionIsValid");
-    });
-    socket.on("checkAction", (res) => {
-        if (res) {
-            alert("Vous n'avez plus d'actions disponibles");
-            return;
-        }
-        socket.off("checkAction");
-    });
-    event.target.classList.add("occupied");
-    socket.on("currentPlayer", (currentPlayer, playerposition) => {
-        console.log("currentPlayer");
-        addPlayerCircle(event.target, currentPlayer);
-        lastActionType = "position";
-        if (playerposition) {
-            console.log("playerposition", playerposition);
-            const cells = document.querySelectorAll(".cell");
-            cells.forEach(cell => {
-                cell.removeEventListener("click", choosePositionToBegin);
-                cell.addEventListener("click", movePlayer);
-            });
-            const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-            walls.forEach(wall => {
-                wall.addEventListener("mouseenter", wallListener);
-                wall.addEventListener("click", wallLaid);
-            })
-        }
-        socket.off("currentPlayer");
-    });
-    showButtonVisible();
-     */
 }
 
 function movePlayer(event) {
     const target = event.target;
     let cellId=target.id;
-    socket.on("movePlayer", {
+    console.log("cellId", cellId);
+    socket.emit("movePlayer", {
         'roomId': gameInformation.roomName,
         'cellId': cellId,
         'tokens': getCookie("jwt")
     })
+    /*
     if(target.id.includes("circle")){
         alert("occupied");
         return;
@@ -393,6 +290,7 @@ function movePlayer(event) {
         }
         socket.off("isNewMoveHumanIsPossible");
     });
+     */
 }
 
 
@@ -448,8 +346,87 @@ function undoAction(){
     }
 }
 /**UTILS **/
+
+function updateUI(action) {
+    switch (action.actionType) {
+            case "positionBegin":
+                positionBegin(action);
+                break;
+            case "validateRound":
+                validate(action);
+                break;
+            case "movePlayer":
+                move(action);
+                break;
+    }
+}
+
+function positionBegin(action) {
+    if (action.valid) {
+        document.getElementById(action.cellId).classList.add("occupied");
+        addPlayerCircle(document.getElementById(action.cellId), action.current);
+        if (action.playerPositions === null) {
+            showButtonVisible();
+            return;
+        }
+        const cells = document.querySelectorAll(".cell");
+        cells.forEach(cell => {
+            cell.removeEventListener("click", choosePositionToBegin);
+            cell.addEventListener("click", movePlayer);
+        });
+        const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+        walls.forEach(wall => {
+            wall.addEventListener("mouseenter", wallListener);
+            wall.addEventListener("click", wallLaid);
+        });
+        console.log("board update");
+    } else {
+        console.log(action.message);
+        alert(action.message);
+        return;
+    }
+    showButtonVisible();
+}
+
+function validate(action) {
+    if (action.valid) {
+        setUpNewRound(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2, action.numberTour);
+    } else {
+        switch (action.case) {
+            case "notPlayed":
+                alert(action.message);
+                break;
+            case "notYourTurn":
+                alert(action.message);
+                break;
+            case "draw":
+                document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
+                document.getElementById("popup").style.display = 'flex';
+                document.getElementById("popup-button").style.display = "none";
+                break;
+            case "victory":
+                document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + action.winner + " !! Félicitations ! ";
+                document.getElementById("popup").style.display = 'flex';
+                document.getElementById("popup-button").style.display = "none";
+                break;
+        }
+    }
+}
+
 function showButtonVisible(){
     document.getElementById("button-validate-action").style.display = "flex";
     document.getElementById("button-undo-action").style.display = "flex";
     document.getElementById("button-save-game").style.display = "none";
+}
+
+function move(action) {
+    if (action.valid) {
+        if (action.oldPosition !== null) removePlayerCircle(action.oldPosition, action.currentPlayer);
+        addPlayerCircle(document.getElementById(action.cellId), action.currentPlayer);
+        lastActionType = "position";
+        showButtonVisible();
+    } else {
+        alert(action.message);
+    }
+    showButtonVisible();
 }

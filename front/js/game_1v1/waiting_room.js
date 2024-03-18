@@ -18,5 +18,4 @@ function onMatchFound(matchInfo) {
         localStorage.setItem('opponentId', matchInfo.opponentId);
         window.location.href = `/1v1game.html`;
     }, 2000);
-    console.log('message received');
 }
