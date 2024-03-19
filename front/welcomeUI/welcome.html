@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Page d'accueil</title>
+    <link rel="stylesheet" href="welcome.css">
 </head>
 <body>
     <h1>Bienvenue sur CupMaze !</h1>
-    <p>Connectez-vous ou inscrivez-vous pour accéder à votre compte.</p>
-    <button id="button-connection">Connexion</button>
-    <button id="button-inscription">Inscription</button>
+    <div>
+        <button id="button-connection">Connexion</button>
+        <br/>
+        <button id="button-inscription">Inscription</button>
+    </div>
     <script>
         document.getElementById('button-connection').addEventListener('click', function() {
             window.location.href = 'http://localhost:8000/login.html';

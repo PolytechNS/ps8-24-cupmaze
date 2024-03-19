@@ -27,7 +27,7 @@
     <div class="right-band">
 
     </div>
-    <script src="./js/socket.io.js"></script>
+    <script src="../js/socket.io.js"></script>
     <script>
         let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
         let socket=io("/api/game");
