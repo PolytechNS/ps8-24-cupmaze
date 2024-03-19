@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game page</title>
+    <link rel="stylesheet" href="./page.css">
+    <script src="./js/game_local_1v1/page.js" type="module"></script>
+    <script src="./js/socket.io.js"></script>
+</head>
+<body>
+    <div id="popup">
+        <div id="popup-content">
+            <p id="popup-ready-message"></p>
+            <button id="popup-button">Jouer le tour</button>
+        </div>
+    </div>
+
+    <h1 id="display-current-player"></h1>
+    <h2 id="display-current-walls"></h2>
+    <h2 id="display-number-actions"></h2>
+    <h2 id="display-number-tour"></h2>
+
+    <button id="button-validate-action">Valider son action</button>
+    <button id="button-undo-action">Revenir en arrière</button>
+    <button id="button-save-game">Sauvegarder et Quitter</button>
+
+    <div id="grid" class="quoridor-board"></div>
+
+</body>
+</html>
+
