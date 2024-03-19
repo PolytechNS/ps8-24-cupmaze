@@ -206,20 +206,41 @@ async function getNotifications(username) {
 
 async function addMessageGlobalChat(message){
   const db = await getDb();
-  const chat = db.collection('chat');
+  const chat = db.collection('chatGlobal');
   await chat.insertOne(message);
 }
 
 async function getGlobalChatMessages(){
   const db = await getDb();
-  const chat = db.collection('chat');
+  const chat = db.collection('chatGlobal');
   return chat.find().toArray();
 }
 
 async function clearGlobalChatDb(){
   const db = await getDb();
-  const chat = db.collection('chat');
+  const chat = db.collection('chatGlobal');
   await chat.deleteMany({});
+}
+
+async function createPrivateChat(username1, username2){
+    const db = await getDb();
+    const chat = db.collection('chatPrivate');
+    await chat.insertOne({username1: username1, username2: username2, messages: []});
+}
+
+async function addMessagePrivateChat(username1, username2, message){
+    const db = await getDb();
+    const chat = db.collection('chatPrivate');
+    await chat.updateOne(
+        {username1: username1, username2: username2},
+        {$push: {messages: message}}
+    );
+}
+
+async function getPrivateChatMessages(username1, username2){
+    const db = await getDb();
+    const chat = db.collection('chatPrivate');
+    const chat1 = await chat.findOne({username1: username1, username2: username2});
 }
 
 
@@ -240,3 +261,6 @@ exports.getNotifications = getNotifications;
 exports.addMessageGlobalChat = addMessageGlobalChat;
 exports.getGlobalChatMessages = getGlobalChatMessages;
 exports.clearGlobalChatDb = clearGlobalChatDb;
+exports.createPrivateChat = createPrivateChat;
+exports.addMessagePrivateChat = addMessagePrivateChat;
+exports.getPrivateChatMessages = getPrivateChatMessages;
