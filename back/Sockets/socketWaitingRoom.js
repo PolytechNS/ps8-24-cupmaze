@@ -132,7 +132,8 @@ function createSocket(io) {
                 const caseWanted = gameState.game.getCase(colonne, ligne);
                 caseWanted.setIsOccupied(true);
                 console.log("caseWanted", caseWanted +" current player", gameState.game.currentPlayer);
-
+                gameState.game.actionsToDo--;
+                gameState.game.lastActionType = "position";
                 WaitingRoomNamespace.to(roomId).emit('actionResult', {
                     valid: true,
                     message: "Position choisie",
@@ -141,11 +142,8 @@ function createSocket(io) {
                     cellId: cellId,
                     actionType: "positionBegin"
                 });
-
-                gameState.game.actionsToDo--;
-                gameState.game.lastPlayerPosition["player" + gameState.game.currentPlayer] = [colonne, ligne];
             } else {
-                console.log("Begin :Ce n'est pas votre tour");
+                console.log("Begin : Ce n'est pas votre tour");
                 socket.emit('actionResult', {
                     valid: false,
                     message: "Ce n'est pas votre tour",
@@ -186,8 +184,6 @@ function createSocket(io) {
                 const caseWanted = gameState.game.getCase(colonne, ligne);
 
                 if (possibleMoves.find((cell) => cell.getPos_x() === colonne && cell.getPos_y() === ligne)) {
-
-
                     gameState.game.movePlayer(gameState.game.currentPlayer, caseWanted, playerCurrentPosition);
                     WaitingRoomNamespace.to(roomId).emit('actionResult', {
                         valid: true,
@@ -393,6 +389,71 @@ function createSocket(io) {
                         actionType: "validateRound"
                     });
                 }
+        });
+
+        socket.on("undoMovePosition", (data) => {
+            console.log("undoMovePosition");
+            let roomId = data.roomId; // room id
+            let token = data.tokens; // token
+            let gameState = GameState[roomId];
+            let user = decodeJWTPayload(token);
+            if (!gameState || !roomId) { return; }
+
+            if (gameState.game.currentPlayer === 1 && user.id === roomId ||
+                gameState.game.currentPlayer === 2 && user.id !== roomId) {
+                if (gameState.game.actionsToDo === 1) {
+                    socket.emit('actionResult', {
+                        valid: false,
+                        message: "Vous n'avez pas encore joué",
+                        case: "notPlayed",
+                        actionType: "undoMovePosition"
+                    });
+                    return;
+                }
+
+                let oldPositionHtml = gameState.game.playerPosition[`player${gameState.game.currentPlayer}`][0]+"-"+gameState.game.playerPosition[`player${gameState.game.currentPlayer}`][1]+"~cell";
+                let newPositionHtml = "";
+                const lastCase = gameState.game.getCase(gameState.game.playerPosition[`player${gameState.game.currentPlayer}`][0], gameState.game.playerPosition[`player${gameState.game.currentPlayer}`][1]);
+                lastCase.setIsOccupied(false);
+
+                if (gameState.game.lastPlayerPosition[`player${gameState.game.currentPlayer}`] !== null) {
+                    newPositionHtml = gameState.game.lastPlayerPosition[`player${gameState.game.currentPlayer}`][0]+"-"+gameState.game.lastPlayerPosition[`player${gameState.game.currentPlayer}`][1]+"~cell";
+                } else {
+                    gameState.game.actionsToDo = 1;
+                    WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                        valid: true,
+                        message: "Il n'y a pas de dernier mouvement",
+                        case: "noLastMove",
+                        currentPlayer: gameState.game.currentPlayer,
+                        cellToReset: oldPositionHtml,
+                        actionType: "undoMovePosition"
+                    });
+                    return;
+                }
+
+                gameState.game.playerPosition[`player${gameState.game.currentPlayer}`] = gameState.game.lastPlayerPosition[`player${gameState.game.currentPlayer}`];
+                const caseUpdated = gameState.game.getCase(gameState.game.playerPosition[`player${gameState.game.currentPlayer}`][0], gameState.game.playerPosition[`player${gameState.game.currentPlayer}`][1]);
+                caseUpdated.setIsOccupied(true);
+
+                gameState.game.actionsToDo = 1;
+                WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                    valid: true,
+                    message: "Dernier mouvement annulé",
+                    case: "LastMoveCancelled",
+                    oldPositionHtml: oldPositionHtml,
+                    newPositionHtml: newPositionHtml,
+                    currentPlayer: gameState.game.currentPlayer,
+                    numberTour: gameState.game.numberTour,
+                    actionType: "undoMovePosition"
+                });
+            } else {
+                socket.emit('actionResult', {
+                    valid: false,
+                    message: "Ce n'est pas votre tour",
+                    case: "notYourTurn",
+                    actionType: "undoMovePosition"
+                });
+            }
         });
     }
 }

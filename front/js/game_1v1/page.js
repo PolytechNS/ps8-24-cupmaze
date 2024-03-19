@@ -1,5 +1,4 @@
-import {beginningPositionIsValid} from "../game_local_1v1/movePlayerReferee.js";
-import {removePlayerCircle, addPlayerCircle} from "../game_1vbot/movePlayerUtils.js";
+ import {removePlayerCircle, addPlayerCircle} from "../game_1vbot/movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
@@ -7,7 +6,6 @@ import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 
 let socket;
 let lastActionType = "";
-let victoryAnswer = "";
 let board;
 let possibleMoves= [];
 document.addEventListener("DOMContentLoaded", main,false);
@@ -60,7 +58,6 @@ function main() {
 }
 
 
-
 function initializeTable() {
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
@@ -96,32 +93,12 @@ function initializeTable() {
 
 
 function validateRound() {
-    isGameOver();
-
     socket.emit("validateRound", ({
         'roomId': gameInformation.roomName,
         'tokens': getCookie("jwt"),
     }));
 }
 
-
-function isGameOver(){
-    socket.emit("isGameOver", null);
-    socket.on("gameOver", function(isGameOver, numberWinner){
-        if(isGameOver){
-            if(numberWinner === 1) {
-                victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
-                alert(victoryAnswer);
-            } else if(numberWinner === 2) {
-                victoryAnswer = "Victoire du joueur 2 !! Félicitations ! ";
-                alert(victoryAnswer);
-            }
-            return true;
-        }
-        socket.off("gameOver");
-        return false;
-    });
-}
 
 /** #############################################  WALL LAYING METHODS  ############################################# **/
 
@@ -178,9 +155,7 @@ function removeHighlight(firstWall, secondWall, space) {
     secondWall.classList.remove("wall-hovered");
     space.classList.remove("space-hovered");
 }
-/*
- fonction pour gerer le survol des murs
- */
+
 function wallListener(event) {
 
     const firstWallToColor = event.target;
@@ -266,33 +241,16 @@ function undoAction(){
 
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
-        socket.emit("undoMovePosition");
-        socket.on("undoMove", (oldPosition, newPosition, currentPlayer, numberTourGame) => {
-            console.log("undoMove", oldPosition, newPosition, currentPlayer, numberTourGame);
-            removePlayerCircle(oldPosition, currentPlayer);
-            if(newPosition!==""){
-                let cell = document.getElementById(newPosition);
-                addPlayerCircle(cell, currentPlayer);
-            }
-            if(numberTourGame===1){
-                const cells = document.querySelectorAll(".cell");
-                cells.forEach(cell => {
-                    cell.removeEventListener("click", movePlayer);
-                    cell.addEventListener("click", choosePositionToBegin);
-                });
-
-                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-                walls.forEach(wall=>{
-                    wall.removeEventListener("mouseenter",wallListener);
-                    wall.removeEventListener("click",wallLaid);
-                })
-
-            }
-            socket.off("undoMove");
+        socket.emit("undoMovePosition", {
+            'roomId': gameInformation.roomName,
+            'tokens': getCookie("jwt")
         });
-
     }else{ //Si la dernière action la placement d'un mur
-        socket.emit("undoWall");
+        socket.emit("undoWall", {
+            'roomId': gameInformation.roomName,
+            'tokens': getCookie("jwt")
+        });
+        /*
         socket.on("idWallToUndo", (tabIDHTML, player, numberWall) => {
             document.getElementById(tabIDHTML[0]).classList.remove("wall-laid","laidBy"+player);
             document.getElementById(tabIDHTML[0]).addEventListener("mouseenter",wallListener);
@@ -304,6 +262,7 @@ function undoAction(){
             updateNumberWallsDisplay(1, numberWall, null)
             socket.off("undoLayingWall");
         });
+         */
     }
 }
 /**UTILS **/
@@ -322,6 +281,12 @@ function updateUI(action) {
             case "layWall":
                 wall(action);
                 break;
+            case "undoMovePosition":
+                undoMovePosition(action);
+                break;
+            case "undoWall":
+                undoWall(action);
+                break;
     }
 }
 
@@ -329,6 +294,7 @@ function positionBegin(action) {
     if (action.valid) {
         document.getElementById(action.cellId).classList.add("occupied");
         addPlayerCircle(document.getElementById(action.cellId), action.current);
+        lastActionType = "position";
         if (action.playerPositions === null) {
             showButtonVisible();
             return;
@@ -411,6 +377,43 @@ function wall(action) {
         showButtonVisible();
         updateNumberWallsDisplay(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2);
         lastActionType="wall";
+    } else {
+        alert(action.message);
+    }
+}
+
+function undoMovePosition(action) {
+    if (action.valid){
+        switch (action.case) {
+            case "LastMoveCancelled":
+                removePlayerCircle(action.oldPositionHtml, action.currentPlayer);
+                if(action.newPositionHtml !== ""){
+                    let cell = document.getElementById(action.newPositionHtml);
+                    addPlayerCircle(cell, action.currentPlayer);
+                }
+                break;
+            case "noLastMove":
+                removePlayerCircle(action.cellToReset, action.currentPlayer);
+                const cells = document.querySelectorAll(".cell");
+                cells.forEach(cell => {
+                    cell.removeEventListener("click", movePlayer);
+                    cell.addEventListener("click", choosePositionToBegin);
+                });
+                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+                walls.forEach(wall => {
+                    wall.removeEventListener("mouseenter", wallListener);
+                    wall.removeEventListener("click", wallLaid);
+                });
+                break;
+        }
+    } else {
+        alert(action.message);
+    }
+}
+
+function undoWall(action) {
+    if (action.valid){
+
     } else {
         alert(action.message);
     }
