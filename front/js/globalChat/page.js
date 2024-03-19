@@ -1,8 +1,8 @@
 let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
 
-let socketNotifications = io("/api/globalChat");
-socketNotifications.emit("setupGlobalChat");
-socketNotifications.on("setupGlobalChat", (messages) => {
+let socketGlobalChat = io("/api/globalChat");
+socketGlobalChat.emit("setupGlobalChat");
+socketGlobalChat.on("setupGlobalChat", (messages) => {
     if(messages.length > 0){
         const messagesContainer = document.getElementById("messages-container");
         messagesContainer.innerHTML = "";
@@ -22,10 +22,10 @@ let buttonSend = document.getElementById("sendButton");
 buttonSend.addEventListener("click", () => {
     let inputMessage = document.getElementById("messageInput");
     //console.log("new message", inputMessage.value, username);
-    socketNotifications.emit("sendMessage", inputMessage.value, username);
+    socketGlobalChat.emit("sendMessage", inputMessage.value, username);
 });
 
-socketNotifications.on("sendMessage", (messages) => {
+socketGlobalChat.on("sendMessage", (messages) => {
     //console.log("messages de la db", messages);
     const messagesContainer = document.getElementById("messages-container");
     messagesContainer.innerHTML = "";
@@ -41,5 +41,9 @@ socketNotifications.on("sendMessage", (messages) => {
 let buttonClear = document.getElementById("clearButton");
 buttonClear.addEventListener("click", () => {
     console.log("clearGlobalChat");
-    socketNotifications.emit("clearGlobalChat");
+    socketGlobalChat.emit("clearGlobalChat");
+});
+
+window.addEventListener('beforeunload', () => {
+    socketGlobalChat.disconnect();
 });
