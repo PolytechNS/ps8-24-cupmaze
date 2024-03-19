@@ -225,14 +225,14 @@ async function clearGlobalChatDb(){
 async function createPrivateChat(username1, username2){
     const db = await getDb();
     const chat = db.collection('chatPrivate');
-    await chat.insertOne({username1: username1, username2: username2, messages: []});
+    await chat.insertOne({conversation: username1+"-"+username2, messages: []});
 }
 
 async function addMessagePrivateChat(username1, username2, message){
     const db = await getDb();
     const chat = db.collection('chatPrivate');
     await chat.updateOne(
-        {username1: username1, username2: username2},
+        {conversation: username1+"-"+username2},
         {$push: {messages: message}}
     );
 }
@@ -240,7 +240,11 @@ async function addMessagePrivateChat(username1, username2, message){
 async function getPrivateChatMessages(username1, username2){
     const db = await getDb();
     const chat = db.collection('chatPrivate');
-    const chat1 = await chat.findOne({username1: username1, username2: username2});
+    let ret = await chat.findOne({conversation: username1+"-"+username2});
+    if (!ret){
+        ret = await chat.findOne({conversation: username2+"-"+username1});
+    }
+    return ret;
 }
 
 
