@@ -13,7 +13,6 @@
     <button id="button-retrieveGame">Récupérer la dernière partie sauvegardée</button>
     <button id="button-1v1game">Lancer une partie en ligne</button>
     <button id="searchFriends">Gestion des amis</button>
-    <button id="button-globalChat">Chat global</button>
     <p>
     </p>
     <button id="notifications-button">Notifications</button>
@@ -40,3 +39,5 @@
 
     <script src="./js/socket.io.js"></script>
     <script src="./js/mainmenu/page.js"></script>
+</body>
+</html>

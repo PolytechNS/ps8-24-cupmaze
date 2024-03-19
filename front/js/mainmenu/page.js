@@ -104,3 +104,8 @@ notificationsButton.addEventListener('click', () => {
 window.addEventListener('beforeunload', () => {
     socketNotifications.disconnect();
 });
+
+let globalChatButton = document.getElementById('button-globalChat');
+globalChatButton.addEventListener('click', () => {
+    window.location.href = 'http://localhost:8000/globalChat.html';
+});

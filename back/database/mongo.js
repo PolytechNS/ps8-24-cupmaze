@@ -204,6 +204,23 @@ async function getNotifications(username) {
   return user.notifications;
 }
 
+async function addMessageGlobalChat(message){
+  const db = await getDb();
+  const chat = db.collection('chat');
+  await chat.insertOne(message);
+}
+
+async function getGlobalChatMessages(){
+  const db = await getDb();
+  const chat = db.collection('chat');
+  return chat.find().toArray();
+}
+
+async function clearGlobalChatDb(){
+  const db = await getDb();
+  const chat = db.collection('chat');
+  await chat.deleteMany({});
+}
 
 
 exports.createUser = createUser;
@@ -220,3 +237,6 @@ exports.clearUsersDb = clearUsersDb;
 exports.addNotification = addNotification;
 exports.removeNotification = removeNotification;
 exports.getNotifications = getNotifications;
+exports.addMessageGlobalChat = addMessageGlobalChat;
+exports.getGlobalChatMessages = getGlobalChatMessages;
+exports.clearGlobalChatDb = clearGlobalChatDb;
