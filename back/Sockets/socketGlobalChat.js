@@ -14,6 +14,11 @@ function createSocket(io) {
 
         socket.on("sendMessage", async (message, username) => {
             console.log("sendMessage socket GlobalChat", message, username);
+            ban_words.forEach(word => {
+                if (message.toLowerCase().includes(word)) {
+                    message = "*********";
+                }
+            });
             const ret = await addMessageGlobalChat({account: username, value: message});
             const ret2 = await getGlobalChatMessages();
             GlobalChatNamespace.emit("sendMessage", ret2);
@@ -30,6 +35,35 @@ function createSocket(io) {
         });
     });
 }
+
+
+const ban_words = [
+    'pd',
+    'pute',
+    'enculer',
+    'salope',
+    'connard',
+    'batard',
+    'bite',
+    'baise',
+    'baiser',
+    'nique',
+    'niquer',
+    'nique ta mère',
+    'niquer ta mère',
+    'nique',
+    'tocard',
+    'batard',
+    'fils de pute',
+    'fils de chienne',
+    'fils de chien',
+    'fils de pétasse',
+    'autiste',
+    'kys',
+    'fagot',
+    'fiotte'
+]
+
 
 module.exports = {
     createSocket: createSocket
