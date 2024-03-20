@@ -27,8 +27,6 @@ class Game {
         this.lastWallsLaid = [];
         this.lastWallLaidsIDHtml = [];
 
-        this.lastPlayer = null;
-
         this.graph = new Graph(9, 9);
         this.casePosition = [];
         this.wallPossible = [];
