@@ -63,6 +63,13 @@ fetch("http://localhost:8000/api/getFriends?$"+queryString, {
                 const buttonChat = document.createElement("button");
                 buttonChat.classList.add('chat');
                 buttonChat.textContent = 'Chat';
+                buttonChat.onclick = function() {
+                    if(username.localeCompare(friend) < 0 ){
+                        window.location.href = 'http://localhost:8000/privateChat.html?idchat='+username+friend;
+                    } else {
+                        window.location.href = 'http://localhost:8000/privateChat.html?idchat='+friend+username;
+                    }
+                }
 
                 listItem.appendChild(nameDiv);
                 listItem.appendChild(buttonChallenge);

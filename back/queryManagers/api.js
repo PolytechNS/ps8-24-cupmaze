@@ -1,4 +1,4 @@
-const { createUser, getUser, createGame, getGame, getUserByName, addFriendRequest, acceptFriendRequest, clearUsersDb } = require('../database/mongo');
+const { createUser, getUser, createGame, getGame, getUserByName, addFriendRequest, acceptFriendRequest, clearUsersDb, clearPrivateChatDb} = require('../database/mongo');
 
 const jwt = require('jsonwebtoken');
 
@@ -38,12 +38,23 @@ function manageRequest(request, response) {
             getFriends(request,response);
             break;
         case 'clearUsersDb':
-            clearUsersDb(request, response);
+            clearUsersDbAPI(request, response);
+            break;
+        case 'clearPrivateChatDb':
+            clearPrivateChatDbAPI(request, response);
             break;
         default:
             response.statusCode = 404;
             response.end('Not Found');
     }
+}
+
+function clearPrivateChatDbAPI(request, response) {
+    clearPrivateChatDb().then(() => {
+        console.log("Chats privés supprimés avec succès");
+        response.statusCode = 200;
+        response.end('Chats privés supprimés');
+    });
 }
 
 function clearUsersDbAPI(request, response) {

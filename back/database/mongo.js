@@ -222,29 +222,38 @@ async function clearGlobalChatDb(){
   await chat.deleteMany({});
 }
 
-async function createPrivateChat(username1, username2){
+async function createPrivateChat(idchat){
     const db = await getDb();
     const chat = db.collection('chatPrivate');
-    await chat.insertOne({conversation: username1+"-"+username2, messages: []});
+    console.log("CREATE PRIVATE CHAT " + idchat)
+    await chat.insertOne({conversation: idchat, messages: []});
 }
 
-async function addMessagePrivateChat(username1, username2, message){
+async function addMessagePrivateChat(idchat, usernameSender, message){
     const db = await getDb();
     const chat = db.collection('chatPrivate');
     await chat.updateOne(
-        {conversation: username1+"-"+username2},
-        {$push: {messages: message}}
+        {conversation: idchat},
+        {$push: {messages: usernameSender + ": " + message.value}}
     );
 }
 
-async function getPrivateChatMessages(username1, username2){
+async function getPrivateChatMessages(idchat){
     const db = await getDb();
     const chat = db.collection('chatPrivate');
-    let ret = await chat.findOne({conversation: username1+"-"+username2});
+    let ret = await chat.findOne({conversation: idchat});
     if (!ret){
-        ret = await chat.findOne({conversation: username2+"-"+username1});
+        await createPrivateChat(idchat);
+        return [];
+    } else {
+        return ret.messages;
     }
-    return ret;
+}
+
+async function clearPrivateChatDb(){
+    const db = await getDb();
+    const chat = db.collection('chatPrivate');
+    await chat.deleteMany({});
 }
 
 
@@ -268,3 +277,4 @@ exports.clearGlobalChatDb = clearGlobalChatDb;
 exports.createPrivateChat = createPrivateChat;
 exports.addMessagePrivateChat = addMessagePrivateChat;
 exports.getPrivateChatMessages = getPrivateChatMessages;
+exports.clearPrivateChatDb = clearPrivateChatDb;
