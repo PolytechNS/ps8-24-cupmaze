@@ -21,7 +21,6 @@ function searchToObject() {
     }
 }
 
-
 function main() {
     socket = io("/api/waitingRoom");
     searchToObject();
@@ -57,7 +56,6 @@ function main() {
     });
 }
 
-
 function initializeTable() {
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
@@ -91,14 +89,12 @@ function initializeTable() {
     }
 }
 
-
 function validateRound() {
     socket.emit("validateRound", ({
         'roomId': gameInformation.roomName,
         'tokens': getCookie("jwt"),
     }));
 }
-
 
 /** #############################################  WALL LAYING METHODS  ############################################# **/
 
@@ -413,7 +409,17 @@ function undoMovePosition(action) {
 
 function undoWall(action) {
     if (action.valid){
+        console.log("undoWall", action.tabIDHTML);
 
+        document.getElementById(action.tabIDHTML[0]).classList.remove("wall-laid","laidBy"+action.currentPlayer);
+        document.getElementById(action.tabIDHTML[0]).addEventListener("mouseenter",wallListener);
+        document.getElementById(action.tabIDHTML[0]).addEventListener("click",wallLaid);
+        document.getElementById(action.tabIDHTML[1]).classList.remove("wall-laid","laidBy"+action.currentPlayer);
+        document.getElementById(action.tabIDHTML[1]).addEventListener("mouseenter",wallListener);
+        document.getElementById(action.tabIDHTML[1]).addEventListener("click",wallLaid);
+        document.getElementById(action.tabIDHTML[2]).classList.remove("wall-laid","laidBy"+action.currentPlayer);
+        updateNumberWallsDisplay(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2);
+        lastActionType = "";
     } else {
         alert(action.message);
     }

@@ -308,7 +308,10 @@ function createSocket(io) {
                     adjacentSpace: data.adjacentSpace,
                     actionType: "layWall"
                 });
-
+                adjacentWallId = wallType + "~" + adjacentWall.getPos_x() + "-" + adjacentWall.getPos_y();
+                adjacentSpaceId = adjacentSpace.getPos_x() + "-" + adjacentSpace.getPos_y() + "-space";
+                gameState.game.lastWallsLaid = [wall, adjacentWall, adjacentSpace];
+                gameState.game.lastWallLaidsIDHtml = [wallId, adjacentWallId, adjacentSpaceId];
             } else {
                 console.log("Lay Wall : Ce n'est pas votre tour");
                 socket.emit('actionResult', {
@@ -452,6 +455,65 @@ function createSocket(io) {
                     message: "Ce n'est pas votre tour",
                     case: "notYourTurn",
                     actionType: "undoMovePosition"
+                });
+            }
+        });
+
+        socket.on("undoWall", (data) => {
+            console.log("undoWall");
+            let roomId = data.roomId; // room id
+            let token = data.tokens; // token
+            let gameState = GameState[roomId];
+            let user = decodeJWTPayload(token);
+            if (!gameState || !roomId) { return; }
+
+            if (gameState.game.currentPlayer === 1 && user.id === roomId ||
+                gameState.game.currentPlayer === 2 && user.id !== roomId) {
+                if (gameState.game.actionsToDo === 1) {
+                    socket.emit('actionResult', {
+                        valid: false,
+                        message: "Vous n'avez pas encore joué",
+                        case: "notPlayed",
+                        actionType: "undoWall"
+                    });
+                    return;
+                }
+
+                if (gameState.game.lastActionType !== "wall") {
+                    socket.emit('actionResult', {
+                        valid: false,
+                        message: "Il n'y a pas de dernier mur posé",
+                        case: "noLastWall",
+                        actionType: "undoWall"
+                    });
+                    return;
+                }
+
+                gameState.game.undoWalls();
+                gameState.game.actionsToDo = 1;
+                if (gameState.game.currentPlayer === 1) {
+                    gameState.game.nbWallsPlayer1++;
+                } else {
+                    gameState.game.nbWallsPlayer2++;
+                }
+                console.log("gameState.game.lastWallLaidsIDHtml", gameState.game.lastWallLaidsIDHtml);
+                WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                    valid: true,
+                    message: "Dernier mur annulé",
+                    case: "LastWallCancelled",
+                    currentPlayer: gameState.game.currentPlayer,
+                    numberTour: gameState.game.numberTour,
+                    tabIDHTML: gameState.game.lastWallLaidsIDHtml,
+                    numberWallsPlayer1: gameState.game.nbWallsPlayer1,
+                    numberWallsPlayer2: gameState.game.nbWallsPlayer2,
+                    actionType: "undoWall"
+                });
+            } else {
+                socket.emit('actionResult', {
+                    valid: false,
+                    message: "Ce n'est pas votre tour",
+                    case: "notYourTurn",
+                    actionType: "undoLayWall"
                 });
             }
         });
