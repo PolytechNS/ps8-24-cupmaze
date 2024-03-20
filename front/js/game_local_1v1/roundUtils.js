@@ -23,7 +23,7 @@ function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
     document.getElementById("button-validate-action").style.display = "none";
     document.getElementById("button-undo-action").style.display = "none"
     document.getElementById("button-save-game").style.display = "flex";
-    document.getElementById("popup-ready-message").innerHTML = "C'est à vous de jouer : Joueur " +currentPlayer;
+    //document.getElementById("popup-ready-message").innerHTML = "C'est à vous de jouer : Joueur " +currentPlayer;
     document.getElementById("popup").style.display = 'flex';
     document.getElementById("grid").style.display = 'none';
     document.getElementById("display-current-player").style.display = "none";
@@ -35,5 +35,4 @@ function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
     document.getElementById("display-number-actions").style.display = "none";
     document.getElementById("display-number-tour").innerHTML = "Tour numéro : "+numberTour;
     document.getElementById("display-number-tour").style.display = "none";
-
 }

@@ -24,12 +24,10 @@ class Game {
         this.elements = [];
         this.lastActionType = "";
         this.init();
-
         this.lastWallsLaid = [];
         this.lastWallLaidsIDHtml = [];
 
         this.graph = new Graph(9, 9);
-
         this.casePosition = [];
         this.wallPossible = [];
         this.gameState = {};
@@ -74,7 +72,7 @@ class Game {
     }
 
     isGameOver() {
-        if(this.playerPosition.player1 ===null || this.playerPosition.player2===null){
+        if(this.playerPosition.player1 === null || this.playerPosition.player2===null){
             console.error("ATTENTION UNE DES DEUX POSITIONS EST NULL DANS LE BACK");
             return [false, -1];
         }
@@ -90,11 +88,11 @@ class Game {
         return [false, -1];
     }
 
-    getCase(y, x) {
-        console.log("On cherche la case : ", x, y);
+    getCase(x, y) {
         for (let i = 0; i < this.elements.length; i++) {
             if(this.elements[i] instanceof Case){
                 if(this.elements[i].getPos_x()===parseInt(x) && this.elements[i].getPos_y()===parseInt(y)){
+                    console.log("getCase", this.elements[i]);
                     return this.elements[i];
                 }
             }
@@ -111,8 +109,11 @@ class Game {
     }
 
     movePlayer(number, caseWanted, playerCurrentPosition) {
-        console.log("caseWanted", caseWanted);
+        console.log("number", number);
+        console.log(this.playerPosition[`player${number}`]);
+        console.log(this.lastPlayerPosition[`player${number}`]);
         const coordinates = [caseWanted.getPos_x(), caseWanted.getPos_y()];
+
         this.lastPlayerPosition[`player${number}`] = this.playerPosition[`player${number}`];
         this.playerPosition[`player${number}`] = coordinates
         caseWanted.setIsOccupied(true);
@@ -120,7 +121,7 @@ class Game {
             this.actionsToDo = 0;
             return;
         }
-        const lastCase = this.getCase(this.lastPlayerPosition[`player${number}`][1], this.lastPlayerPosition[`player${number}`][0]);
+        const lastCase = this.getCase(this.lastPlayerPosition[`player${number}`][0], this.lastPlayerPosition[`player${number}`][1]);
         lastCase.setIsOccupied(false);
         this.actionsToDo=0;
     }

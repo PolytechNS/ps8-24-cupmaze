@@ -1,65 +1,61 @@
-import {beginningPositionIsValid} from "../game_local_1v1/movePlayerReferee.js";
-import {removePlayerCircle, addPlayerCircle} from "../game_1vbot/movePlayerUtils.js";
+ import {removePlayerCircle, addPlayerCircle} from "../game_1vbot/movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
-import {getCookie} from "./waiting_room.js";
-
+import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 
 let socket;
 let lastActionType = "";
-let victoryAnswer = "";
 let board;
-let possibleMoves=[];
+let possibleMoves= [];
 document.addEventListener("DOMContentLoaded", main,false);
 
 let gameInformation;
+let player1_name;
+let player2_name;
 function searchToObject() {
     gameInformation = {
         'roomName': localStorage.getItem('room'),
-        'opponent': localStorage.getItem('opponent'),
+        'opponentName': localStorage.getItem('opponentName'),
         'opponentId': localStorage.getItem('opponentId'),
     }
 }
 
-
 function main() {
     socket = io("/api/waitingRoom");
     searchToObject();
-    console.log("gameInformation", gameInformation);
+
     socket.emit("setupGame", getCookie("jwt"));
     socket.emit("joinRoom", gameInformation.roomName);
 
-    board = document.getElementById("grid");
+    socket.on("game", (gameState) => {
+        console.log("gameState : ", gameState);
+        console.log("gameInformation", gameInformation.roomName);
+        let firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
+        if (firstPlayer) {
+            player1_name = decodeJWTPayload(getCookie("jwt")).username;
+            player2_name = gameInformation.opponentName;
+            console.log("player1_name", player1_name, "player2_name", player2_name);
+            setUpNewRound(player1_name,10,10,1)
+        } else {
+            player2_name = decodeJWTPayload(getCookie("jwt")).username;
+            player1_name = gameInformation.opponentName;
+            console.log("player1_name", player1_name, "player2_name", player2_name);
+            setUpNewRound(player2_name,10,10,1)
+        }
 
-    //On ajoute un event listener sur l'écran anti triche
-    document.getElementById("popup-button").addEventListener("click",startNewRound);
-
-    //On ajoute un event listener pour valider le round
-    document.getElementById("button-validate-action").addEventListener("click",validateRound);
-
-    //On ajoute un event listener pour undo l'action
-    document.getElementById("button-undo-action").addEventListener("click",undoAction);
-
-    initializeTable();
-    //Mettre le brouillard de guerre
-    //Mettre le brouillard de guerre
-    //setVisionForPlayer(1, {player1: null, player2: null});
-    //On setup les différents textes nécessaires
-    //setUpNewRound(1,10,10,1);
+        board = document.getElementById("grid");
+        document.getElementById("popup-button").addEventListener("click",startNewRound);
+        document.getElementById("button-validate-action").addEventListener("click",validateRound);
+        document.getElementById("button-undo-action").addEventListener("click",undoAction);
+        initializeTable();
+        //setVisionForPlayer(player_number, {player1: null, player2: null});
+        //setUpNewRound(player1_name,10,10,1);
+        socket.on("actionResult", (action) => updateUI(action));
+        socket.off("game");
+    });
 }
 
-/*
-    * Fonction qui initialise le plateau de jeu
-    * Elle va generer toute les cases du plateau, cellules, mur vertical et horizontal et les espace entre les murs
-    *
-    * Pour generer on utilise une boucle for qui va creer les elements et les ajouter au html,
-    * precisement en fils de la balise avec l'id "grid"
-    *
-    * on ajoute au élement un event listener, c'est a dire une fonction qui sera executer quand on clique sur l'element
-    * absolument tout est modifiable, on peut changer le type d'element, les classes, les id, les event listener, etc...
-    *
- */
 function initializeTable() {
     for (let i = 0; i < 9; i++) {
         for (let j = 0; j < 9; j++) {
@@ -93,82 +89,11 @@ function initializeTable() {
     }
 }
 
-/** #############################################  ROUND METHODS  ############################################# **/
-
-/**
- * Cette fonction est appelée à chaque fois qu'un utilisateur va valider un round
- * Quand on valide un round, on va sauvegarder les nouvelles positions des joueurs et on va lancer la pop up
- */
 function validateRound() {
-
-    isGameOver();
-    // on envoie un message au serveur pour lui dire de valider le round
-    socket.emit("validateRound");
-
-    socket.on("numberTour", (numberTour) => {
-        if (numberTour > 1) {
-            possibleMoves.forEach(cell => {
-                cell.classList.remove("possible-move");
-            });
-        }
-        socket.off("numberTour");
-    });
-    socket.on("positionOpp", (OpponentPosition, currentplayer,playerPosition) => {
-        if (playerPosition["player2"] !== null){
-            const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
-            console.log("htmlOldPosition", htmlOldPosition);
-            removePlayerCircle(htmlOldPosition, currentplayer);
-        }
-        console.log("OpponentPosition", OpponentPosition);
-        let circle_opp = document.getElementById(OpponentPosition);
-        console.log("circle_opp", circle_opp);
-        addPlayerCircle(circle_opp, currentplayer);
-        socket.off("positionOpp");
-    });
-    socket.on("gameOver", (winner) => {
-        if (winner !== null) {
-            document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + winner + " !! Félicitations ! ";$
-            document.getElementById("popup").style.display = 'flex';
-            document.getElementById("popup-button").style.display = "none";
-        }
-        socket.off("gameOver");
-    });
-    socket.on("numberTourAfter", (numberTour) => {
-        if (numberTour === 101) {
-            document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
-            document.getElementById("popup").style.display = 'flex';
-            document.getElementById("popup-button").style.display = "none";
-        }
-        socket.off("numberTourAfter");
-    });
-    socket.on("updateRound", (possibleMoves, numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
-        console.log("updateRound", numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
-        //setVisionForPlayer(currentPlayer, playerPosition);
-        //setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
-        socket.off("updateBoard");
-    });
-}
-
-/**
- * Fonction qui analyse si un joueur à fini une partie ou pas
- * @returns {boolean}
- */
-function isGameOver(){
-    socket.emit("isGameOver", null);
-    socket.on("gameOver", function(isGameOver, numberWinner){
-        if(isGameOver){
-            if(numberWinner === 1) {
-                victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
-                alert(victoryAnswer);
-            } else if(numberWinner === 2) {
-                victoryAnswer = "Victoire du joueur 2 !! Félicitations ! ";
-                alert(victoryAnswer);
-            }
-            return true;
-        }
-        socket.off("gameOver");
-        return false;
-    });
+    socket.emit("validateRound", ({
+        'roomId': gameInformation.roomName,
+        'tokens': getCookie("jwt"),
+    }));
 }
 
 /** #############################################  WALL LAYING METHODS  ############################################# **/
@@ -201,14 +126,11 @@ function findAdjacentSpace(wallPosition) {
 
     var space = `${colonne}-${ligne}-space`;
     if (colonne < 9  && ligne <= 9) {
-        console.log("space", space);
         return document.getElementById(space);
     } else {
         if (ligne === 9) {
-            console.log("space", `${colonne-1}-${ligne}-space`);
             return document.getElementById(`${colonne}-${ligne-1}-space`);
         } else {
-            console.log("space", `${colonne}-${ligne-1}-space`);
             return document.getElementById(`${colonne-1}-${ligne}-space`);
         }
     }
@@ -229,9 +151,7 @@ function removeHighlight(firstWall, secondWall, space) {
     secondWall.classList.remove("wall-hovered");
     space.classList.remove("space-hovered");
 }
-/*
- fonction pour gerer le survol des murs
- */
+
 function wallListener(event) {
 
     const firstWallToColor = event.target;
@@ -239,7 +159,6 @@ function wallListener(event) {
     // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
-    console.log(wallType, wallPosition);
     if (wallPosition[0] === "9" || wallPosition[2] === "1") {
         return;
     }
@@ -262,15 +181,8 @@ function wallListener(event) {
     });
 }
 
-/**
- * EventListener qui se déclenche quand on va vouloir poser un mur
- * On va ajouter ce listener sur tous les murs qui sont posés
- */
 function wallLaid(event) {
-    //On va récupérer le premier mur
     const firstWallToColor = event.target;
-
-    // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
     const adjacentWall = findAdjacentWall(wallType, wallPosition);
@@ -279,115 +191,43 @@ function wallLaid(event) {
     if(isWallPlacementValid(firstWallToColor, adjacentWall, adjacentSpace) === false) {
         return;
     }
-
-    socket.emit("wallLaid", firstWallToColor, wallType, wallPosition, wallId);
-    socket.on("laidWall", (currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
-        if (currentPlayer === null) {
-            alert("Vous n'avez plus d'actions disponibles");
-            return;
-        }
-        adjacentWall.classList.add("wall-laid", "laidBy" + currentPlayer);
-        adjacentWall.removeEventListener("mouseenter", wallListener);
-        adjacentWall.removeEventListener("click", wallLaid);
-
-        adjacentSpace.classList.add("wall-laid", "laidBy" + currentPlayer);
-
-        firstWallToColor.classList.add("wall-laid", "laidBy" + currentPlayer);
-        firstWallToColor.removeEventListener("mouseenter", wallListener);
-        firstWallToColor.removeEventListener("click", wallLaid);
-        showButtonVisible();
-        updateNumberWallsDisplay(currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
-        socket.off("laidWall");
-        lastActionType="wall";
+    console.log("wallLaid", firstWallToColor, wallType, wallPosition, wallId, adjacentWall, adjacentSpace);
+    socket.emit("layWall", {
+        'roomId': gameInformation.roomName,
+        'tokens': getCookie("jwt"),
+        'firstWallToColor': firstWallToColor.id,
+        'wallType': wallType,
+        'wallPosition': wallPosition,
+        'wallId': wallId,
+        'adjacentWall': adjacentWall.id,
+        'adjacentSpace': adjacentSpace.id
     });
 }
 
 /** #############################################  MOVE PLAYER METHODS  ############################################# **/
 
-/**
- * Fonction qui gere le placement des pions la 1er fois :
- * Chaque joueur doit placer un pion sur la 1er ligne pour le joueur 1
- * et sur la derniere ligne pour le joueur 2 sinon on affiche un message d'erreur
- * et ensuite on change de listener pour le tour suivant car le comportement change
- */
+
 function choosePositionToBegin(event) {
-    socket.emit("choosePositionToBegin", event.target.id);
-    socket.on("beginningPositionIsValid", (res) => {
-        if (!res) {
-            alert("Vous devez commencez par la première ligne");
-            return;
-        }
-        socket.off("beginningPositionIsValid");
+    socket.emit("choosePositionToBegin", {
+        'roomId': gameInformation.roomName,
+        'cellId': event.target.id,
+        'tokens': getCookie("jwt")
     });
-    socket.on("checkAction", (res) => {
-        if (res) {
-            alert("Vous n'avez plus d'actions disponibles");
-            return;
-        }
-        socket.off("checkAction");
-    });
-    event.target.classList.add("occupied");
-    socket.on("currentPlayer", (currentPlayer, playerposition) => {
-        console.log("currentPlayer");
-        addPlayerCircle(event.target, currentPlayer);
-        lastActionType = "position";
-        if (playerposition) {
-            const cells = document.querySelectorAll(".cell");
-            cells.forEach(cell => {
-                cell.removeEventListener("click", choosePositionToBegin);
-                cell.addEventListener("click", movePlayer);
-            });
-            const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-            walls.forEach(wall => {
-                wall.addEventListener("mouseenter", wallListener);
-                wall.addEventListener("click", wallLaid);
-            })
-        }
-        socket.off("currentPlayer");
-    });
-    showButtonVisible();
 }
 
 function movePlayer(event) {
     const target = event.target;
-    console.log(target);
-    console.log(target.id);
     let cellId=target.id;
-    // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
-    if(target.id.includes("circle")){
-        alert("occupied");
-        return;
-    }
-    else if(target.classList.contains("fog")){
-        cellId=target.id.split("~")[1]+"~cell";
-        console.log(cellId);
-    }
-    const clickedCell=document.getElementById(cellId);
-
-    socket.emit("newMoveHumanIsPossible", clickedCell.id);
-    socket.on("isNewMoveHumanIsPossible", (isPossible, lastPosition) => {
-        if (isPossible) {
-            console.log("move valid");
-            if(lastPosition!==null) removePlayerCircle(lastPosition, 1);
-            addPlayerCircle(target, 1);
-            lastActionType = "position";
-            showButtonVisible();
-        }else{
-            alert("Mouvement non autorisé");
-        }
-        socket.off("isNewMoveHumanIsPossible");
-    });
+    socket.emit("movePlayer", {
+        'roomId': gameInformation.roomName,
+        'cellId': cellId,
+        'tokens': getCookie("jwt")
+    })
 }
 
 
 /** #############################################  UNDO METHODS  ############################################# **/
 
-/**
- * Cette fonction est appelée quand un joueur veut annuler l'action qu'il vient d'effectuer
- * On va donc regarder la variable lastActionType pour savoir qu'elle est la dernière action utilisée
- * Si la dernière action est la pose d'un mur, alors la variable ressemble à ceci : lastActionType = "wall "+firstWallToColor.id+" "+spaceToColor.id+" "+secondWallToColor.id;
- * Si la dernière action est la mouvement d'un pion, alors on va regarder dans les données sauvegardées au début du tour pour replacer le pion correctement
- */
 function undoAction(){
     //On re-cache les boutons
     document.getElementById("button-validate-action").style.display = "none";
@@ -397,33 +237,16 @@ function undoAction(){
 
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
-        socket.emit("undoMovePosition");
-        socket.on("undoMove", (oldPosition, newPosition, currentPlayer, numberTourGame) => {
-            console.log("undoMove", oldPosition, newPosition, currentPlayer, numberTourGame);
-            removePlayerCircle(oldPosition, currentPlayer);
-            if(newPosition!==""){
-                let cell = document.getElementById(newPosition);
-                addPlayerCircle(cell, currentPlayer);
-            }
-            if(numberTourGame===1){
-                const cells = document.querySelectorAll(".cell");
-                cells.forEach(cell => {
-                    cell.removeEventListener("click", movePlayer);
-                    cell.addEventListener("click", choosePositionToBegin);
-                });
-
-                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
-                walls.forEach(wall=>{
-                    wall.removeEventListener("mouseenter",wallListener);
-                    wall.removeEventListener("click",wallLaid);
-                })
-
-            }
-            socket.off("undoMove");
+        socket.emit("undoMovePosition", {
+            'roomId': gameInformation.roomName,
+            'tokens': getCookie("jwt")
         });
-
     }else{ //Si la dernière action la placement d'un mur
-        socket.emit("undoWall");
+        socket.emit("undoWall", {
+            'roomId': gameInformation.roomName,
+            'tokens': getCookie("jwt")
+        });
+        /*
         socket.on("idWallToUndo", (tabIDHTML, player, numberWall) => {
             document.getElementById(tabIDHTML[0]).classList.remove("wall-laid","laidBy"+player);
             document.getElementById(tabIDHTML[0]).addEventListener("mouseenter",wallListener);
@@ -435,11 +258,169 @@ function undoAction(){
             updateNumberWallsDisplay(1, numberWall, null)
             socket.off("undoLayingWall");
         });
+         */
     }
 }
 /**UTILS **/
+
+function updateUI(action) {
+    switch (action.actionType) {
+            case "positionBegin":
+                positionBegin(action);
+                break;
+            case "validateRound":
+                validate(action);
+                break;
+            case "movePlayer":
+                move(action);
+                break;
+            case "layWall":
+                wall(action);
+                break;
+            case "undoMovePosition":
+                undoMovePosition(action);
+                break;
+            case "undoWall":
+                undoWall(action);
+                break;
+    }
+}
+
+function positionBegin(action) {
+    if (action.valid) {
+        document.getElementById(action.cellId).classList.add("occupied");
+        addPlayerCircle(document.getElementById(action.cellId), action.current);
+        lastActionType = "position";
+        if (action.playerPositions === null) {
+            showButtonVisible();
+            return;
+        }
+        const cells = document.querySelectorAll(".cell");
+        cells.forEach(cell => {
+            cell.removeEventListener("click", choosePositionToBegin);
+            cell.addEventListener("click", movePlayer);
+        });
+        const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+        walls.forEach(wall => {
+            wall.addEventListener("mouseenter", wallListener);
+            wall.addEventListener("click", wallLaid);
+        });
+        console.log("board update");
+    } else {
+        console.log(action.message);
+        alert(action.message);
+        return;
+    }
+    showButtonVisible();
+}
+
+function validate(action) {
+    if (action.valid) {
+        setUpNewRound(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2, action.numberTour);
+    } else {
+        switch (action.case) {
+            case "notPlayed":
+                alert(action.message);
+                break;
+            case "notYourTurn":
+                alert(action.message);
+                break;
+            case "draw":
+                document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
+                document.getElementById("popup").style.display = 'flex';
+                document.getElementById("popup-button").style.display = "none";
+                break;
+            case "victory":
+                document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + action.winner + " !! Félicitations ! ";
+                document.getElementById("popup").style.display = 'flex';
+                document.getElementById("popup-button").style.display = "none";
+                break;
+        }
+    }
+}
+
 function showButtonVisible(){
     document.getElementById("button-validate-action").style.display = "flex";
     document.getElementById("button-undo-action").style.display = "flex";
     document.getElementById("button-save-game").style.display = "none";
+}
+
+function move(action) {
+    if (action.valid) {
+        if (action.oldPosition !== null) removePlayerCircle(action.oldPosition, action.currentPlayer);
+        addPlayerCircle(document.getElementById(action.cellId), action.currentPlayer);
+        lastActionType = "position";
+        showButtonVisible();
+    } else {
+        alert(action.message);
+    }
+    showButtonVisible();
+}
+
+function wall(action) {
+    if (action.valid) {
+        console.log("wall valid", action.adjacentWall);
+        const adjacentWall = document.getElementById(action.adjacentWall);
+        const adjacentSpace = document.getElementById(action.adjacentSpace);
+        const firstWallToColor = document.getElementById(action.firstWallToColor);
+        adjacentWall.classList.add("wall-laid", "laidBy" + action.currentPlayer);
+        adjacentWall.removeEventListener("mouseenter", wallListener);
+        adjacentWall.removeEventListener("click", wallLaid);
+        adjacentSpace.classList.add("wall-laid", "laidBy" + action.currentPlayer);
+        firstWallToColor.classList.add("wall-laid", "laidBy" + action.currentPlayer);
+        firstWallToColor.removeEventListener("mouseenter", wallListener);
+        firstWallToColor.removeEventListener("click", wallLaid);
+        showButtonVisible();
+        updateNumberWallsDisplay(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2);
+        lastActionType="wall";
+    } else {
+        alert(action.message);
+    }
+}
+
+function undoMovePosition(action) {
+    if (action.valid){
+        switch (action.case) {
+            case "LastMoveCancelled":
+                removePlayerCircle(action.oldPositionHtml, action.currentPlayer);
+                if(action.newPositionHtml !== ""){
+                    let cell = document.getElementById(action.newPositionHtml);
+                    addPlayerCircle(cell, action.currentPlayer);
+                }
+                break;
+            case "noLastMove":
+                removePlayerCircle(action.cellToReset, action.currentPlayer);
+                const cells = document.querySelectorAll(".cell");
+                cells.forEach(cell => {
+                    cell.removeEventListener("click", movePlayer);
+                    cell.addEventListener("click", choosePositionToBegin);
+                });
+                const walls = document.querySelectorAll(".wall-vertical,.wall-horizontal");
+                walls.forEach(wall => {
+                    wall.removeEventListener("mouseenter", wallListener);
+                    wall.removeEventListener("click", wallLaid);
+                });
+                break;
+        }
+    } else {
+        alert(action.message);
+    }
+}
+
+function undoWall(action) {
+    if (action.valid){
+        console.log("undoWall", action.tabIDHTML);
+
+        document.getElementById(action.tabIDHTML[0]).classList.remove("wall-laid","laidBy"+action.currentPlayer);
+        document.getElementById(action.tabIDHTML[0]).addEventListener("mouseenter",wallListener);
+        document.getElementById(action.tabIDHTML[0]).addEventListener("click",wallLaid);
+        document.getElementById(action.tabIDHTML[1]).classList.remove("wall-laid","laidBy"+action.currentPlayer);
+        document.getElementById(action.tabIDHTML[1]).addEventListener("mouseenter",wallListener);
+        document.getElementById(action.tabIDHTML[1]).addEventListener("click",wallLaid);
+        document.getElementById(action.tabIDHTML[2]).classList.remove("wall-laid","laidBy"+action.currentPlayer);
+        updateNumberWallsDisplay(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2);
+        lastActionType = "";
+    } else {
+        alert(action.message);
+    }
 }
