@@ -974,3 +974,5 @@ exports.updateBoard = function updateBoard(gameState){
 }
 
 /*-------------------------------------------------------------------------------*/
+
+module.exports = { Node, Graph, PriorityQueue, NodeWall};

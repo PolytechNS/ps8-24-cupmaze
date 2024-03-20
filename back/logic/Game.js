@@ -3,6 +3,7 @@ const { Case } = require('./Case.js');
 const { Space } = require('./Space.js');
 const { getPossibleMoves } = require('./movePlayerReferee.js');
 
+const { Node, Graph, NodeWall, PriorityQueue } = require('./CupMaze.js');
 
 class Game {
     constructor() {
@@ -23,14 +24,15 @@ class Game {
         this.elements = [];
         this.lastActionType = "";
         this.init();
-
         this.lastWallsLaid = [];
         this.lastWallLaidsIDHtml = [];
 
+        this.graph = new Graph(9, 9);
         this.casePosition = [];
         this.wallPossible = [];
         this.gameState = {};
     }
+
 
     assignGameContext(savedGame) {
         this.userEmail = savedGame.userEmail;
@@ -44,55 +46,53 @@ class Game {
         this.elements = savedGame.elements;
         this.lastWallsLaid = savedGame.lastWallsLaid;
         this.lastWallLaidsIDHtml = savedGame.lastWallLaidsIDHtml;
+
+        this.graph = savedGame.graph;
     }
 
     init() {
-        for (let i = 0; i < 9; i++) {
-            for (let j = 0; j < 9; j++) {
-                //ajoute case, mur et à la fin on doit juste finir sur case
-                this.elements.push(new Case(i, j, false));
-                if(j<8) {
-                    //console.log("wall vertical", i, j);
-                    this.elements.push(new Wall(i, j, false, "vertical"));
+        for (let i = 1; i <= 9; i++) {
+            for (let j = 1; j <= 9; j++) {
+                this.elements.push(new Case(j, i, false));
+                if(j<=8) {
+                    this.elements.push(new Wall(j, i, false, "vertical"));
                 }
             }
-            for(let j = 0; j < 9; j++){
-                this.elements.push(new Wall(i, j, false, "horizontal"));
-                // on rajoute un space entre chaque mur
-                if (j < 8) {
-                    this.elements.push(new Space(i, j, true));
+            for(let j = 1; j <= 9; j++){
+                this.elements.push(new Wall(j, i, false, "horizontal"));
+                if (j <= 8) {
+                    this.elements.push(new Space(j, i, true));
                 }
             }
         }
     }
 
     getPossibleMoves(playerPosition) {
-        if(this.actionsToDo===0) return [];
         return getPossibleMoves(playerPosition, this.elements);
     }
 
     isGameOver() {
-        if(this.playerPosition[0]===null || this.playerPosition[1]===null){
+        if(this.playerPosition.player1 === null || this.playerPosition.player2===null){
             console.error("ATTENTION UNE DES DEUX POSITIONS EST NULL DANS LE BACK");
             return [false, -1];
         }
-        if(this.playerPosition[0].getPos_x()===8 && this.playerPosition[1].getPos_x() === 0){
+        if(this.playerPosition.player1[1] === 9 && this.playerPosition.player2[1] === 1){
             return [true, 0];
         }
-        if(this.playerPosition[0].getPos_x()===8 && this.playerPosition[1].getPos_x() !==0){
+        if(this.playerPosition.player1[1] === 9 && this.playerPosition.player2[1] !== 1){
             return [true, 1];
         }
-        if(this.playerPosition[0].getPos_x()!==8 && this.playerPosition[1].getPos_x() ===0){
+        if(this.playerPosition.player1[1] !== 9 && this.playerPosition.player2[1] === 1){
             return [true, 2];
         }
         return [false, -1];
     }
 
-    getCase(y, x) {
-        console.log("On cherche la case : ", y, x);
+    getCase(x, y) {
         for (let i = 0; i < this.elements.length; i++) {
             if(this.elements[i] instanceof Case){
                 if(this.elements[i].getPos_x()===parseInt(x) && this.elements[i].getPos_y()===parseInt(y)){
+                    console.log("getCase", this.elements[i]);
                     return this.elements[i];
                 }
             }
@@ -109,42 +109,34 @@ class Game {
     }
 
     movePlayer(number, caseWanted, playerCurrentPosition) {
-
-        console.log("ancientV1", this.lastPlayerPosition[`player${number}`])
-        console.log("movePlayerV1", this.playerPosition[`player${number}`])
-
+        console.log("number", number);
+        console.log(this.playerPosition[`player${number}`]);
+        console.log(this.lastPlayerPosition[`player${number}`]);
         const coordinates = [caseWanted.getPos_x(), caseWanted.getPos_y()];
+
         this.lastPlayerPosition[`player${number}`] = this.playerPosition[`player${number}`];
         this.playerPosition[`player${number}`] = coordinates
-
-        console.log("ancientV2", this.lastPlayerPosition[`player${number}`])
-        console.log("movePlayerV2", this.playerPosition[`player${number}`])
-
+        caseWanted.setIsOccupied(true);
+        if (playerCurrentPosition === null) {
+            this.actionsToDo = 0;
+            return;
+        }
+        const lastCase = this.getCase(this.lastPlayerPosition[`player${number}`][0], this.lastPlayerPosition[`player${number}`][1]);
+        lastCase.setIsOccupied(false);
         this.actionsToDo=0;
-
-        //return getPossibleMoves(playerPosition, this.elements);
-    }
-
-    isGameOver(playersPositions) {
-        if (playersPositions.player1[0] === 8) return 1;
-        if (playersPositions.player2[0] === 0) return 2;
-        return 0;
     }
 
     layWall(firstCase, secondCase, space) {
         // on chercher les mur et le space dans les elements
-        console.log("firstCase", firstCase);
         for (let i = 0; i < this.elements.length; i++) {
             if (this.elements[i] instanceof Wall) {
                 if (this.elements[i].equals(firstCase) || this.elements[i].equals(secondCase)) {
                     this.elements[i].setIsLaid(true);
-                    console.log("MUR TROUVE");
                 }
             }
             if (this.elements[i] instanceof Space) {
                 if (this.elements[i].equals(space)) {
                     this.elements[i].setIsLaid(true);
-                    console.log("SPACE TROUVE");
                 }
             }
         }
@@ -180,9 +172,11 @@ class Game {
         for(let i=0; i!==this.lastWallsLaid.length; i++){
             this.lastWallsLaid[i].setIsLaid(false);
         }
+        const colonne = this.lastWallsLaid[0].getPos_x();
+        const ligne = this.lastWallsLaid[0].getPos_y();
+        this.graph.removeWall(colonne, ligne);
     }
-
-
 }
+
 
 module.exports = { Game };

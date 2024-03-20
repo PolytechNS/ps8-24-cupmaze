@@ -36,5 +36,4 @@ function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
     document.getElementById("display-number-actions").style.display = "none";
     document.getElementById("display-number-tour").innerHTML = "Tour numéro : "+numberTour;
     document.getElementById("display-number-tour").style.display = "none";
-
 }

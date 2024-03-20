@@ -1,10 +1,3 @@
-/*
-inutile puisque un wall est un objet
-
-function extractWallInfo(wallId) {
-
-}
-*/
 const {Wall} = require("./Wall");
 const {Case} = require("./Case");
 const {Space} = require("./Space");
@@ -29,23 +22,22 @@ function findSpace(pos_x, pos_y, elements) {
         element instanceof Space &&
         element.pos_x === pos_x &&
         element.pos_y === pos_y);
-
 }
 
 function findAdjacentWall(wall, elements) {
     if (wall === undefined) { return undefined; }
-    const line = wall.pos_x;
-    const column = wall.pos_y;
+    const colonne = wall.pos_x;
+    const ligne = wall.pos_y;
     const inclinaison = wall.inclinaison;
-    if (inclinaison === "vertical" && line < 8) {
-        return findWall(line + 1, column, inclinaison, elements);
-    } else if (inclinaison === "horizontal" && column < 8) {
-        return findWall(line, column + 1, inclinaison, elements);
+    if (inclinaison === "vertical" && colonne < 9) {
+        return findWall(colonne, ligne-1, inclinaison, elements);
+    } else if (inclinaison === "horizontal" && ligne < 9) {
+        return findWall(colonne+1, ligne, inclinaison, elements);
     } else {
         if (inclinaison === "vertical") {
-            return findWall(line - 1, column, inclinaison, elements);
+            return findWall(colonne, ligne, inclinaison, elements);
         }
-        return findWall(line, column - 1, inclinaison, elements);
+        return findWall(colonne+1, ligne, inclinaison, elements);
     }
 }
 
@@ -70,8 +62,5 @@ function highlightElements(firstWall, secondWall, space) {
     space.setIsLaid(true);
 }
 
-function updateNumberAction(nombreAction){
 
-}
-
-module.exports = { findWall, findCase, findSpace, findAdjacentWall, findAdjacentSpace, highlightElements, updateNumberAction };
+module.exports = { findWall, findCase, findSpace, findAdjacentWall, findAdjacentSpace };
