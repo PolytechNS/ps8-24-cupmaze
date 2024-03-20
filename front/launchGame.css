@@ -1,5 +1,5 @@
 body {
-    background-image: url("../imageResources/cupheadPlay.jpg");
+    background-image: url("imageResources/cupheadPlay.jpg");
     margin: 0; /* Remove default margin */
     padding: 0; /* Remove default padding */
     background-size: cover; /* Cover the entire body */
