@@ -12,6 +12,7 @@ function startNewRound(){
     document.getElementById("display-current-walls").style.display = "flex";
     document.getElementById("display-number-actions").style.display = "flex";
     document.getElementById("display-number-tour").style.display = "flex";
+    document.getElementById("button-save-game").style.display = "flex";
 }
 
 
@@ -22,8 +23,8 @@ function startNewRound(){
 function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
     document.getElementById("button-validate-action").style.display = "none";
     document.getElementById("button-undo-action").style.display = "none"
-    document.getElementById("button-save-game").style.display = "flex";
-    //document.getElementById("popup-ready-message").innerHTML = "C'est à vous de jouer : Joueur " +currentPlayer;
+    document.getElementById("button-save-game").style.display = "none";
+    document.getElementById("popup-ready-message").innerHTML = "C'est à vous de jouer : Joueur " +currentPlayer;
     document.getElementById("popup").style.display = 'flex';
     document.getElementById("grid").style.display = 'none';
     document.getElementById("display-current-player").style.display = "none";
