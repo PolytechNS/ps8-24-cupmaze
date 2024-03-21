@@ -1,16 +1,30 @@
 let waitingPlayers = []
+let waitingFriendlyPlayers = []
 
-async function joinWaitingRoom(id, username) {
-    if (waitingPlayers.filter(player => player.id === id).length > 0) {
-        console.log("user " + username + " already in the waiting room");
-        return;
+async function joinWaitingRoom(id, username, gameType) {
+    if (gameType === "ranked") {
+        if (waitingPlayers.filter(player => player.id === id).length > 0) {
+            console.log("user " + username + " already in the waiting room");
+            return;
+        }
+        if (waitingPlayers.length === 0) {
+            console.log(username, id + " joined the waiting room");
+            waitingPlayers.push({id, username});
+            return;
+        }
+        return waitingPlayers.pop();
+    } else {
+        if (waitingFriendlyPlayers.filter(player => player.id === id).length > 0) {
+            console.log("user " + username + " already in the waiting room");
+            return;
+        }
+        if (waitingFriendlyPlayers.length === 0) {
+            console.log(username, id + " joined the waiting room");
+            waitingFriendlyPlayers.push({id, username});
+            return;
+        }
+        return waitingFriendlyPlayers.pop();
     }
-    if (waitingPlayers.length === 0) {
-        console.log(username, id + " joined the waiting room");
-        waitingPlayers.push({id, username});
-        return;
-    }
-    return waitingPlayers.pop();
 }
 
 function remove(id) {

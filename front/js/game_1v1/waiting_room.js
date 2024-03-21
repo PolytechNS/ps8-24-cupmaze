@@ -6,7 +6,10 @@ document.addEventListener('DOMContentLoaded', init, false);
 
 function init() {
     console.log('connected to the waiting room');
-    socket.emit('waiting_room', token);
+    socket.emit('waiting_room',
+        token,
+        localStorage.getItem('gameType')
+    );
     socket.on('matchFound', (matchInfo) => onMatchFound(matchInfo));
 }
 

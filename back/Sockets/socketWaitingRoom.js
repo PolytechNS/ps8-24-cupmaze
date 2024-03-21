@@ -17,13 +17,13 @@ function createSocket(io) {
             console.log("a user " + socket.id +" connected");
             let currentRoomId = null;
 
-            socket.on("waiting_room", async (playerToken) => {
+            socket.on("waiting_room", async (playerToken, gameType) => {
                 console.log("user " + socket.id + " is in the waiting room");
                 const userDB = await getUser(jwt.verify(playerToken, 'secret').email);
                 if (!userDB) { return; }
                 const user = decodeJWTPayload(playerToken);
                 currentRoomId = user.id;
-                await initMatchmaking(socket, playerToken);
+                await initMatchmaking(socket, playerToken, gameType);
             });
 
             socket.on("disconnect", () => {
@@ -43,13 +43,13 @@ function createSocket(io) {
         });
 
     // cherche a associer un joueur a une room
-    async function initMatchmaking(socket, token) {
+    async function initMatchmaking(socket, token, gameType) {
         const userDB = await getUser(jwt.verify(token, 'secret').email);
         if (!userDB) { return; }
         let user = decodeJWTPayload(token);
         socket.join(user.id);
         console.log("user " + user.username + " joined waiting room " + user.id);
-        let match = await matchmaking.joinWaitingRoom(user.id, user.username);
+        let match = await matchmaking.joinWaitingRoom(user.id, user.username, gameType);
         if (!match) { return; }
         const matchDB = await getUserByName(match.username);
         console.log("match found " + match.elo + " vs " + user.username);
@@ -70,7 +70,8 @@ function createSocket(io) {
         });
         playersWithRooms[user.id] = {
             'player1': user.id,
-            'player2': match.id
+            'player2': match.id,
+            'gameMode': gameType
         };
     }
 
@@ -532,7 +533,7 @@ function createSocket(io) {
 
         let player1_Chance = 1 / (1 + Math.pow(10, (player2_elo - player1_elo) / 400));
         let elo_Diff;
-        if (winner === 0 || winner === 1) {
+        if (winner === 0 || winner === -1 || playersWithRooms[roomId].gameMode === "friendly") {
             return 0;
         }
         if (winner === 1) {
@@ -546,7 +547,6 @@ function createSocket(io) {
         return elo_Diff;
     }
 }
-
 
 module.exports = {createSocket};
 module.exports.rooms = rooms;

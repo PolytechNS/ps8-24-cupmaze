@@ -58,6 +58,7 @@ fetch("http://localhost:8000/api/getFriends?$"+queryString, {
                 const buttonChallenge = document.createElement("button");
                 buttonChallenge.classList.add('challenge');
                 buttonChallenge.textContent = 'Challenge!';
+                buttonChallenge.onclick = sendChallenge();
 
                 const buttonChat = document.createElement("button");
                 buttonChat.classList.add('chat');
@@ -115,3 +116,7 @@ let globalChatButton = document.getElementById('button-globalChat');
 globalChatButton.addEventListener('click', () => {
     window.location.href = 'http://localhost:8000/globalChat.html';
 });
+
+function sendChallenge() {
+
+}
