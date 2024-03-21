@@ -1,20 +1,19 @@
 let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
 let socket=io("/api/game");
 //socket.emit("clearGames",username);
-document.getElementById('button-launch-botGame').addEventListener('click', function() {
-    window.location.href = 'http://localhost:8000/botgame.html';
+document.getElementById('button-play').addEventListener('click', function() {
+    window.location.href = 'http://localhost:8000/launchGame.html';
 });
-document.getElementById('button-launch-localGame').addEventListener('click', function() {
-    window.location.href = 'http://localhost:8000/index.html'; //Changer le nom de index.html
+document.getElementById('button-leaderboard').addEventListener('click', function() {
+    //window.location.href = 'http://localhost:8000/leaderboard.html';
 });
-document.getElementById('button-retrieveGame').addEventListener('click', function() {
-    window.location.href = 'http://localhost:8000/botgame.html?intent=retrieveGame'; //Changer le nom de index.html
+document.getElementById('button-prizes').addEventListener('click', function() {
+    //window.location.href = 'http://localhost:8000/prizes.html';
 });
-document.getElementById('button-1v1game').addEventListener('click', function() {
-    window.location.href = 'http://localhost:8000/waiting_room.html';
+document.getElementById('button-options').addEventListener('click', function() {
+    //window.location.href = 'http://localhost:8000/options.html';
 });
 console.log(username);
-document.getElementById('nameCurrentPlayer').innerText = "Bienvenue "+username+" :";
 document.getElementById('searchFriends').addEventListener('click', function () {
     window.location.href = 'http://localhost:8000/searchFriends.html';
 });
