@@ -20,12 +20,6 @@ function createSocket(io) {
         console.log("a user connected");
         const game = new Game();
 
-        socket.on("newMove", (msg) => {
-            console.log("On demande à l'IA de jouer maintenant");
-            let newPosition = AIEasy.computeMove(msg);
-            BotGameNamespace.emit("updatedBoard", newPosition);
-        });
-
         socket.on("saveGame", (msg)=>{
             getGame(msg).then((savedGame) => {
                 if (savedGame) {
@@ -78,18 +72,17 @@ function createSocket(io) {
         });
 
         socket.on("isGameOver", () => {
-            console.log("On demande à l'IA si la partie est terminée");
             let answer = game.isGameOver();
-            console.log("La partie est terminée : ", answer[0], " et le gagnant est : ", answer[1]);
             BotGameNamespace.emit("gameOver", answer[0], answer[1]);
         });
 
         socket.on("newMoveHumanIsPossible", async (clickedCellId) => {
 
             let possibleMoves = game.getPossibleMoves(game.playerPosition.player1);
+            console.log("possibleMoves", possibleMoves);
             const colonne = parseInt(clickedCellId.split("-")[0]);
             const ligne = parseInt(clickedCellId.split("-")[1]);
-            let caseWanted = await game.getCase(ligne, colonne);
+            let caseWanted = game.getCase(ligne, colonne);
             let isPossible = possibleMoves.includes(caseWanted);
 
             if (isPossible && game.actionsToDo===1) {
@@ -109,17 +102,20 @@ function createSocket(io) {
         socket.on("undoMovePosition", () => {
             let oldPositionHTML=game.playerPosition["player1"][0]+"-"+game.playerPosition["player1"][1]+"~cell";
             let newPositionHtml="";
+            const lastCase = game.getCase(game.lastPlayerPosition["player1"][0], game.lastPlayerPosition["player1"][1]);
+            lastCase.setIsOccupied(false);
             if(game.lastPlayerPosition["player1"]!==null){
                 newPositionHtml=game.lastPlayerPosition["player1"][0]+"-"+game.lastPlayerPosition["player1"][1]+"~cell";
             }
             game.playerPosition["player1"] = game.lastPlayerPosition["player1"]
             game.actionsToDo=1;
+            const currentCase = game.getCase(game.playerPosition["player1"][0], game.playerPosition["player1"][1]);
+            currentCase.setIsOccupied(true);
             game.graph.updateNodeState(game.playerPosition["player1"][0], game.playerPosition["player1"][1], 0);
             BotGameNamespace.emit("undoMove", oldPositionHTML, newPositionHtml, 1, game.numberTour);
         });
 
         socket.on("choosePositionToBegin", (cellId) => {
-            console.log("choosePositionToBegin", cellId);
             const colonne = parseInt(cellId.split("-")[0]);
             const ligne = parseInt(cellId.split("-")[1]);
             const action = game.actionsToDo;
@@ -152,18 +148,19 @@ function createSocket(io) {
 
             BotGameNamespace.emit("numberTour", numberTour, possibleMoves);
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
-            if (newAIPosition instanceof Case) {
-                newAIPosition = [newAIPosition.getPos_x(), newAIPosition.getPos_y()]
+            console.log("newAIPosition", newAIPosition);
+            if (!(newAIPosition instanceof Case)) {
+                newAIPosition = game.getCase(newAIPosition[1], newAIPosition[0])
             }
 
 
             game.currentPlayer = 2
             game.actionsToDo = 1;
-            const cellId = newAIPosition[0] + "-" + newAIPosition[1] + "~cell";
+            const cellId = newAIPosition.getPos_x() + "-" + newAIPosition.getPos_y() + "~cell";
             game.graph.updateNodeState(newAIPosition[0], newAIPosition[1], 2);
             if(game.actionsToDo === 1){
                 BotGameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
-                game.playerPosition.player2 = newAIPosition;
+                game.movePlayer(2, newAIPosition, game.getPlayerCurrentPosition(2));
                 game.actionsToDo=0;
             }
 
@@ -183,13 +180,8 @@ function createSocket(io) {
             //game.lastPlayerPosition = game.playerPosition;
 
             if (numberTour > 1) {
-                console.log("playerPosition", playerPosition);
                 possibleMoves = game.getPossibleMoves(playerPosition.player1);
             }
-            console.log("updateRound");
-            console.log("possibleMoves player 1", possibleMoves);
-            console.log("playerPosition", playerPosition);
-            console.log("action", game.actionsToDo);
             BotGameNamespace.emit("updateRound",
                 possibleMoves, numberTour,
                 playerPosition, currentplayer,
@@ -198,7 +190,6 @@ function createSocket(io) {
 
 
         socket.on("wallLaid",(firstWallToColor, wallType, wallPosition, wallId) => {
-            console.log("wallLaid", firstWallToColor, wallType, wallPosition);
             if (game.actionsToDo === 0) {
                 BotGameNamespace.emit("laidWall", null, true, true);
                 return;
@@ -208,6 +199,7 @@ function createSocket(io) {
 
             const colonne = parseInt(wallPosition[0]);
             const ligne = parseInt(wallPosition[2]);
+            console.log("colonne", colonne, "ligne", ligne);
             let wallInclinaison;
             if (firstWallToColor === null) { return;}
 
@@ -220,10 +212,8 @@ function createSocket(io) {
                     ? findWall(colonne, ligne-1, wallInclinaison, game.elements)
                     : findWall(colonne+1, ligne, wallInclinaison, game.elements);
             const adjacentSpace = findSpace(colonne, ligne, game.elements);
-            // on verifie que la pose de ce mur n'enferme pas un joueur
 
             if (game.actionsToDo > 0 && ((game.currentPlayer === 1 && game.nbWallsPlayer1 > 0) || (game.currentPlayer === 2 && game.nbWallsPlayer2 > 0))) {
-                console.log("AVANT layWall");
                 game.layWall(wall,adjacentWall,adjacentSpace);
                 game.graph.placeWall(colonne,ligne, (wallInclinaison === "vertical") ? 0 : 1)
                 game.actionsToDo--;
@@ -233,7 +223,6 @@ function createSocket(io) {
                 } else {
                     game.nbWallsPlayer2--;
                 }
-                game.lastActionType = "wall";
                 if (adjacentWall === undefined || adjacentSpace === undefined) {
                     BotGameNamespace.emit("laidWall", null, null, null);
                 } else {

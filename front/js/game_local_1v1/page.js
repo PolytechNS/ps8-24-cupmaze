@@ -356,6 +356,7 @@ function undoAction(){
     //On re-cache les boutons
     document.getElementById("button-validate-action").style.display = "none";
     document.getElementById("button-undo-action").style.display = "none";
+    document.getElementById("button-save-game").style.display = "flex";
 
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
@@ -420,5 +421,7 @@ function updateDueToAction(){
     actionsToDo--;
     document.getElementById("button-validate-action").style.display = "flex";
     document.getElementById("button-undo-action").style.display = "flex";
+    document.getElementById("button-save-game").style.display = "none";
+
     updateNumberAction(0);
 }

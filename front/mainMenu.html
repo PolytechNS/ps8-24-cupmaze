@@ -2,41 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="mainMenu.css">
     <title>Menu principal :</title>
     <link rel="stylesheet" href="./mainMenu.css">
 </head>
 <body>
-    <h1>Bienvenue sur le menu principal du jeu !</h1>
-    <p id="nameCurrentPlayer"></p>
-    <button id="button-launch-botGame">Lancer une partie contre un bot</button>
-    <button id="button-launch-localGame">Lancer une partie locale</button>
-    <button id="button-retrieveGame">Récupérer la dernière partie sauvegardée</button>
-    <button id="button-1v1game">Lancer une partie en ligne</button>
-    <button id="searchFriends">Gestion des amis</button>
-    <button id="button-globalChat">Chat global</button>
-    <p>
-    </p>
-    <button id="notifications-button">Notifications</button>
-    <div id="popup" class="popup">
-        <div class="popup-content">
-            <span class="close" id="closePopup">&times;</span>
-            <ul id="notifications-list">Notifications :
-                <p id="element1"></p>
-                <p id="element2"></p>
-                <p id="element3"></p>
-            </ul>
-        </div>
+    <div class="left-band">
+
     </div>
-
-    <div id="popup-notif" class="popup-notif">
-        <div class="popup-notif-content">
-            <span class="close" id="closePopup-notif">&times;</span>
-            <p id="popup-notif-content"></p>
-        </div>
+    <div class="center">
+        <p id="welcomeMsg">Bienvenue sur le menu principal du jeu !</p>
+        <p>
+            <button id="button-play" class="button">Jouer</button>
+        </p>
+        <p>
+            <button id="button-leaderboard" class="button">Leaderboard</button>
+        </p>
+        <p>
+            <button id="button-prizes" class="button">Récompenses</button>
+        </p>
+        <p>
+            <button id="button-options" class="button">Options</button>
+        </p>
+        <p>
+            <button id="button-launch-botGame">Lancer une partie contre un bot</button>
+            <button id="button-launch-localGame">Lancer une partie locale</button>
+            <button id="button-retrieveGame">Récupérer la dernière partie sauvegardée</button>
+            <button id="button-1v1game">Lancer une partie en ligne</button>
+            <button id="searchFriends">Gestion des amis</button>
+            <button id="button-globalChat">Chat global</button>
+        </p>
     </div>
+    <div class="right-band">
+        <button id="notifications-button">Notifications</button>
+        <div id="popup" class="popup">
+            <div class="popup-content">
+                <span class="close" id="closePopup">&times;</span>
+                <ul id="notifications-list">Notifications :
+                    <p id="element1"></p>
+                    <p id="element2"></p>
+                    <p id="element3"></p>
+                </ul>
+            </div>
+        </div>
 
-    <ul id='friend-list'>Liste d'amis :
-    </ul>
+        <div id="popup-notif" class="popup-notif">
+            <div class="popup-notif-content">
+                <span class="close" id="closePopup-notif">&times;</span>
+                <p id="popup-notif-content"></p>
+            </div>
+        </div>
 
+        <ul id='friend-list'>Liste d'amis :
+        </ul>
+    </div>
+    <script src="js/socket.io.js"></script>
+    <script>
+        let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+        let socket=io("/api/game");
+        //socket.emit("clearGames",username);
+        document.getElementById('button-play').addEventListener('click', function() {
+            window.location.href = 'http://localhost:8000/launchGame.html';
+        });
+        document.getElementById('button-leaderboard').addEventListener('click', function() {
+            //window.location.href = 'http://localhost:8000/leaderboard.html';
+        });
+        document.getElementById('button-prizes').addEventListener('click', function() {
+            //window.location.href = 'http://localhost:8000/prizes.html';
+        });
+        document.getElementById('button-options').addEventListener('click', function() {
+            //window.location.href = 'http://localhost:8000/options.html';
+        });
+        document.getElementById('button-1v1game').addEventListener('click', function() {
+            window.location.href = 'http://localhost:8000/waiting_room.html';
+        });
+        console.log(username);
+        document.getElementById('nameCurrentPlayer').innerText = "Bienvenue "+username+" :";
+    </script>
     <script src="./js/socket.io.js"></script>
     <script src="./js/mainmenu/page.js"></script>
+</body>
+</html>
+

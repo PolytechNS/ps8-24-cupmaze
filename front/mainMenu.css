@@ -1,10 +1,3 @@
-html, body {
-    font-family: sans-serif;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-}
-
 #friend-list {
     display: block;
     margin: 0;
@@ -46,23 +39,6 @@ html, body {
 
 .friend:not(.selected):hover {
     background: #DDD;
-}
-
-button {
-    border: 1.5px solid white;
-    background: darkgrey;
-    font-size: 140%;
-    padding: 10px 16px;
-    margin-right: 15px;
-    color: white;
-    font-weight: 300;
-    transition: background-color 0.2s ease-in-out;
-}
-
-button:hover {
-    cursor: pointer;
-    background-color: white;
-    color: black;
 }
 
 
@@ -125,4 +101,48 @@ button:hover {
 }
 .popup-notif-content {
     text-align: center;
+}
+
+
+
+body {
+    background-image: url("imageResources/cupheadMenu.png");
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    background-size: cover; /* Cover the entire body */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Do not repeat the background image */
+    height: 100vh; /* Make the body take up the entire viewport height */
+    display: flex;
+    background-color: #cccccc;
+}
+
+.left-band, .right-band {
+    width: 20%;
+    background: rgba(55, 84, 76, 0.7);
+}
+
+.center{
+    width: 60%;
+    text-align: center;
+}
+
+#welcomeMsg{
+    color: rgba(255, 255, 255);
+    font-weight: bolder;
+    text-shadow: -1px 1px 0 darkgreen,
+    1px 1px 0 darkgreen,
+    1px -1px 0 darkgreen,
+    -1px -1px 0 darkgreen;
+    font-size: xxx-large;
+}
+
+.button{
+    color: rgba(255, 255, 255);
+    margin: 2%;
+    font-size: xx-large;
+    font-weight: bold;
+    padding: 2%;
+    background: rgba(55, 84, 76, 0.7);
+    border: none;
 }

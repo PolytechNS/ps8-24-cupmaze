@@ -24,12 +24,10 @@ class Game {
         this.elements = [];
         this.lastActionType = "";
         this.init();
-
         this.lastWallsLaid = [];
         this.lastWallLaidsIDHtml = [];
 
         this.graph = new Graph(9, 9);
-
         this.casePosition = [];
         this.wallPossible = [];
         this.gameState = {};
@@ -53,16 +51,16 @@ class Game {
     }
 
     init() {
-        for (let i = 0; i <= 9; i++) {
-            for (let j = 0; j <= 9; j++) {
+        for (let i = 1; i <= 9; i++) {
+            for (let j = 1; j <= 9; j++) {
                 this.elements.push(new Case(j, i, false));
-                if(j<8) {
+                if(j<=8) {
                     this.elements.push(new Wall(j, i, false, "vertical"));
                 }
             }
-            for(let j = 0; j <= 9; j++){
+            for(let j = 1; j <= 9; j++){
                 this.elements.push(new Wall(j, i, false, "horizontal"));
-                if (j < 8) {
+                if (j <= 8) {
                     this.elements.push(new Space(j, i, true));
                 }
             }
@@ -74,7 +72,7 @@ class Game {
     }
 
     isGameOver() {
-        if(this.playerPosition.player1 ===null || this.playerPosition.player2===null){
+        if(this.playerPosition.player1 === null || this.playerPosition.player2===null){
             console.error("ATTENTION UNE DES DEUX POSITIONS EST NULL DANS LE BACK");
             return [false, -1];
         }
@@ -90,11 +88,11 @@ class Game {
         return [false, -1];
     }
 
-    getCase(y, x) {
-        console.log("On cherche la case : ", x, y);
+    getCase(x, y) {
         for (let i = 0; i < this.elements.length; i++) {
             if(this.elements[i] instanceof Case){
                 if(this.elements[i].getPos_x()===parseInt(x) && this.elements[i].getPos_y()===parseInt(y)){
+                    console.log("getCase", this.elements[i]);
                     return this.elements[i];
                 }
             }
@@ -111,25 +109,25 @@ class Game {
     }
 
     movePlayer(number, caseWanted, playerCurrentPosition) {
-
-        console.log("ancientV1", this.lastPlayerPosition[`player${number}`])
-        console.log("movePlayerV1", this.playerPosition[`player${number}`])
-
+        console.log("number", number);
+        console.log(this.playerPosition[`player${number}`]);
+        console.log(this.lastPlayerPosition[`player${number}`]);
         const coordinates = [caseWanted.getPos_x(), caseWanted.getPos_y()];
+
         this.lastPlayerPosition[`player${number}`] = this.playerPosition[`player${number}`];
         this.playerPosition[`player${number}`] = coordinates
-
-        console.log("ancientV2", this.lastPlayerPosition[`player${number}`])
-        console.log("movePlayerV2", this.playerPosition[`player${number}`])
         caseWanted.setIsOccupied(true);
-        const lastCase = this.getCase(this.lastPlayerPosition[`player${number}`][1], this.lastPlayerPosition[`player${number}`][0]);
+        if (playerCurrentPosition === null) {
+            this.actionsToDo = 0;
+            return;
+        }
+        const lastCase = this.getCase(this.lastPlayerPosition[`player${number}`][0], this.lastPlayerPosition[`player${number}`][1]);
         lastCase.setIsOccupied(false);
         this.actionsToDo=0;
     }
 
     layWall(firstCase, secondCase, space) {
         // on chercher les mur et le space dans les elements
-        console.log("firstCase", firstCase);
         for (let i = 0; i < this.elements.length; i++) {
             if (this.elements[i] instanceof Wall) {
                 if (this.elements[i].equals(firstCase) || this.elements[i].equals(secondCase)) {
