@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="mainMenu.css">
     <title>Menu principal :</title>
+    <link rel="stylesheet" href="./mainMenu.css">
 </head>
 <body>
     <div class="left-band">
@@ -23,9 +24,37 @@
         <p>
             <button id="button-options" class="button">Options</button>
         </p>
+        <p>
+            <button id="button-launch-botGame">Lancer une partie contre un bot</button>
+            <button id="button-launch-localGame">Lancer une partie locale</button>
+            <button id="button-retrieveGame">Récupérer la dernière partie sauvegardée</button>
+            <button id="button-1v1game">Lancer une partie en ligne</button>
+            <button id="searchFriends">Gestion des amis</button>
+            <button id="button-globalChat">Chat global</button>
+        </p>
     </div>
     <div class="right-band">
+        <button id="notifications-button">Notifications</button>
+        <div id="popup" class="popup">
+            <div class="popup-content">
+                <span class="close" id="closePopup">&times;</span>
+                <ul id="notifications-list">Notifications :
+                    <p id="element1"></p>
+                    <p id="element2"></p>
+                    <p id="element3"></p>
+                </ul>
+            </div>
+        </div>
 
+        <div id="popup-notif" class="popup-notif">
+            <div class="popup-notif-content">
+                <span class="close" id="closePopup-notif">&times;</span>
+                <p id="popup-notif-content"></p>
+            </div>
+        </div>
+
+        <ul id='friend-list'>Liste d'amis :
+        </ul>
     </div>
     <script src="js/socket.io.js"></script>
     <script>
@@ -50,5 +79,8 @@
         console.log(username);
         document.getElementById('nameCurrentPlayer').innerText = "Bienvenue "+username+" :";
     </script>
+    <script src="./js/socket.io.js"></script>
+    <script src="./js/mainmenu/page.js"></script>
 </body>
 </html>
+
