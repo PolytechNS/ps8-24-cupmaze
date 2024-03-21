@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId} = require('mongodb');
 const MONGO_URI = 'mongodb://mongo_container:27017/';
 
 const client = new MongoClient(MONGO_URI);
@@ -87,6 +87,26 @@ async function getUserByName(username) {
   const db = await getDb();
   const users = db.collection('users');
   return users.findOne({ username: username });
+}
+
+async function getUserById(id) {
+    if (id === null) {
+        return null;
+    }
+    try {
+        const db = await getDb();
+        const users = db.collection('users');
+        const user = await users.findOne({ _id: new ObjectId(id) });
+        if (user !== null)
+        return {
+            'id': user._id,
+            'username': user.username,
+            'elo': user.elo,
+        }
+    } catch (error) {
+        console.error('Erreur lors de la récupération des données :', error);
+        throw error;
+    }
 }
 
 async function createGame(game) {
@@ -256,6 +276,27 @@ async function clearPrivateChatDb(){
     await chat.deleteMany({});
 }
 
+async function updateStats(winnerId, looserId, eloDiff) {
+    let winner = await getUserById(winnerId);
+    let looser = await getUserById(looserId);
+    try {
+        const db = await getDb();
+        const users = db.collection('users');
+        await users.updateOne(
+            { _id: winner.id },
+            { $set: { elo: winner.elo + eloDiff } }
+        );
+        await users.updateOne(
+            { _id: looser.id },
+            { $set: { elo: (looser.elo - eloDiff) > 0 ? looser.elo - eloDiff : 0 } }
+        );
+        console.log('Opérations de mise à jour réussies');
+        return 'Opérations de mise à jour réussies';
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour des données :', error);
+        throw error;
+    }
+}
 
 exports.createUser = createUser;
 exports.getUser = getUser;
@@ -278,3 +319,5 @@ exports.createPrivateChat = createPrivateChat;
 exports.addMessagePrivateChat = addMessagePrivateChat;
 exports.getPrivateChatMessages = getPrivateChatMessages;
 exports.clearPrivateChatDb = clearPrivateChatDb;
+exports.getUserById = getUserById;
+exports.updateStats = updateStats;

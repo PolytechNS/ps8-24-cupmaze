@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {getUser, clearGameDb, decodeJWTPayload, getUserByName} = require("../database/mongo");
+const {getUser, decodeJWTPayload, getUserByName, getUserById, updateStats} = require("../database/mongo");
 const matchmaking = require("./matchmaking.js");
 const {Game} = require("../logic/Entities/Game");
 const {beginningPositionIsValid} = require("../logic/movePlayerReferee");
@@ -356,10 +356,12 @@ function createSocket(io) {
 
                 const winner = gameState.game.isGameOver(gameState.game.playerPosition);
                 if (winner[0]) {
+                    const eloGame = updateElo(roomId, winner[1]);
                     WaitingRoomNamespace.to(roomId).emit('actionResult', {
                         valid: false,
                         message: "Le joueur " + winner[1] + " a gagné",
                         winner: winner[1],
+                        eloGame: eloGame,
                         case: "victory",
                         actionType: "validateRound"
                     });
@@ -525,10 +527,23 @@ function createSocket(io) {
     }
 
     async function updateElo(roomId, winner) {
-        let player1 = playersWithRooms[roomId].player1;
-        let player2 = playersWithRooms[roomId].player2;
-        let user1 = await getUser(player1);
-        let user2 = await getUser(player2);
+        let player1_elo = getUserById(playersWithRooms[roomId].player1).elo;
+        let player2_elo = getUserById(playersWithRooms[roomId].player2).elo;
+
+        let player1_Chance = 1 / (1 + Math.pow(10, (player2_elo - player1_elo) / 400));
+        let elo_Diff;
+        if (winner === 0 || winner === 1) {
+            return 0;
+        }
+        if (winner === 1) {
+            elo_Diff = Math.round(32 * (1 - player1_Chance));
+            // on met a jour l'elo du perdant et du gagnant
+            await updateStats(playersWithRooms[roomId].player1, playersWithRooms[roomId].player2, elo_Diff);
+        } else {
+            elo_Diff = Math.round(32 * player1_Chance);
+            await updateStats(playersWithRooms[roomId].player2, playersWithRooms[roomId].player1, elo_Diff);
+        }
+        return elo_Diff;
     }
 }
 
