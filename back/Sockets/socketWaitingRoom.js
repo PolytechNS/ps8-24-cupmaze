@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
-const {getUser, clearGameDb, decodeJWTPayload} = require("../database/mongo");
+const {getUser, clearGameDb, decodeJWTPayload, getUserByName} = require("../database/mongo");
 const matchmaking = require("./matchmaking.js");
-const {Game} = require("../logic/Game");
+const {Game} = require("../logic/Entities/Game");
 const {beginningPositionIsValid} = require("../logic/movePlayerReferee");
 const {findWall, findSpace} = require("../logic/utils");
 
@@ -51,16 +51,21 @@ function createSocket(io) {
         console.log("user " + user.username + " joined waiting room " + user.id);
         let match = await matchmaking.joinWaitingRoom(user.id, user.username);
         if (!match) { return; }
-
-        console.log("match found " + match.username + " vs " + user.username);
+        const matchDB = await getUserByName(match.username);
+        console.log("match found " + match.elo + " vs " + user.username);
+        console.log("elo " + matchDB.elo + " vs " + userDB.elo);
         WaitingRoomNamespace.to(user.id).emit('matchFound', {
             'opponentName': match.username,
             'opponentId': match.id,
+            'player1_elo': userDB.elo,
+            'player2_elo': matchDB.elo,
             'room' : user.id
         });
         WaitingRoomNamespace.to(match.id).emit('matchFound', {
             'opponentName': user.username,
             'opponentId': user.id,
+            'player1_elo': matchDB.elo,
+            'player2_elo': userDB.elo,
             'room' : user.id
         });
         playersWithRooms[user.id] = {
@@ -517,6 +522,13 @@ function createSocket(io) {
                 });
             }
         });
+    }
+
+    async function updateElo(roomId, winner) {
+        let player1 = playersWithRooms[roomId].player1;
+        let player2 = playersWithRooms[roomId].player2;
+        let user1 = await getUser(player1);
+        let user2 = await getUser(player2);
     }
 }
 

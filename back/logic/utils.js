@@ -1,6 +1,6 @@
-const {Wall} = require("./Wall");
-const {Case} = require("./Case");
-const {Space} = require("./Space");
+const {Wall} = require("./Entities/Wall");
+const {Case} = require("./Entities/Case");
+const {Space} = require("./Entities/Space");
 
 function findWall(pos_x, pos_y, inclinaison, elements) {
     return elements.find((element) =>

@@ -18,6 +18,8 @@ function searchToObject() {
         'roomName': localStorage.getItem('room'),
         'opponentName': localStorage.getItem('opponentName'),
         'opponentId': localStorage.getItem('opponentId'),
+        'player1_elo': localStorage.getItem('player1_elo'),
+        'player2_elo': localStorage.getItem('player2_elo'),
     }
 }
 
@@ -35,11 +37,15 @@ function main() {
         if (firstPlayer) {
             player1_name = decodeJWTPayload(getCookie("jwt")).username;
             player2_name = gameInformation.opponentName;
+            const elo_player1 = gameInformation.player1_elo;
+            console.log("elo_player1", elo_player1);
             console.log("player1_name", player1_name, "player2_name", player2_name);
             setUpNewRound(player1_name,10,10,1)
         } else {
             player2_name = decodeJWTPayload(getCookie("jwt")).username;
             player1_name = gameInformation.opponentName;
+            const elo_player2 = gameInformation.player2_elo;
+            console.log("elo_player2", elo_player2);
             console.log("player1_name", player1_name, "player2_name", player2_name);
             setUpNewRound(player2_name,10,10,1)
         }
@@ -246,21 +252,9 @@ function undoAction(){
             'roomId': gameInformation.roomName,
             'tokens': getCookie("jwt")
         });
-        /*
-        socket.on("idWallToUndo", (tabIDHTML, player, numberWall) => {
-            document.getElementById(tabIDHTML[0]).classList.remove("wall-laid","laidBy"+player);
-            document.getElementById(tabIDHTML[0]).addEventListener("mouseenter",wallListener);
-            document.getElementById(tabIDHTML[0]).addEventListener("click",wallLaid);
-            document.getElementById(tabIDHTML[1]).classList.remove("wall-laid","laidBy"+player);
-            document.getElementById(tabIDHTML[1]).addEventListener("mouseenter",wallListener);
-            document.getElementById(tabIDHTML[1]).addEventListener("click",wallLaid);
-            document.getElementById(tabIDHTML[2]).classList.remove("wall-laid","laidBy"+player);
-            updateNumberWallsDisplay(1, numberWall, null)
-            socket.off("undoLayingWall");
-        });
-         */
     }
 }
+
 /**UTILS **/
 
 function updateUI(action) {
@@ -410,7 +404,6 @@ function undoMovePosition(action) {
 function undoWall(action) {
     if (action.valid){
         console.log("undoWall", action.tabIDHTML);
-
         document.getElementById(action.tabIDHTML[0]).classList.remove("wall-laid","laidBy"+action.currentPlayer);
         document.getElementById(action.tabIDHTML[0]).addEventListener("mouseenter",wallListener);
         document.getElementById(action.tabIDHTML[0]).addEventListener("click",wallLaid);

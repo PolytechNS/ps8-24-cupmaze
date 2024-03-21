@@ -1,11 +1,11 @@
 const AIEasy = require("../logic/ai.js");
 const { Server } = require("socket.io");
-const { Game } = require("../logic/Game.js");
+const { Game } = require("../logic/Entities/Game.js");
 const { getGame, createGame, clearGames} = require("../database/mongo");
-const { Case } = require("../logic/Case.js");
+const { Case } = require("../logic/Entities/Case.js");
 const { findWall, findAdjacentWall, findAdjacentSpace,  removeHighlight, findSpace} = require("../logic/utils");
 const { isWallPlacementValid } = require("../logic/wallLayingUtils.js");
-const { Wall } = require("../logic/Wall");
+const { Wall } = require("../logic/Entities/Wall");
 const {beginningPositionIsValid} = require("../logic/movePlayerReferee");
 
 /**

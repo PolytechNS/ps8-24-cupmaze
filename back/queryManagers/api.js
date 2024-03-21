@@ -246,7 +246,7 @@ function creationOfUser(email, username, password, response) {
         // TODO : hash du mot de passe
 
         // on cree l'utilisateur
-        createUser({ email, username, password, friendsList:[], friendsRequests: [], notifications: [] }).then(() => {
+        createUser({ email, username, password, friendsList:[], friendsRequests: [], notifications: [], elo:400 }).then(() => {
             response.statusCode = 201;
             response.end('Utilisateur créé');
         });

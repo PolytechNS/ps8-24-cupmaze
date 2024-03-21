@@ -1,5 +1,5 @@
 
-const {Game} = require("./logic/Game.js");
+const {Game} = require("./logic/Entities/Game.js");
 
 /*----------------------------------------------------------*/
 class dataAdapter {
