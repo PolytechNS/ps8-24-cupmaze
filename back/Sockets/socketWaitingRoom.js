@@ -75,7 +75,6 @@ function createSocket(io) {
         };
     }
 
-
     // initialise le jeu pour une id de room donnée
     async function initRoom(socket, token, roomId) {
         socket.join(roomId);
@@ -533,7 +532,7 @@ function createSocket(io) {
 
         let player1_Chance = 1 / (1 + Math.pow(10, (player2_elo - player1_elo) / 400));
         let elo_Diff;
-        if (winner === 0 || winner === -1 || playersWithRooms[roomId].gameMode === "friendly") {
+        if (winner === 0 || winner === -1 || playersWithRooms[roomId].gameMode === undefined) {
             return 0;
         }
         if (winner === 1) {
@@ -548,5 +547,13 @@ function createSocket(io) {
     }
 }
 
-module.exports = {createSocket};
+function setupChallenge(roomId, player1Id, player2Id) {
+    playersWithRooms[roomId] = {
+        'player1': player1Id,
+        'player2': player2Id,
+        'gameMode': 'friendly'
+    }
+}
+
+module.exports = {createSocket, setupChallenge};
 module.exports.rooms = rooms;
