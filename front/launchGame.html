@@ -17,7 +17,7 @@
            <button id="button-retrieveGame" class="button">Récupérer la dernière partie sauvegardée</button>
         </p>
         <p>
-            <button id="button-launch-onlineGame" class="button">Lancer une partie contre en ligne</button>
+            <button id="button-launch-onlineGame" class="button">Lancer une partie en ligne</button>
         </p>
         <p>
             <button id="button-create-privateGame" class="button">Créer une partie privée</button>
@@ -42,6 +42,11 @@
         document.getElementById('back').addEventListener('click',function () {
             window.location.href = 'http://localhost:8000/mainMenu.html';
         })
+        document.getElementById('button-launch-onlineGame').addEventListener('click', function() {
+            localStorage.setItem('gameType', 'ranked');
+            window.location.href = 'http://localhost:8000/waiting_room.html';
+        });
+
     </script>
 </body>
 </html>

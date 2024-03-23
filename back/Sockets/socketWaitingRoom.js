@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
-const {getUser, clearGameDb, decodeJWTPayload} = require("../database/mongo");
+const {getUser, decodeJWTPayload, getUserByName, getUserById, updateStats} = require("../database/mongo");
 const matchmaking = require("./matchmaking.js");
-const {Game} = require("../logic/Game");
+const {Game} = require("../logic/Entities/Game");
 const {beginningPositionIsValid} = require("../logic/movePlayerReferee");
 const {findWall, findSpace} = require("../logic/utils");
 
@@ -17,13 +17,13 @@ function createSocket(io) {
             console.log("a user " + socket.id +" connected");
             let currentRoomId = null;
 
-            socket.on("waiting_room", async (playerToken) => {
+            socket.on("waiting_room", async (playerToken, gameType) => {
                 console.log("user " + socket.id + " is in the waiting room");
                 const userDB = await getUser(jwt.verify(playerToken, 'secret').email);
                 if (!userDB) { return; }
                 const user = decodeJWTPayload(playerToken);
                 currentRoomId = user.id;
-                await initMatchmaking(socket, playerToken);
+                await initMatchmaking(socket, playerToken, gameType);
             });
 
             socket.on("disconnect", () => {
@@ -43,32 +43,37 @@ function createSocket(io) {
         });
 
     // cherche a associer un joueur a une room
-    async function initMatchmaking(socket, token) {
+    async function initMatchmaking(socket, token, gameType) {
         const userDB = await getUser(jwt.verify(token, 'secret').email);
         if (!userDB) { return; }
         let user = decodeJWTPayload(token);
         socket.join(user.id);
         console.log("user " + user.username + " joined waiting room " + user.id);
-        let match = await matchmaking.joinWaitingRoom(user.id, user.username);
+        let match = await matchmaking.joinWaitingRoom(user.id, user.username, gameType);
         if (!match) { return; }
-
-        console.log("match found " + match.username + " vs " + user.username);
+        const matchDB = await getUserByName(match.username);
+        console.log("match found " + match.elo + " vs " + user.username);
+        console.log("elo " + matchDB.elo + " vs " + userDB.elo);
         WaitingRoomNamespace.to(user.id).emit('matchFound', {
             'opponentName': match.username,
             'opponentId': match.id,
+            'player1_elo': userDB.elo,
+            'player2_elo': matchDB.elo,
             'room' : user.id
         });
         WaitingRoomNamespace.to(match.id).emit('matchFound', {
             'opponentName': user.username,
             'opponentId': user.id,
+            'player1_elo': matchDB.elo,
+            'player2_elo': userDB.elo,
             'room' : user.id
         });
         playersWithRooms[user.id] = {
             'player1': user.id,
-            'player2': match.id
+            'player2': match.id,
+            'gameMode': gameType
         };
     }
-
 
     // initialise le jeu pour une id de room donnée
     async function initRoom(socket, token, roomId) {
@@ -351,10 +356,12 @@ function createSocket(io) {
 
                 const winner = gameState.game.isGameOver(gameState.game.playerPosition);
                 if (winner[0]) {
+                    const eloGame = updateElo(roomId, winner[1]);
                     WaitingRoomNamespace.to(roomId).emit('actionResult', {
                         valid: false,
                         message: "Le joueur " + winner[1] + " a gagné",
                         winner: winner[1],
+                        eloGame: eloGame,
                         case: "victory",
                         actionType: "validateRound"
                     });
@@ -518,8 +525,35 @@ function createSocket(io) {
             }
         });
     }
+
+    async function updateElo(roomId, winner) {
+        let player1_elo = getUserById(playersWithRooms[roomId].player1).elo;
+        let player2_elo = getUserById(playersWithRooms[roomId].player2).elo;
+
+        let player1_Chance = 1 / (1 + Math.pow(10, (player2_elo - player1_elo) / 400));
+        let elo_Diff;
+        if (winner === 0 || winner === -1 || playersWithRooms[roomId].gameMode === undefined) {
+            return 0;
+        }
+        if (winner === 1) {
+            elo_Diff = Math.round(32 * (1 - player1_Chance));
+            // on met a jour l'elo du perdant et du gagnant
+            await updateStats(playersWithRooms[roomId].player1, playersWithRooms[roomId].player2, elo_Diff);
+        } else {
+            elo_Diff = Math.round(32 * player1_Chance);
+            await updateStats(playersWithRooms[roomId].player2, playersWithRooms[roomId].player1, elo_Diff);
+        }
+        return elo_Diff;
+    }
 }
 
+function setupChallenge(roomId, player1Id, player2Id) {
+    playersWithRooms[roomId] = {
+        'player1': player1Id,
+        'player2': player2Id,
+        'gameMode': 'friendly'
+    }
+}
 
-module.exports = {createSocket};
+module.exports = {createSocket, setupChallenge};
 module.exports.rooms = rooms;
