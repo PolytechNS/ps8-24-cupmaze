@@ -24,8 +24,71 @@ function searchToObject() {
 }
 
 function main() {
+
+    let reactionButton = document.getElementById("sendReaction");
+    reactionButton.addEventListener("click", () => {
+        let reaction = document.getElementById("popup-reaction");
+        reaction.style.display = "block";
+    });
+
+    console.log("etape1");
+
+    let closeReaction = document.getElementById("closePopup");
+    closeReaction.addEventListener("click", () => {
+        let reaction = document.getElementById("popup-reaction");
+        reaction.style.display = "none";
+    });
+
+    console.log("etape2");
+
+    for(let i = 1; i < 5; i++) {
+        let nameEmoji = "reaction" + i;
+        console.log(nameEmoji);
+        let reactionEmoji = document.getElementById(nameEmoji);
+        reactionEmoji.addEventListener("click", () => {
+            let reaction = document.getElementById("popup-reaction");
+            reaction.style.display = "none";
+
+            const roomId = gameInformation.roomName;
+            reaction = reactionEmoji.textContent;
+            const usernameSender = decodeJWTPayload(getCookie("jwt")).username;
+            socket.emit("reaction", { roomId, reaction, usernameSender } );
+        });
+    }
+
+    console.log("etape3");
+
+
     socket = io("/api/waitingRoom");
     searchToObject();
+
+
+    socket.on("reaction", (reaction, usernameSender) => {
+        if(usernameSender !== decodeJWTPayload(getCookie("jwt")).username) {
+            let popupNotif = document.getElementById("popup-notif");
+            popupNotif.style.display = "block";
+            let content = document.getElementById("popup-notif-content");
+            content.textContent = usernameSender + " a envoyé une réaction !";
+            let reactionSend = document.getElementById("popup-reaction-send");
+            reactionSend.style.fontSize= "20px";
+            reactionSend.textContent = reaction;
+        } else {
+            let popupNotif = document.getElementById("popup-notif");
+            popupNotif.style.display = "block";
+            let content = document.getElementById("popup-notif-content");
+            content.textContent = "Vous avez envoyé une réaction !";
+            let reactionSend = document.getElementById("popup-reaction-send");
+            reactionSend.style.fontSize= "20px";
+            reactionSend.textContent = reaction;
+        }
+    });
+
+    let closeNotif = document.getElementById("closePopup-notif");
+    closeNotif.addEventListener("click", () => {
+        let popupNotif = document.getElementById("popup-notif");
+        popupNotif.style.display = "none";
+    });
+
 
     socket.emit("setupGame", getCookie("jwt"));
     socket.emit("joinRoom", gameInformation.roomName);
