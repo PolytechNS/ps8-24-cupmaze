@@ -24,7 +24,6 @@ function searchAccountOnDB(){
                 addButton.textContent = "Envoyer une demande d'ami";
                 addButton.addEventListener("click", () => {
                     addFriendRequest(ret.username);
-                    alert(`L'utilisateur ${ret.username} a reçu une demande d'ami.`);
                 });
                 resultDiv.appendChild(addButton);
             }
@@ -40,6 +39,12 @@ function addFriendRequest(usernameToAdd) {
         usernameAdder: myUsername,
         usernameToAdd: usernameToAdd
     };
+
+    if(usernameToAdd === myUsername){
+        alert("Vous ne pouvez pas vous ajouter vous-même en ami.");
+        return;
+    }
+
     const queryString = new URLSearchParams(params).toString();
     fetch("http://localhost:8000/api/addFriend?$"+queryString, {
         method: "GET",
