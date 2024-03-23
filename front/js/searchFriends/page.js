@@ -74,6 +74,8 @@ function acceptFriendRequest(usernameAdder) {
             }else{
                 alert("Ajout de l'ami validé");
                 console.log("Ajout de l'ami bon");
+                retrieveFriends(null);
+                retrieveWaitingFriendsRequests(null);
             }
         })
         .catch(error => {
@@ -98,6 +100,7 @@ function deleteFriend(usernameToDelete) {
             }else{
                 alert("Suppression de l'ami validée");
                 console.log("Suppression de l'ami bon");
+                retrieveFriends(null);
             }
         })
         .catch(error => {
@@ -108,6 +111,16 @@ function deleteFriend(usernameToDelete) {
 
 
 function retrieveFriends(params){
+    if(params == null){
+        let myUsername = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+        params = {
+            username: myUsername
+        };
+    }
+
+    const resultDiv = document.getElementById("friendsList");
+    resultDiv.innerHTML = "";
+
     //On va mettre a jour notre liste d'amis
     let queryString = new URLSearchParams(params).toString();
     fetch("http://localhost:8000/api/getFriends?$"+queryString, {
@@ -142,6 +155,16 @@ function retrieveFriends(params){
 
 
 function retrieveWaitingFriendsRequests(params){
+    if(params == null){
+        let myUsername = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+        params = {
+            username: myUsername
+        };
+    }
+
+    const resultDiv = document.getElementById("friendsRequests");
+    resultDiv.innerHTML = "";
+
     // On va retrouver la liste des demandes qui attendent le joueur
     queryString = new URLSearchParams(params).toString();
     fetch("http://localhost:8000/api/getWaitingFriendsRequests?$"+queryString, {
