@@ -1,4 +1,4 @@
-const { createUser, getUser, createGame, getGame, getUserByName, addFriendRequest, acceptFriendRequest, clearUsersDb, clearPrivateChatDb} = require('../database/mongo');
+const { createUser, getUser, createGame, getGame, getUserByName, addFriendRequest,removeFriend, acceptFriendRequest, clearUsersDb, clearPrivateChatDb} = require('../database/mongo');
 
 const jwt = require('jsonwebtoken');
 
@@ -42,6 +42,9 @@ function manageRequest(request, response) {
             break;
         case 'clearPrivateChatDb':
             clearPrivateChatDbAPI(request, response);
+            break;
+        case 'removeFriend':
+            removeFriendAPI(request, response);
             break;
         default:
             response.statusCode = 404;
@@ -93,6 +96,23 @@ function acceptFriendRequestAPI(request, response){
             response.writeHead(401, {'Content-Type': 'application/json'});
             response.end(JSON.stringify({ content: "ErrorAcceptFriendRequest" }));
         });
+}
+
+function removeFriendAPI(request, response){
+    let usernameRemover = (request.url).toString().split("=")[1].split("&")[0];
+    let usernameToRemove = (request.url).toString().split("=")[2].split("&")[0];
+    removeFriend(usernameRemover, usernameToRemove)
+        .then(() => {
+            console.log("Ami supprimé avec succès");
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "RemoveFriendDone" }));
+        })
+        .catch((error) => {
+            console.error("Erreur lors de la suppression de l'ami :", error);
+            response.writeHead(401, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "ErrorRemoveFriend" }));
+        });
+
 }
 
 function getWaitingFriendsRequests(request, response){

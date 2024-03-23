@@ -57,11 +57,57 @@ function addFriendRequest(usernameToAdd) {
         });
 }
 
-function main(){
+
+function acceptFriendRequest(usernameAdder) {
     let myUsername = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
     const params = {
-        username: myUsername
+        usernameAdder: myUsername,
+        usernameToAdd: usernameAdder
     };
+    const queryString = new URLSearchParams(params).toString();
+    fetch("http://localhost:8000/api/acceptFriendRequest?$"+queryString, {
+        method: "GET",
+    })
+        .then(async response => {
+            if (!response.ok) {
+                alert("ERROR"+response.status);
+            }else{
+                alert("Ajout de l'ami validé");
+                console.log("Ajout de l'ami bon");
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });
+}
+
+
+function deleteFriend(usernameToDelete) {
+    let myUsername = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+    const params = {
+        username: myUsername,
+        usernameToDelete: usernameToDelete
+    };
+    const queryString = new URLSearchParams(params).toString();
+    fetch("http://localhost:8000/api/removeFriend?$"+queryString, {
+        method: "GET",
+    })
+        .then(async response => {
+            if (!response.ok) {
+                alert("ERROR"+response.status);
+            }else{
+                alert("Suppression de l'ami validée");
+                console.log("Suppression de l'ami bon");
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });
+}
+
+
+
+function retrieveFriends(params){
     //On va mettre a jour notre liste d'amis
     let queryString = new URLSearchParams(params).toString();
     fetch("http://localhost:8000/api/getFriends?$"+queryString, {
@@ -78,14 +124,24 @@ function main(){
                     const resultDiv = document.getElementById("friendsList");
                     const usernameParagraph = document.createElement("p");
                     usernameParagraph.textContent = `Nom d'utilisateur : ${friend}`;
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "Supprimer l'ami";
+                    deleteButton.addEventListener("click", () => {
+                        deleteFriend(friend);
+                        alert(`L'utilisateur ${friend} a été supprimé de votre liste d'amis.`);
+                    });
                     resultDiv.appendChild(usernameParagraph);
+                    resultDiv.appendChild(deleteButton);
                 }
             }
         })
         .catch(error => {
             console.error('Erreur:', error);
         });
+}
 
+
+function retrieveWaitingFriendsRequests(params){
     // On va retrouver la liste des demandes qui attendent le joueur
     queryString = new URLSearchParams(params).toString();
     fetch("http://localhost:8000/api/getWaitingFriendsRequests?$"+queryString, {
@@ -116,35 +172,24 @@ function main(){
         .catch(error => {
             console.error('Erreur:', error);
         });
+}
+
+
+
+function main(){
+    let myUsername = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+    const params = {
+        username: myUsername
+    };
+
+    retrieveFriends(params);
+    retrieveWaitingFriendsRequests(params);
 
     socketNotifications= io("/notifications");
     socketNotifications.emit('joinRoom', myUsername);
     window.addEventListener('beforeunload', () => {
         socketNotifications.disconnect();
     });
-}
-
-function acceptFriendRequest(usernameAdder) {
-    let myUsername = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
-    const params = {
-        usernameAdder: myUsername,
-        usernameToAdd: usernameAdder
-    };
-    const queryString = new URLSearchParams(params).toString();
-    fetch("http://localhost:8000/api/acceptFriendRequest?$"+queryString, {
-        method: "GET",
-    })
-        .then(async response => {
-            if (!response.ok) {
-                alert("ERROR"+response.status);
-            }else{
-                alert("Ajout de l'ami validé");
-                console.log("Ajout de l'ami bon");
-            }
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-        });
 }
 
 // Appeler main() lorsque le DOM est complètement chargé

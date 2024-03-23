@@ -298,6 +298,36 @@ async function updateStats(winnerId, looserId, eloDiff) {
     }
 }
 
+async function removeFriend(usernameRemover, usernameToRemove){
+    const db = await getDb();
+    const users = db.collection('users');
+    await users.updateOne(
+        {username: usernameRemover},
+        {$pull: {friendsList: usernameToRemove}},
+        function(err, result) {
+            if (err) {
+                console.error('Erreur lors de la mise à jour des données :', err);
+                return;
+            }
+            console.log('Ami retiré avec succès');
+            client.close();
+        }
+    );
+    await users.updateOne(
+        {username: usernameToRemove},
+        {$pull: {friendsList: usernameRemover}},
+        function(err, result) {
+            if (err) {
+                console.error('Erreur lors de la mise à jour des données :', err);
+                return;
+            }
+            console.log('Ami retiré avec succès');
+            client.close();
+        }
+    );
+}
+
+
 exports.createUser = createUser;
 exports.getUser = getUser;
 exports.createGame = createGame;
@@ -321,3 +351,4 @@ exports.getPrivateChatMessages = getPrivateChatMessages;
 exports.clearPrivateChatDb = clearPrivateChatDb;
 exports.getUserById = getUserById;
 exports.updateStats = updateStats;
+exports.removeFriend = removeFriend;
