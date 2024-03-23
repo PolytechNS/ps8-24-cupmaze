@@ -33,6 +33,12 @@ function createSocket(io) {
                 matchmaking.remove(currentRoomId);
             });
 
+            socket.on("reaction", (data) => {
+                const { roomId, reaction, usernameSender} = data;
+                console.log("reaction", roomId, reaction, usernameSender);
+                WaitingRoomNamespace.to(roomId).emit("reaction", reaction, usernameSender);
+            });
+
 
             socket.on('setupGame', token =>
                 socket.on('joinRoom', (room) =>

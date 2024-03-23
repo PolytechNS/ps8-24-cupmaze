@@ -118,3 +118,37 @@ body {
     height: 100%;
     object-fit: cover; /* Assure que l'image couvre toute la zone */
 }
+
+
+#popup-reaction {
+    display: none;
+    position: fixed; /* Change de fixed à absolute */
+    bottom: 20px; /* Ajuste la position verticale selon vos besoins */
+    right: 20px; /* Ajuste la position horizontale selon vos besoins */
+    max-width: calc(100% - 40px); /* Taille flexible */
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popup-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    width: 100%; /* Ajuste la largeur à 100% */
+}
+
+
+.popup-notif {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 9999;
+}
+.popup-notif-content {
+    text-align: center;
+}
