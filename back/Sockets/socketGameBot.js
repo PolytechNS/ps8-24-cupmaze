@@ -82,7 +82,7 @@ function createSocket(io) {
             console.log("possibleMoves", possibleMoves);
             const colonne = parseInt(clickedCellId.split("-")[0]);
             const ligne = parseInt(clickedCellId.split("-")[1]);
-            let caseWanted = game.getCase(ligne, colonne);
+            let caseWanted = game.getCase(colonne, ligne);
             let isPossible = possibleMoves.includes(caseWanted);
 
             if (isPossible && game.actionsToDo===1) {
@@ -150,7 +150,7 @@ function createSocket(io) {
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
             console.log("newAIPosition", newAIPosition);
             if (!(newAIPosition instanceof Case)) {
-                newAIPosition = game.getCase(newAIPosition[1], newAIPosition[0])
+                newAIPosition = game.getCase(newAIPosition[0], newAIPosition[1])
             }
 
 
