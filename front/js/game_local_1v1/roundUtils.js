@@ -12,6 +12,7 @@ function startNewRound(){
     document.getElementById("display-current-walls").style.display = "flex";
     document.getElementById("display-number-actions").style.display = "flex";
     document.getElementById("display-number-tour").style.display = "flex";
+    document.getElementById("playerImage").style.display = "flex";
     document.getElementById("button-save-game").style.display = "flex";
 }
 
@@ -36,4 +37,5 @@ function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
     document.getElementById("display-number-actions").style.display = "none";
     document.getElementById("display-number-tour").innerHTML = "Tour numéro : "+numberTour;
     document.getElementById("display-number-tour").style.display = "none";
+    document.getElementById("playerImage").style.display = "none";
 }
