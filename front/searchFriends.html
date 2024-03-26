@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recherche d'amis</title>
+</head>
+<body>
+<script src="./js/searchFriends/page.js"></script>
+<script src="./js/socket.io.js"></script>
+<input type="text" id="searchInput" placeholder="Rechercher des amis...">
+<button class="searchFriendsButton" onclick=searchAccountOnDB()>Rechercher</button>
+<h1>Résultat de la recherche :</h1>
+<div id="searchResult"></div>
+
+
+<h1>Voici votre liste d'amis :</h1>
+<ul id="friendsList">
+</ul>
+
+<h1>Ils souhaitent devenir votre ami :</h1>
+<ul id="friendsRequests">
+</ul>
+
+</body>
+</html>

@@ -18,12 +18,77 @@ function searchToObject() {
         'roomName': localStorage.getItem('room'),
         'opponentName': localStorage.getItem('opponentName'),
         'opponentId': localStorage.getItem('opponentId'),
+        'player1_elo': localStorage.getItem('player1_elo'),
+        'player2_elo': localStorage.getItem('player2_elo'),
     }
 }
 
 function main() {
+
+    let reactionButton = document.getElementById("sendReaction");
+    reactionButton.addEventListener("click", () => {
+        let reaction = document.getElementById("popup-reaction");
+        reaction.style.display = "block";
+    });
+
+    console.log("etape1");
+
+    let closeReaction = document.getElementById("closePopup");
+    closeReaction.addEventListener("click", () => {
+        let reaction = document.getElementById("popup-reaction");
+        reaction.style.display = "none";
+    });
+
+    console.log("etape2");
+
+    for(let i = 1; i < 5; i++) {
+        let nameEmoji = "reaction" + i;
+        console.log(nameEmoji);
+        let reactionEmoji = document.getElementById(nameEmoji);
+        reactionEmoji.addEventListener("click", () => {
+            let reaction = document.getElementById("popup-reaction");
+            reaction.style.display = "none";
+
+            const roomId = gameInformation.roomName;
+            reaction = reactionEmoji.textContent;
+            const usernameSender = decodeJWTPayload(getCookie("jwt")).username;
+            socket.emit("reaction", { roomId, reaction, usernameSender } );
+        });
+    }
+
+    console.log("etape3");
+
+
     socket = io("/api/waitingRoom");
     searchToObject();
+
+
+    socket.on("reaction", (reaction, usernameSender) => {
+        if(usernameSender !== decodeJWTPayload(getCookie("jwt")).username) {
+            let popupNotif = document.getElementById("popup-notif");
+            popupNotif.style.display = "block";
+            let content = document.getElementById("popup-notif-content");
+            content.textContent = usernameSender + " a envoyé une réaction !";
+            let reactionSend = document.getElementById("popup-reaction-send");
+            reactionSend.style.fontSize= "20px";
+            reactionSend.textContent = reaction;
+        } else {
+            let popupNotif = document.getElementById("popup-notif");
+            popupNotif.style.display = "block";
+            let content = document.getElementById("popup-notif-content");
+            content.textContent = "Vous avez envoyé une réaction !";
+            let reactionSend = document.getElementById("popup-reaction-send");
+            reactionSend.style.fontSize= "20px";
+            reactionSend.textContent = reaction;
+        }
+    });
+
+    let closeNotif = document.getElementById("closePopup-notif");
+    closeNotif.addEventListener("click", () => {
+        let popupNotif = document.getElementById("popup-notif");
+        popupNotif.style.display = "none";
+    });
+
 
     socket.emit("setupGame", getCookie("jwt"));
     socket.emit("joinRoom", gameInformation.roomName);
@@ -35,11 +100,15 @@ function main() {
         if (firstPlayer) {
             player1_name = decodeJWTPayload(getCookie("jwt")).username;
             player2_name = gameInformation.opponentName;
+            const elo_player1 = gameInformation.player1_elo;
+            console.log("elo_player1", elo_player1);
             console.log("player1_name", player1_name, "player2_name", player2_name);
             setUpNewRound(player1_name,10,10,1)
         } else {
             player2_name = decodeJWTPayload(getCookie("jwt")).username;
             player1_name = gameInformation.opponentName;
+            const elo_player2 = gameInformation.player2_elo;
+            console.log("elo_player2", elo_player2);
             console.log("player1_name", player1_name, "player2_name", player2_name);
             setUpNewRound(player2_name,10,10,1)
         }
@@ -246,21 +315,9 @@ function undoAction(){
             'roomId': gameInformation.roomName,
             'tokens': getCookie("jwt")
         });
-        /*
-        socket.on("idWallToUndo", (tabIDHTML, player, numberWall) => {
-            document.getElementById(tabIDHTML[0]).classList.remove("wall-laid","laidBy"+player);
-            document.getElementById(tabIDHTML[0]).addEventListener("mouseenter",wallListener);
-            document.getElementById(tabIDHTML[0]).addEventListener("click",wallLaid);
-            document.getElementById(tabIDHTML[1]).classList.remove("wall-laid","laidBy"+player);
-            document.getElementById(tabIDHTML[1]).addEventListener("mouseenter",wallListener);
-            document.getElementById(tabIDHTML[1]).addEventListener("click",wallLaid);
-            document.getElementById(tabIDHTML[2]).classList.remove("wall-laid","laidBy"+player);
-            updateNumberWallsDisplay(1, numberWall, null)
-            socket.off("undoLayingWall");
-        });
-         */
     }
 }
+
 /**UTILS **/
 
 function updateUI(action) {
@@ -410,7 +467,6 @@ function undoMovePosition(action) {
 function undoWall(action) {
     if (action.valid){
         console.log("undoWall", action.tabIDHTML);
-
         document.getElementById(action.tabIDHTML[0]).classList.remove("wall-laid","laidBy"+action.currentPlayer);
         document.getElementById(action.tabIDHTML[0]).addEventListener("mouseenter",wallListener);
         document.getElementById(action.tabIDHTML[0]).addEventListener("click",wallLaid);

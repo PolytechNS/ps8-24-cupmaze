@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>1v1-Game page</title>
-    <link rel="stylesheet" href="page.css">
-    <script src="js/game_1v1/page.js" type="module"></script>
+    <link rel="stylesheet" href="./page.css">
+    <script src="./js/game_1v1/page.js" type="module"></script>
     <script src="./js/socket.io.js"></script>
 </head>
 <body>
@@ -16,6 +16,28 @@
 <button id="button-validate-action">Valider son action</button>
 <button id="button-undo-action">Revenir en arrière</button>
 <button id="button-save-game">Sauvegarder et Quitter</button>
+
+
+<button id="sendReaction">Envoyer une réaction</button>
+<div id="popup-reaction" class="popup">
+    <div class="popup-content">
+        <span class="close" id="closePopup">&times;</span>
+        <ul id="reaction-list">
+            <p style="font-size:100px" id="reaction1">&#128512;</p>
+            <p style="font-size:100px" id="reaction2">&#128520;</p>
+            <p style="font-size:100px" id="reaction3">&#128531;</p>
+            <p style="font-size:100px" id="reaction4">&#128564;</p>
+        </ul>
+    </div>
+</div>
+
+<div id="popup-notif" class="popup-notif">
+    <div class="popup-notif-content">
+        <span class="close" id="closePopup-notif">&times;</span>
+        <p id="popup-notif-content"></p>
+        <p id="popup-reaction-send"></p>
+    </div>
+</div>
 
 <div id="grid" class="quoridor-board"></div>
 
