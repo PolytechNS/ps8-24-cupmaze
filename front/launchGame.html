@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="launchGame.css">
+    <title>Menu de Jeu</title>
+</head>
+<body>
+    <div class="center">
+        <p>
+            <button id="button-launch-botGame" class="button">Lancer une partie contre un bot</button>
+        </p>
+        <p>
+            <button id="button-launch-localGame" class="button">Lancer une partie locale</button>
+        </p>
+        <p>
+           <button id="button-retrieveGame" class="button">Récupérer la dernière partie sauvegardée</button>
+        </p>
+        <p>
+            <button id="button-launch-onlineGame" class="button">Lancer une partie en ligne</button>
+        </p>
+        <p>
+            <button id="button-create-privateGame" class="button">Créer une partie privée</button>
+        </p>
+        <p>
+            <button id="button-join-privateGame" class="button">Rejoindre une partie privée</button>
+        </p>
+        <p id="back">
+            Retour
+        </p>
+    </div>
+    <script>
+        document.getElementById('button-launch-botGame').addEventListener('click', function() {
+            window.location.href = 'http://localhost:8000/botgame.html';
+        });
+        document.getElementById('button-launch-localGame').addEventListener('click', function() {
+            window.location.href = 'http://localhost:8000/game1v1.html'; //Changer le nom de game1v1.html
+        });
+        document.getElementById('button-retrieveGame').addEventListener('click', function() {
+            window.location.href = 'http://localhost:8000/botgame.html?intent=retrieveGame'; //Changer le nom de game1v1.html
+        });
+        document.getElementById('back').addEventListener('click',function () {
+            window.location.href = 'http://localhost:8000/mainMenu.html';
+        })
+        document.getElementById('button-launch-onlineGame').addEventListener('click', function() {
+            localStorage.setItem('gameType', 'ranked');
+            window.location.href = 'http://localhost:8000/waiting_room.html';
+        });
+
+    </script>
+</body>
+</html>

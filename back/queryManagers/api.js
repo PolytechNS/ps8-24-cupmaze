@@ -1,4 +1,4 @@
-const { createUser, getUser, createGame, getGame } = require('../database/mongo');
+const { createUser, getUser, createGame, getGame, getUserByName, addFriendRequest,removeFriend, acceptFriendRequest, clearUsersDb, clearPrivateChatDb} = require('../database/mongo');
 
 const jwt = require('jsonwebtoken');
 
@@ -22,16 +22,149 @@ function manageRequest(request, response) {
         case 'saveGame':
             saveGame(request, response);
             break;
+        case 'searchAccount':
+            searchAccountOnDB(request,response);
+            break;
+        case 'addFriend':
+            addPlayerFriendList(request,response);
+            break;
+        case 'getWaitingFriendsRequests':
+            getWaitingFriendsRequests(request,response);
+            break;
+        case 'acceptFriendRequest':
+            acceptFriendRequestAPI(request,response);
+            break;
+        case 'getFriends':
+            getFriends(request,response);
+            break;
+        case 'clearUsersDb':
+            clearUsersDbAPI(request, response);
+            break;
+        case 'clearPrivateChatDb':
+            clearPrivateChatDbAPI(request, response);
+            break;
+        case 'removeFriend':
+            removeFriendAPI(request, response);
+            break;
         default:
             response.statusCode = 404;
             response.end('Not Found');
     }
-
-    /*
-    response.statusCode = 200;
-    response.end(`Thanks for calling ${request.url}`);
-     */
 }
+
+function clearPrivateChatDbAPI(request, response) {
+    clearPrivateChatDb().then(() => {
+        console.log("Chats privés supprimés avec succès");
+        response.statusCode = 200;
+        response.end('Chats privés supprimés');
+    });
+}
+
+function clearUsersDbAPI(request, response) {
+    clearUsersDb().then(() => {
+        console.log("Utilisateurs supprimés avec succès");
+        response.statusCode = 200;
+        response.end('Utilisateurs supprimés');
+    });
+}
+
+function getFriends(request, response){
+    let username = (request.url).toString().split("=")[1].split("&")[0];
+    getUserByName(username)
+        .then((user) => {
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify(user.friendsList));
+        })
+        .catch((error) => {
+            console.error("Erreur lors de la récupération des amis :", error);
+            response.writeHead(401, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "ErrorGetFriends" }));
+        });
+}
+
+function acceptFriendRequestAPI(request, response){
+    let usernameReceveur = (request.url).toString().split("=")[1].split("&")[0];
+    let usernameAddeur = (request.url).toString().split("=")[2].split("&")[0];
+    acceptFriendRequest(usernameReceveur, usernameAddeur)
+        .then(() => {
+            console.log("Demande d'ami acceptée avec succès");
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "AcceptFriendRequestDone" }));
+        })
+        .catch((error) => {
+            console.error("Erreur lors de l'acceptation de la demande d'ami :", error);
+            response.writeHead(401, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "ErrorAcceptFriendRequest" }));
+        });
+}
+
+function removeFriendAPI(request, response){
+    let usernameRemover = (request.url).toString().split("=")[1].split("&")[0];
+    let usernameToRemove = (request.url).toString().split("=")[2].split("&")[0];
+    removeFriend(usernameRemover, usernameToRemove)
+        .then(() => {
+            console.log("Ami supprimé avec succès");
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "RemoveFriendDone" }));
+        })
+        .catch((error) => {
+            console.error("Erreur lors de la suppression de l'ami :", error);
+            response.writeHead(401, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "ErrorRemoveFriend" }));
+        });
+
+}
+
+function getWaitingFriendsRequests(request, response){
+    let username = (request.url).toString().split("=")[1].split("&")[0];
+    getUserByName(username)
+        .then((requests) => {
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify(requests.friendsRequests));
+        })
+        .catch((error) => {
+            console.error("Erreur lors de la récupération des demandes d'ami :", error);
+            response.writeHead(401, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "ErrorGetFriendRequest" }));
+        });
+}
+
+function searchAccountOnDB(request, response) {
+    /*Récupération du paramètre*/
+    let username = (request.url).toString().split("=")[1].split("&")[0];
+    getUserByName(username).then((user) => {
+        if (!user) {
+            response.statusCode = 401;
+            response.end('Utilisateur inconnu');
+        } else {
+            console.log(user);
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ username: user.username }));
+        }
+    }).catch((error) => {
+        response.statusCode = 500;
+        response.end('Erreur interne du serveur');
+        console.error('Erreur lors de la recherche de l\'utilisateur:', error);
+    });
+}
+
+function addPlayerFriendList(request, response){
+    let usernameAdder = (request.url).toString().split("=")[1].split("&")[0];
+    let usernameToAdd = (request.url).toString().split("=")[2].split("&")[0];
+
+    addFriendRequest(usernameAdder, usernameToAdd)
+        .then(() => {
+            console.log("Demande d'ami ajoutée avec succès");
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "AddFriendRequestDone" }));
+        })
+        .catch((error) => {
+            console.error("Erreur lors de l'ajout de la demande d'ami :", error);
+            response.writeHead(401, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({ content: "ErrorAddFriendRequest" }));
+        });
+}
+
 
 // Methode pour gerer l'inscription
 // je code tout en early return pour éviter les if else
@@ -89,15 +222,18 @@ function login(request, response) {
             }
 
             // generate token
-            let token = jwt.sign({ email: user.email}, 'secret', { expiresIn: '2h' });
-            console.log(token);
+            let token = jwt.sign({
+                id: user._id,
+                email: user.email,
+                username: user.username
+            }, 'secret', { expiresIn: '2h' });
             token = JSON.stringify(token);
             response.setHeader('Set-Cookie', token);
             response.setHeader("Nameaccount", user.username);
 
             // on envoie un token
-            response.writeHead(200, {'Content-Type': 'text/plain'});
-            response.end('Token envoyé et sauvegardé dans le cookie.');
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.end(JSON.stringify({token: token}));
         });
     });
 }
@@ -130,7 +266,7 @@ function creationOfUser(email, username, password, response) {
         // TODO : hash du mot de passe
 
         // on cree l'utilisateur
-        createUser({ email, username, password }).then(() => {
+        createUser({ email, username, password, friendsList:[], friendsRequests: [], notifications: [], elo:400 }).then(() => {
             response.statusCode = 201;
             response.end('Utilisateur créé');
         });

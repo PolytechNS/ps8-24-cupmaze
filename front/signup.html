@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>Inscription</title>
+    <link rel="stylesheet" href="./login_signup.css">
 </head>
 <body>
-    <h1>Bienvenue sur la page d'inscription au jeu !</h1>
-    <p>Pour pouvoir créer votre compte, veuillez remplir ce formulaire en renseignant votre nom, email et mot de passe ! </p>
+    <h1>Inscription :</h1>
     <form id="signup-form">
-        <label for="username">Nom d'utilisateur:</label><br>
-        <input type="text" id="username" name="username" required><br><br>
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" required><br>
-        <label for="password">Mot de passe:</label><br>
-        <input type="password" id="password" name="password" required><br>
-        <button type="submit">Envoyer</button>
+        <div>
+            <label for="username">Nom d'utilisateur:</label><br>
+            <input type="text" id="username" name="username" placeholder="username" required><br></div>
+        <div>
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email" placeholder="example@mail.com" required><br></div>
+        <div>
+            <label for="password">Mot de passe:</label><br>
+            <input type="password" id="password" name="password" required><br>
+        </div>
+        <button type="submit">S'inscrire</button>
     </form>
 
-    <script src="./js/signup/page.js"></script>
+    <script src="js/signup/page.js"></script>
 
 </body>
 </html>
