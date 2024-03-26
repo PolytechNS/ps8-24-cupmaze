@@ -351,11 +351,12 @@ function movePlayer(event) {
 function undoAction(){
     //On remet le nombre d'actions à 1
     actionsToDo=1;
-    updateNumberAction(1);
+    updateNumberAction(1, currentPlayer);
 
     //On re-cache les boutons
     document.getElementById("button-validate-action").style.display = "none";
     document.getElementById("button-undo-action").style.display = "none";
+    document.getElementById("button-save-game").style.display = "flex";
 
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
@@ -420,5 +421,7 @@ function updateDueToAction(){
     actionsToDo--;
     document.getElementById("button-validate-action").style.display = "flex";
     document.getElementById("button-undo-action").style.display = "flex";
-    updateNumberAction(0);
+    document.getElementById("button-save-game").style.display = "none";
+
+    updateNumberAction(0, currentPlayer);
 }
