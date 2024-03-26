@@ -103,16 +103,16 @@ function createSocket(io) {
         socket.on("undoMovePosition", () => {
             let oldPositionHTML=game.playerPosition["player1"][0]+"-"+game.playerPosition["player1"][1]+"~cell";
             let newPositionHtml="";
-            const lastCase = game.getCase(game.lastPlayerPosition["player1"][0], game.lastPlayerPosition["player1"][1]);
-            lastCase.setIsOccupied(false);
-            if(game.lastPlayerPosition["player1"]!==null){
-                newPositionHtml=game.lastPlayerPosition["player1"][0]+"-"+game.lastPlayerPosition["player1"][1]+"~cell";
-            }
-            game.playerPosition["player1"] = game.lastPlayerPosition["player1"]
+            game.playerPosition["player1"] = game.lastPlayerPosition["player1"];
             game.actionsToDo=1;
-            const currentCase = game.getCase(game.playerPosition["player1"][0], game.playerPosition["player1"][1]);
-            currentCase.setIsOccupied(true);
-            game.graph.updateNodeState(game.playerPosition["player1"][0], game.playerPosition["player1"][1], 0);
+            if(game.lastPlayerPosition["player1"]!== null){
+                const lastCase = game.getCase(game.lastPlayerPosition["player1"][0], game.lastPlayerPosition["player1"][1]);
+                lastCase.setIsOccupied(false);
+                newPositionHtml=game.lastPlayerPosition["player1"][0]+"-"+game.lastPlayerPosition["player1"][1]+"~cell";
+                const currentCase = game.getCase(game.playerPosition["player1"][0], game.playerPosition["player1"][1]);
+                currentCase.setIsOccupied(true);
+                game.graph.updateNodeState(game.playerPosition["player1"][0], game.playerPosition["player1"][1], 0);
+            }
             BotGameNamespace.emit("undoMove", oldPositionHTML, newPositionHtml, 1, game.numberTour);
         });
 
