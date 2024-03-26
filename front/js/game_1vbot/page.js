@@ -233,12 +233,15 @@ function isGameOver(){
     socket.on("gameOver", (isGameOver, numberWinner)=>{
         if(isGameOver){
             if(numberWinner === 1) {
-                victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
-                alert(victoryAnswer);
+                document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur 1 !! Félicitations ! ";
+                document.getElementById("popup").style.display = 'flex';
+                document.getElementById("popup-button").style.display = "none";
             } else if(numberWinner === 2) {
-                victoryAnswer = "Victoire du joueur 2 !! Félicitations ! ";
-                alert(victoryAnswer);
+                document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur 2 !! Félicitations ! ";
+                document.getElementById("popup").style.display = 'flex';
+                document.getElementById("popup-button").style.display = "none";
             }
+            setTimeout(()=>window.location.href= "/launchGame.html", 2000);
             return true;
         }
         socket.off("gameOver");
