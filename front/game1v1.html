@@ -15,17 +15,31 @@
         </div>
     </div>
 
-    <h1 id="display-current-player"></h1>
-    <h2 id="display-current-walls"></h2>
-    <h2 id="display-number-actions"></h2>
-    <h2 id="display-number-tour"></h2>
+    <h1 id="display-number-tour"></h1>
 
-    <button id="button-validate-action">Valider son action</button>
-    <button id="button-undo-action">Revenir en arrière</button>
-    <button id="button-save-game">Sauvegarder et Quitter</button>
+    <table>
+        <tr>
+            <td id="player1-info">
+                <h1 id="display-player-1"></h1>
+                <h2 id="display-player-1-walls"></h2>
+                <h2 id="display-player-1-number-actions"></h2>
+            </td>
+            <td id="player2-info">
+                <h1 id="display-player-2"></h1>
+                <h2 id="display-player-2-walls"></h2>
+                <h2 id="display-player-2-number-actions"></h2>
+            </td>
+        </tr>
+    </table>
+
+    <img id="player1Image" src="./imageResources/cupheadRed.png" alt="playerRed"/>
+    <img id="player2Image" src="./imageResources/CupheadBlue.png" alt="playerBlue"/>
 
     <div id="grid" class="quoridor-board"></div>
 
+    <button id="button-validate-action">Valider son action</button>
+    <button id="button-undo-action">Revenir en arrière</button>
+
+    <button id="button-save-game">Sauvegarder et Quitter</button>
 </body>
 </html>
-
