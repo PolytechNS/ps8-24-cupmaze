@@ -388,9 +388,7 @@ function validate(action) {
                 document.getElementById("popup-button").style.display = "none";
                 break;
             case "victory":
-                document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + action.winner + " !! Félicitations ! ";
-                document.getElementById("popup").style.display = 'flex';
-                document.getElementById("popup-button").style.display = "none";
+                onVictory(action);
                 break;
         }
     }
@@ -480,3 +478,31 @@ function undoWall(action) {
         alert(action.message);
     }
 }
+
+ function onVictory(action) {
+
+     let winnerText, winnerElo;
+
+     if (gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id) {
+         if (action.winner === 1) {
+             winnerText = player1_name;
+             winnerElo = gameInformation.player1_elo;
+         } else {
+             winnerText = player2_name;
+             winnerElo = gameInformation.player2_elo;
+         }
+     } else {
+         if (action.winner === 1) {
+             winnerText = player1_name;
+             winnerElo = gameInformation.player1_elo;
+         } else {
+             winnerText = player2_name;
+             winnerElo = gameInformation.player2_elo;
+         }
+     }
+
+     const popup = document.getElementById("popup");
+     popup.style.display = 'flex';
+     document.getElementById("popup-ready-message").innerHTML = "Victoire de " + winnerText + " !! Félicitations ! ";
+     document.getElementById("popup-button").style.display = "none";
+ }
