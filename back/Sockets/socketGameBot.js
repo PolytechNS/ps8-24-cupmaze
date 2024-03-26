@@ -72,6 +72,7 @@ function createSocket(io) {
         });
 
         socket.on("isGameOver", () => {
+            console.log("emit from event isGameOver socketBackend")
             let answer = game.isGameOver();
             BotGameNamespace.emit("gameOver", answer[0], answer[1]);
         });
@@ -148,7 +149,7 @@ function createSocket(io) {
 
             BotGameNamespace.emit("numberTour", numberTour, possibleMoves);
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
-            console.log("newAIPosition", newAIPosition);
+            //console.log("newAIPosition", newAIPosition);
             if (!(newAIPosition instanceof Case)) {
                 newAIPosition = game.getCase(newAIPosition[0], newAIPosition[1])
             }
@@ -169,8 +170,11 @@ function createSocket(io) {
             game.actionsToDo = 1;
 
             const winner = game.isGameOver(game.playerPosition);
-            if (winner !== 0) {
-                BotGameNamespace.emit("gameOver", winner);
+            console.log(winner);
+            console.log(winner[0]);
+            if (winner[0] === true) {
+                console.log("emitting GameOver")
+                BotGameNamespace.emit("gameOver", winner[1]);
                 return;
             }
 

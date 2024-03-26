@@ -1,0 +1,154 @@
+#grid.quoridor-board {
+    display: grid;
+    grid-template-columns: repeat(8, 40px 5px) 40px;
+    grid-template-rows: repeat(8, 40px 5px) 40px;
+    justify-content: center;
+}
+
+body {
+    background-image: url('imageResources/cupheadInGame2.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.7;
+    height: 100vh;
+    max-height: 100vh;
+}
+
+.cell {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    border: 0.1px solid;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.possible-move {
+    background-color: white;
+    opacity: 0.7;
+    border-radius: 50%;
+}
+
+.wall-vertical {
+    background-color: white;
+    width: 5px;
+    height: 40px;
+    /*border: 0.1px solid;*/
+}
+
+.wall-horizontal {
+    width: 40px;
+    height: 5px;
+    /*border: 0.5px solid;  si on retire la border on doit mettre 40px a la width */
+    background-color: white;
+}
+
+.wall-hovered {
+    background-color: green;
+}
+
+.wall-laid{
+    background-color: black;
+}
+
+.laidBy1{
+    background-color: red;
+}
+
+.laidBy2{
+    background-color: blue;
+}
+
+.space {
+    width: 5px;
+    height: 5px;
+    /*border: 0.5px solid;*/
+    justify-content: center;
+}
+
+.space-hovered {
+    background-color: green;
+}
+
+.player1-circle {
+    background-color: #ff0000;
+    border-radius: 50%;
+    box-sizing: border-box;
+    width: 25px;
+    height: 25px;
+}
+.player2-circle {
+    background-color: #0000ff;
+    border-radius: 50%;
+    box-sizing: border-box;
+    width: 25px;
+    height: 25px;
+}
+
+#popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 999;
+    color: white;
+    font-size: 24px;
+}
+
+#popup-content {
+    padding: 20px;
+    background: black;
+    border-radius: 10px;
+}
+
+.fog {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Assure que l'image couvre toute la zone */
+}
+
+
+#popup-reaction {
+    display: none;
+    position: fixed; /* Change de fixed à absolute */
+    bottom: 20px; /* Ajuste la position verticale selon vos besoins */
+    right: 20px; /* Ajuste la position horizontale selon vos besoins */
+    max-width: calc(100% - 40px); /* Taille flexible */
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popup-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    width: 100%; /* Ajuste la largeur à 100% */
+}
+
+
+.popup-notif {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 9999;
+}
+.popup-notif-content {
+    text-align: center;
+}

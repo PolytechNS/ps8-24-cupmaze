@@ -207,14 +207,7 @@ function validateRound() {
         addPlayerCircle(circle_bot, currentplayer);
         socket.off("positionAI");
     });
-    socket.on("gameOver", (winner) => {
-        if (winner !== null) {
-            document.getElementById("popup-ready-message").innerHTML = "Victoire du joueur " + winner + " !! Félicitations ! ";$
-            document.getElementById("popup").style.display = 'flex';
-            document.getElementById("popup-button").style.display = "none";
-        }
-        socket.off("gameOver");
-    });
+    isGameOver();
     socket.on("numberTourAfter", (numberTour) => {
         if (numberTour === 101) {
             document.getElementById("popup-ready-message").innerHTML = "Nombre de tours max atteints, égalité";
@@ -237,7 +230,7 @@ function validateRound() {
  */
 function isGameOver(){
     socket.emit("isGameOver", null);
-    socket.on("gameOver", function(isGameOver, numberWinner){
+    socket.on("gameOver", (isGameOver, numberWinner)=>{
         if(isGameOver){
             if(numberWinner === 1) {
                 victoryAnswer = "Victoire du joueur 1 !! Félicitations ! ";
