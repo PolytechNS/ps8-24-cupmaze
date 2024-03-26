@@ -121,7 +121,12 @@ body {
 
 img{
     position: absolute;
-    max-height: 70%;
+    height: 70%;
+    width: auto;
+}
+
+#player2Image{
+    right: 0;
 }
 
 #display-number-tour{
@@ -139,7 +144,7 @@ h1, h2{
     -1px -1px 0 black;
 }
 
-#display-current-player{
+#display-player-1, #display-player-2{
     font-size: 2vw;
 }
 
@@ -182,4 +187,13 @@ h2{
     left: 35%;
     transform: translateX(-35%);
     background: rgba(246, 224, 114, 0.7);
+}
+
+table{
+    width: 100%;
+}
+
+#player2-info{
+    padding-left: 28%;
+    padding-right: 0;
 }
