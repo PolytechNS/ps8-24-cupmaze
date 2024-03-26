@@ -3,6 +3,7 @@ import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
+import {updateNumberAction} from "../game_local_1v1/utils.js";
 
 
 let socket;
@@ -404,7 +405,7 @@ function wallLaid(event) {
         firstWallToColor.classList.add("wall-laid", "laidBy" + currentPlayer);
         firstWallToColor.removeEventListener("mouseenter", wallListener);
         firstWallToColor.removeEventListener("click", wallLaid);
-        showButtonVisible();
+        updateDueToAction(currentPlayer);
         updateNumberWallsDisplay(currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
         socket.off("laidWall");
         lastActionType="wall";
@@ -453,9 +454,9 @@ function choosePositionToBegin(event) {
                 wall.addEventListener("click", wallLaid);
             })
         }
+        updateDueToAction(currentPlayer);
         socket.off("currentPlayer");
     });
-    showButtonVisible();
 }
 
 function movePlayer(event) {
@@ -481,7 +482,7 @@ function movePlayer(event) {
             if(lastPosition!==null) removePlayerCircle(lastPosition, 1);
             addPlayerCircle(target, 1);
             lastActionType = "position";
-            showButtonVisible();
+            updateDueToAction(1);
         }else{
             alert("Mouvement non autorisé");
         }
@@ -527,8 +528,8 @@ function undoAction(){
                     wall.removeEventListener("mouseenter",wallListener);
                     wall.removeEventListener("click",wallLaid);
                 })
-
             }
+            updateNumberAction(currentPlayer,1);
             socket.off("undoMove");
         });
 
@@ -546,13 +547,16 @@ function undoAction(){
             document.getElementById(tabIDHTML[2]).classList.remove("wall-laid","laidBy"+player);
 
             updateNumberWallsDisplay(1, numberWall, null)
+            updateNumberAction(1,1);
             socket.off("undoLayingWall");
         });
     }
 }
 /**UTILS **/
-function showButtonVisible(){
+function updateDueToAction(currentPlayer){
     document.getElementById("button-validate-action").style.display = "flex";
     document.getElementById("button-undo-action").style.display = "flex";
     document.getElementById("button-save-game").style.display = "none";
+
+    updateNumberAction(0, currentPlayer);
 }
