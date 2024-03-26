@@ -327,6 +327,13 @@ async function removeFriend(usernameRemover, usernameToRemove){
     );
 }
 
+async function getUsersRank(){
+    //return users sorted by elo
+    const db = await getDb();
+    const users = db.collection('users');
+    return users.find().sort({elo: -1}).toArray();
+}
+
 
 exports.createUser = createUser;
 exports.getUser = getUser;
@@ -352,3 +359,4 @@ exports.clearPrivateChatDb = clearPrivateChatDb;
 exports.getUserById = getUserById;
 exports.updateStats = updateStats;
 exports.removeFriend = removeFriend;
+exports.getUsersRank = getUsersRank;

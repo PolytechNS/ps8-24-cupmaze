@@ -1,4 +1,4 @@
-const { createUser, getUser, createGame, getGame, getUserByName, addFriendRequest,removeFriend, acceptFriendRequest, clearUsersDb, clearPrivateChatDb} = require('../database/mongo');
+const { createUser, getUser, getUsersRank,createGame, getGame, getUserByName, addFriendRequest,removeFriend, acceptFriendRequest, clearUsersDb, clearPrivateChatDb} = require('../database/mongo');
 
 const jwt = require('jsonwebtoken');
 
@@ -46,10 +46,28 @@ function manageRequest(request, response) {
         case 'removeFriend':
             removeFriendAPI(request, response);
             break;
+        case 'getLeaderboard':
+            getLeaderboard(request, response);
+            break;
+
         default:
             response.statusCode = 404;
             response.end('Not Found');
     }
+}
+
+function getLeaderboard(request, response) {
+    getUsersRank().then((users) => {
+        response.writeHead(200, {'Content-Type': 'application/json'});
+        //retourner la paire username, elo et trier par elo
+        response.end(JSON.stringify(users.sort((a, b) => b.elo - a.elo).map((user) => {
+            return { username: user.username, elo: user.elo};
+        })));
+    }).catch((error) => {
+        response.statusCode = 500;
+        response.end('Erreur interne du serveur');
+        console.error('Erreur lors de la récupération du leaderboard:', error);
+    });
 }
 
 function clearPrivateChatDbAPI(request, response) {

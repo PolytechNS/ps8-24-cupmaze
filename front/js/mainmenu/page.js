@@ -7,7 +7,7 @@ document.getElementById('button-play').addEventListener('click', function() {
     window.location.href = 'http://localhost:8000/launchGame.html';
 });
 document.getElementById('button-leaderboard').addEventListener('click', function() {
-    //window.location.href = 'http://localhost:8000/leaderboard.html';
+    window.location.href = 'http://localhost:8000/leaderboard.html';
 });
 document.getElementById('button-prizes').addEventListener('click', function() {
     //window.location.href = 'http://localhost:8000/prizes.html';
