@@ -232,7 +232,7 @@ function createSocket(io) {
                 } else {
                     adjacentWallId = wallType + "~" + adjacentWall.pos_x + "-" + adjacentWall.pos_y;
                     adjacentSpaceId = adjacentSpace.pos_x + "-" + adjacentSpace.pos_y + "-space";
-                    BotGameNamespace.emit("laidWall",wallType, game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
+                    BotGameNamespace.emit("laidWall",game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
                 }
             }
             game.lastWallLaidsIDHtml = [wallId, adjacentWallId, adjacentSpaceId];

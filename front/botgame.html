@@ -3,28 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <title>Game page</title>
-    <link rel="stylesheet" href="./basicGamePage.css">
+    <link rel="stylesheet" href="./page.css">
     <script src="./js/game_1vbot/page.js" type="module"></script>
     <script src="./js/socket.io.js"></script>
 </head>
 <body>
-<h1 id="display-current-player"></h1>
-<h2 id="display-current-walls"></h2>
-<h2 id="display-number-actions"></h2>
-<h2 id="display-number-tour"></h2>
-
-<button id="button-validate-action">Valider son action</button>
-<button id="button-undo-action">Revenir en arrière</button>
-<button id="button-save-game">Sauvegarder et Quitter</button>
-
-<div id="grid" class="quoridor-board"></div>
-
-<div id="popup">
-    <div id="popup-content">
-        <p id="popup-ready-message"></p>
-        <button id="popup-button">Jouer le tour</button>
+    <div id="popup">
+        <div id="popup-content">
+            <p id="popup-ready-message"></p>
+            <button id="popup-button">Jouer le tour</button>
+        </div>
     </div>
-</div>
+
+    <h1 id="display-number-tour"></h1>
+
+    <table>
+        <tr>
+            <td id="player1-info">
+                <h1 id="display-player-1"></h1>
+                <h2 id="display-player-1-walls"></h2>
+                <h2 id="display-player-1-number-actions"></h2>
+            </td>
+            <td id="player2-info">
+                <h1 id="display-player-2"></h1>
+                <h2 id="display-player-2-walls"></h2>
+                <h2 id="display-player-2-number-actions"></h2>
+            </td>
+        </tr>
+    </table>
+
+    <img id="player1Image" src="./imageResources/cupheadRED.png" alt="playerRed"/>
+    <img id="player2Image" src="./imageResources/CupheadBlue.png" alt="playerBlue"/>
+
+    <div id="grid" class="quoridor-board"></div>
+
+    <button id="button-validate-action">Valider son action</button>
+    <button id="button-undo-action">Revenir en arrière</button>
+    <button id="button-save-game">Sauvegarder et Quitter</button>
 
 </body>
 </html>

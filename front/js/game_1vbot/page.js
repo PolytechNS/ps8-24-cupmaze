@@ -58,7 +58,7 @@ function main(isLoadGame) {
         //Mettre le brouillard de guerre
         //setVisionForPlayer(1, {player1: null, player2: null});
         //On setup les différents textes nécessaires
-        //setUpNewRound(1,10,10,1);
+        setUpNewRound(1,10,10,1);
     }
 }
 
@@ -219,7 +219,7 @@ function validateRound() {
     socket.on("updateRound", (possibleMoves, numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
         console.log("updateRound", numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
         //setVisionForPlayer(currentPlayer, playerPosition);
-        //setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
+        setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
         socket.off("updateBoard");
     });
 }
