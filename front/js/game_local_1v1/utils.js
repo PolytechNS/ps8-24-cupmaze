@@ -69,6 +69,6 @@ function removeHighlight(firstWall, secondWall, space) {
 }
 
 
-function updateNumberAction(nombreAction){
-    document.getElementById("display-number-actions").innerHTML = "Nombre d'actions restantes : "+nombreAction;
+function updateNumberAction(nombreAction, currentPlayer){
+    document.getElementById("display-player-"+currentPlayer+"-number-actions").innerHTML = "Nombre d'actions restantes : "+nombreAction;
 }
