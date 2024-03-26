@@ -8,6 +8,5 @@ function isWallPlacementValid(firstWall, secondWall, space) {
 }
 
 function updateNumberWallsDisplay(currentPlayer,nbWallsPlayer1,nbWallsPlayer2){
-    if(currentPlayer===1) document.getElementById("display-current-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer1;
-    else document.getElementById("display-current-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer2;
+    document.getElementById("display-player-"+currentPlayer+"-walls").innerHTML = "Nombre de murs restants : "+(currentPlayer===1? nbWallsPlayer1:nbWallsPlayer2);
 }

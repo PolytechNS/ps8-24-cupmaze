@@ -351,7 +351,7 @@ function movePlayer(event) {
 function undoAction(){
     //On remet le nombre d'actions à 1
     actionsToDo=1;
-    updateNumberAction(1);
+    updateNumberAction(1, currentPlayer);
 
     //On re-cache les boutons
     document.getElementById("button-validate-action").style.display = "none";
@@ -423,5 +423,5 @@ function updateDueToAction(){
     document.getElementById("button-undo-action").style.display = "flex";
     document.getElementById("button-save-game").style.display = "none";
 
-    updateNumberAction(0);
+    updateNumberAction(0, currentPlayer);
 }
