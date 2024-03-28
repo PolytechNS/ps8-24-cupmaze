@@ -2,7 +2,7 @@ import {beginningPositionIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
-import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
+import {setVisionForPlayer} from "./fog_of_war.js";
 import {updateNumberAction} from "../game_local_1v1/utils.js";
 
 
@@ -57,7 +57,7 @@ function main(isLoadGame) {
         initializeTable();
         //Mettre le brouillard de guerre
         //Mettre le brouillard de guerre
-        //setVisionForPlayer(1, {player1: null, player2: null});
+        setVisionForPlayer(1, {player1: null, player2: null});
         //On setup les différents textes nécessaires
         setUpNewRound(1,10,10,1);
     }
@@ -219,7 +219,7 @@ function validateRound() {
     });
     socket.on("updateRound", (possibleMoves, numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
         console.log("updateRound", numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
-        //setVisionForPlayer(currentPlayer, playerPosition);
+        setVisionForPlayer(currentPlayer, playerPosition);
         setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
         socket.off("updateBoard");
     });
