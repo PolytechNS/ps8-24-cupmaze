@@ -49,11 +49,27 @@ function manageRequest(request, response) {
         case 'getLeaderboard':
             getLeaderboard(request, response);
             break;
+        case 'getStats':
+            getStats(request, response);
+            break;
 
         default:
             response.statusCode = 404;
             response.end('Not Found');
     }
+}
+
+
+function getStats(request, response) {
+    let username = (request.url).toString().split("=")[1].split("&")[0];
+    getUserByName(username).then((user) => {
+        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.end(JSON.stringify(user));
+    }).catch((error) =>{
+        response.statusCode = 500;
+        response.end('Erreur interne du serveur');
+        console.log("Erreur lors de la récupération du leaderboard:", error)
+    })
 }
 
 function getLeaderboard(request, response) {
@@ -284,7 +300,7 @@ function creationOfUser(email, username, password, response) {
         // TODO : hash du mot de passe
 
         // on cree l'utilisateur
-        createUser({ email, username, password, friendsList:[], friendsRequests: [], notifications: [], elo:400 }).then(() => {
+        createUser({ email, username, password, friendsList:[], friendsRequests: [], notifications: [], elo:400, gamesWin:0, gamesLoose:0}).then(() => {
             response.statusCode = 201;
             response.end('Utilisateur créé');
         });
