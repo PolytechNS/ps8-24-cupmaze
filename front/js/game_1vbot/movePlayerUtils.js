@@ -7,8 +7,8 @@ function removePlayerCircle(oldPosition,currentPlayer) {
     console.log(oldCell);
     oldCell.classList.remove("occupied");
     const playerCircle = document.getElementById("player"+currentPlayer+"-circle");
-    console.log(playerCircle.children);
     if (playerCircle && oldCell.contains(playerCircle)) {
+        console.log(playerCircle.children);
         oldCell.removeChild(playerCircle);
     }
 }

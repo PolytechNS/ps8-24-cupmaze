@@ -28,10 +28,12 @@ function getPossibleMoves(playerPosition, elements) {
             }
         }
     }
-    checkMove(colonne - 1, ligne, possibleMoves, "A");
-    checkMove(colonne + 1, ligne, possibleMoves, "B");
-    checkMove(colonne, ligne - 1, possibleMoves, "L");
-    checkMove(colonne, ligne + 1, possibleMoves, "R");
+
+    console.log("ligne : ",ligne," colonne : "+ colonne);
+    checkMove(colonne, ligne + 1, possibleMoves, "A");
+    checkMove(colonne, ligne - 1, possibleMoves, "B");
+    checkMove(colonne - 1, ligne, possibleMoves, "L");
+    checkMove(colonne + 1, ligne, possibleMoves, "R");
     return possibleMoves;
 }
 

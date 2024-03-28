@@ -205,7 +205,8 @@ function validateRound() {
         console.log("AIPosition", AIPosition);
         let circle_bot = document.getElementById(AIPosition);
         console.log("circle_bot", circle_bot);
-        addPlayerCircle(circle_bot, currentplayer);
+        if(parseInt(circle_bot.visibility)<=0)
+            addPlayerCircle(circle_bot, currentplayer);
         socket.off("positionAI");
     });
     isGameOver();
