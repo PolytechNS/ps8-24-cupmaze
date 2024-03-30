@@ -1,7 +1,7 @@
 import {beginningPositionIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
-import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
+import {/*startNewRound, setUpNewRound*/} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "./fog_of_war.js";
 import {updateNumberAction} from "../game_local_1v1/utils.js";
 
@@ -23,7 +23,7 @@ function main(isLoadGame) {
     board = document.getElementById("grid");
 
     //On ajoute un event listener sur l'écran anti triche
-    document.getElementById("popup-button").addEventListener("click",startNewRound);
+    //document.getElementById("popup-button").addEventListener("click",startNewRound);
 
     //On ajoute un event listener pour valider le round
     document.getElementById("button-validate-action").addEventListener("click",validateRound);
@@ -60,6 +60,7 @@ function main(isLoadGame) {
         setVisionForPlayer(1, {player1: null, player2: null});
         //On setup les différents textes nécessaires
         setUpNewRound(1,10,10,1);
+        startNewRound();
     }
 }
 
@@ -562,4 +563,48 @@ function updateDueToAction(currentPlayer){
     document.getElementById("button-save-game").style.display = "none";
 
     updateNumberAction(0, currentPlayer);
+}
+
+function startNewRound(){
+    document.getElementById("grid").style.display = 'grid';
+    document.getElementById("display-player-1").style.display = "flex";
+    document.getElementById("display-player-2").style.display = "flex";
+    document.getElementById("display-player-1-walls").style.display = "flex";
+    document.getElementById("display-player-2-walls").style.display = "flex";
+    document.getElementById("display-player-1-number-actions").style.display = "flex";
+    document.getElementById("display-player-2-number-actions").style.display = "flex";
+    document.getElementById("display-number-tour").style.display = "flex";
+    document.getElementById("player1Image").style.display = "flex";
+    document.getElementById("player2Image").style.display = "flex";
+    document.getElementById("button-save-game").style.display = "flex";
+}
+
+
+/**
+ * Fonction permettant de pouvoir afficher la pop-up pour l'écran anti-triche
+ * On va donc cacher la grille derrière pour éviter la triche
+ */
+function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
+    console.log("setUpNewRound");
+    document.getElementById("button-validate-action").style.display = "none";
+    document.getElementById("button-undo-action").style.display = "none"
+    document.getElementById("button-save-game").style.display = "none";
+    document.getElementById("grid").style.display = 'none';
+    document.getElementById("display-player-1").style.display = "none";
+    document.getElementById("display-player-1").innerHTML = "Joueur 1 : ";
+    document.getElementById("display-player-1-walls").style.display = "none";
+    document.getElementById("display-player-1-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer1;
+    document.getElementById("display-player-2").style.display = "none";
+    document.getElementById("display-player-2").innerHTML = "Joueur 2 : ";
+    document.getElementById("display-player-2-walls").style.display = "none";
+    document.getElementById("display-player-2-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer2;
+    document.getElementById("display-player-1-number-actions").innerHTML = "Nombre d'actions restantes : 1";
+    document.getElementById("display-player-1-number-actions").style.display = "none";
+    document.getElementById("display-player-2-number-actions").innerHTML = "Nombre d'actions restantes : 1";
+    document.getElementById("display-player-2-number-actions").style.display = "none";
+    document.getElementById("display-number-tour").innerHTML = "Tour numéro : "+numberTour;
+    document.getElementById("display-number-tour").style.display = "none";
+    document.getElementById("player1Image").style.display = "none";
+    document.getElementById("player2Image").style.display = "none";
+    startNewRound()
 }

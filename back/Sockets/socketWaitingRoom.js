@@ -145,6 +145,10 @@ function createSocket(io) {
                 console.log("caseWanted", caseWanted +" current player", gameState.game.currentPlayer);
                 gameState.game.actionsToDo--;
                 gameState.game.lastActionType = "position";
+                socket.emit('actionResult', {
+                    showButton: true,
+                    actionType: "button"
+                });
                 WaitingRoomNamespace.to(roomId).emit('actionResult', {
                     valid: true,
                     message: "Position choisie",
@@ -153,6 +157,7 @@ function createSocket(io) {
                     cellId: cellId,
                     actionType: "positionBegin"
                 });
+
             } else {
                 console.log("Begin : Ce n'est pas votre tour");
                 socket.emit('actionResult', {
@@ -196,6 +201,10 @@ function createSocket(io) {
 
                 if (possibleMoves.find((cell) => cell.getPos_x() === colonne && cell.getPos_y() === ligne)) {
                     gameState.game.movePlayer(gameState.game.currentPlayer, caseWanted, playerCurrentPosition);
+                    socket.emit('actionResult', {
+                        showButton: true,
+                        actionType: "button"
+                    });
                     WaitingRoomNamespace.to(roomId).emit('actionResult', {
                         valid: true,
                         message: "Joueur déplacé",
@@ -305,7 +314,10 @@ function createSocket(io) {
                 } else {
                     gameState.game.nbWallsPlayer2--;
                 }
-
+                socket.emit('actionResult', {
+                    showButton: true,
+                    actionType: "button"
+                });
                 WaitingRoomNamespace.to(roomId).emit('actionResult', {
                     valid: true,
                     message: "Mur posé",
