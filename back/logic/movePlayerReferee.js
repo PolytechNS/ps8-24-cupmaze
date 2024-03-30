@@ -56,24 +56,24 @@ function findJumpCell(colonne, ligne, direction, elements) {
     let isWall = false;
     switch (direction) {
         case "A":
-            jumpColonne--;
-            console.log("A : wall to find", jumpColonne, ligne, "horizontal");
-            isWall = utils.findWall(jumpColonne, ligne, "vertical", elements)?.isLaid || false;
+            jumpLigne++;
+            console.log("A : wall to find", colonne, jumpLigne, "horizontal");
+            isWall = utils.findWall(colonne, jumpLigne, "vertical", elements)?.isLaid || false;
             break;
         case "B":
-            jumpColonne++;
-            console.log("B : wall to find", jumpColonne, ligne, "horizontal");
+            jumpLigne--;
+            console.log("B : wall to find", colonne, ligne, "horizontal");
             isWall = utils.findWall(colonne, ligne, "vertical", elements)?.isLaid || false;
             break;
         case "L":
-            //jumpLigne--;
-            console.log("L : wall to find", colonne, jumpLigne, "vertical");
-            isWall = utils.findWall(colonne, jumpLigne, "horizontal", elements)?.isLaid || false;
+            jumpColonne--;
+            console.log("L : wall to find", jumpColonne, ligne, "vertical");
+            isWall = utils.findWall(jumpColonne, ligne, "horizontal", elements)?.isLaid || false;
             break;
         case "R":
-            jumpLigne++;
-            console.log("R : wall to find", colonne, jumpLigne, "horizontal");
-            isWall = utils.findWall(colonne, jumpLigne, "horizontal", elements)?.isLaid || false;
+            jumpColonne++;
+            console.log("R : wall to find", colonne, ligne, "horizontal");
+            isWall = utils.findWall(colonne, ligne, "horizontal", elements)?.isLaid || false;
             break;
     }
     const inBoard = jumpColonne >= 1 && jumpColonne <= 9 && jumpLigne >= 1 && jumpLigne <= 9;

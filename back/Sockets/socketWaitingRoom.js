@@ -336,7 +336,6 @@ function createSocket(io) {
                 gameState.game.lastWallsLaid = [wall, adjacentWall, adjacentSpace];
                 gameState.game.lastWallLaidsIDHtml = [wallId, adjacentWallId, adjacentSpaceId];
             } else {
-                console.log("Lay Wall : Ce n'est pas votre tour");
                 socket.emit('actionResult', {
                     valid: false,
                     message: "Ce n'est pas votre tour",

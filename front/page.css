@@ -114,6 +114,15 @@ img{
     transform: translateX(-50%);
 }
 
+#display-player-turn{
+    position: absolute;
+    font-size: 3vw;
+    left: 50%; /* Position h1 50% from the left of the body */
+    transform: translateX(-50%);
+    /* put under the display-number-tour */
+    top: 10%;
+}
+
 h1, h2{
     color: white;
     text-shadow: -1px 1px 0 black,
@@ -206,5 +215,14 @@ table{
     z-index: 9999;
 }
 .popup-notif-content {
+    text-align: center;
+}
+
+#sendReaction {
+    /* put the button in the left-bottom corner */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     text-align: center;
 }
