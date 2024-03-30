@@ -15,6 +15,7 @@ function getPossibleMoves(playerPosition, elements) {
             return;
         }
         const wall = wallFinder(newColonne, newLigne, colonne, ligne, direction, elements);
+        console.log("wall", wall);
         const cell = utils.findCase(newColonne, newLigne, elements);
         if (!wall || !wall.isLaid) {
             if (cell.isOccupied) {
@@ -29,7 +30,7 @@ function getPossibleMoves(playerPosition, elements) {
         }
     }
 
-    console.log("ligne : ",ligne," colonne : "+ colonne);
+    console.log("colonnes", colonne, "lignes", ligne);
     checkMove(colonne, ligne + 1, possibleMoves, "A");
     checkMove(colonne, ligne - 1, possibleMoves, "B");
     checkMove(colonne - 1, ligne, possibleMoves, "L");
@@ -40,13 +41,13 @@ function getPossibleMoves(playerPosition, elements) {
 function wallFinder(newColonne, newLigne, colonne, ligne, direction, elements) {
     switch (direction) {
         case "A":
-            return utils.findWall(newColonne, newLigne, "vertical", elements);
+            return utils.findWall(newColonne, newLigne, "horizontal", elements);
         case "B":
-            return utils.findWall(colonne, ligne, "vertical", elements);
-        case "L":
             return utils.findWall(colonne, ligne, "horizontal", elements);
+        case "L":
+            return utils.findWall(colonne, ligne, "vertical", elements);
         case "R":
-            return utils.findWall(colonne, newLigne, "horizontal", elements);
+            return utils.findWall(colonne, newLigne, "vertical", elements);
     }
 }
 
