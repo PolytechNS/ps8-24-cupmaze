@@ -45,7 +45,7 @@ function wallFinder(newColonne, newLigne, colonne, ligne, direction, elements) {
         case "B":
             return utils.findWall(colonne, ligne, "horizontal", elements);
         case "L":
-            return utils.findWall(colonne, ligne, "vertical", elements);
+            return utils.findWall(newColonne, ligne, "vertical", elements);
         case "R":
             return utils.findWall(colonne, newLigne, "vertical", elements);
     }
@@ -59,22 +59,22 @@ function findJumpCell(colonne, ligne, direction, elements) {
         case "A":
             jumpLigne++;
             console.log("A : wall to find", colonne, jumpLigne, "horizontal");
-            isWall = utils.findWall(colonne, jumpLigne, "vertical", elements)?.isLaid || false;
+            isWall = utils.findWall(colonne, jumpLigne, "horizontal", elements)?.isLaid || false;
             break;
         case "B":
             jumpLigne--;
             console.log("B : wall to find", colonne, ligne, "horizontal");
-            isWall = utils.findWall(colonne, ligne, "vertical", elements)?.isLaid || false;
+            isWall = utils.findWall(colonne, ligne, "horizontal", elements)?.isLaid || false;
             break;
         case "L":
             jumpColonne--;
             console.log("L : wall to find", jumpColonne, ligne, "vertical");
-            isWall = utils.findWall(jumpColonne, ligne, "horizontal", elements)?.isLaid || false;
+            isWall = utils.findWall(jumpColonne, ligne, "vertical", elements)?.isLaid || false;
             break;
         case "R":
             jumpColonne++;
-            console.log("R : wall to find", colonne, ligne, "horizontal");
-            isWall = utils.findWall(colonne, ligne, "horizontal", elements)?.isLaid || false;
+            console.log("R : wall to find", colonne, ligne, "vertical");
+            isWall = utils.findWall(colonne, ligne, "vertical", elements)?.isLaid || false;
             break;
     }
     const inBoard = jumpColonne >= 1 && jumpColonne <= 9 && jumpLigne >= 1 && jumpLigne <= 9;

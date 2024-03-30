@@ -217,10 +217,8 @@ function createSocket(io) {
                     ? findWall(colonne, ligne-1, wallInclinaison, game.elements)
                     : findWall(colonne+1, ligne, wallInclinaison, game.elements);
             const adjacentSpace = findSpace(colonne, ligne, game.elements);
-            console.log("wall", wall, "adjacentWall", adjacentWall, "adjacentSpace", adjacentSpace);
             if (game.actionsToDo > 0 && ((game.currentPlayer === 1 && game.nbWallsPlayer1 > 0) || (game.currentPlayer === 2 && game.nbWallsPlayer2 > 0))) {
                 game.layWall(wall,adjacentWall,adjacentSpace);
-                console.log("wall", wall, "adjacentWall", adjacentWall, "adjacentSpace", adjacentSpace);
                 game.graph.placeWall(colonne,ligne, (wallInclinaison === "vertical") ? 0 : 1)
                 game.actionsToDo--;
                 game.lastActionType = "wall";
