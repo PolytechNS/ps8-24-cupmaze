@@ -205,8 +205,7 @@ function validateRound() {
         console.log("AIPosition", AIPosition);
         let circle_bot = document.getElementById(AIPosition);
         console.log("circle_bot", circle_bot);
-        if(parseInt(circle_bot.visibility)<=0)
-            addPlayerCircle(circle_bot, currentplayer);
+        //addPlayerCircle(circle_bot, currentplayer);
         socket.off("positionAI");
     });
     isGameOver();
@@ -221,8 +220,11 @@ function validateRound() {
     socket.on("updateRound", (possibleMoves, numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
         console.log("updateRound", numberTour, playerPosition, currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
         setVisionForPlayer(currentPlayer, playerPosition);
+        let circle_bot = document.getElementById(playerPosition.player2[0]+"-"+playerPosition.player2[1]+"~cell");
+        if(parseInt(circle_bot.visibility)<=0)
+            addPlayerCircle(circle_bot, 2);
         setUpNewRound(currentPlayer, nbWallsPlayer1, nbWallsPlayer2, numberTour);
-        socket.off("updateBoard");
+        socket.off("updateRound");
     });
 }
 

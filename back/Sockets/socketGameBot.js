@@ -156,7 +156,6 @@ function createSocket(io) {
                 newAIPosition = game.getCase(newAIPosition[0], newAIPosition[1])
             }
 
-
             game.currentPlayer = 2
             game.actionsToDo = 1;
             const cellId = newAIPosition.getPos_x() + "-" + newAIPosition.getPos_y() + "~cell";
@@ -190,7 +189,7 @@ function createSocket(io) {
             }
             BotGameNamespace.emit("updateRound",
                 possibleMoves, numberTour,
-                playerPosition, currentplayer,
+                game.playerPosition, currentplayer,
                 nbWallsPlayer1, nbWallsPlayer2);
         });
 

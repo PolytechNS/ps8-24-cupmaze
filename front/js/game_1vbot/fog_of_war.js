@@ -109,34 +109,12 @@ function setVisionForPlayer(currentPlayer,playerPositions){
     console.log(" ########### ROUND BREAK ###########")
     cells.forEach(function(cell)
         {
-            let player1circle = document.getElementById("player" + 1 + "-circle");
-            let player2circle = document.getElementById("player" + 2 + "-circle");
-            if(cell.id===playerPositions["player"+currentPlayer]){
-                cell.visibility=""+(INFINITY*(currentPlayer===1? -1:1));
-                document.getElementById("player" + currentPlayer + "-circle").style.display="block";
-            }
             if((parseInt(cell.visibility)>0 && currentPlayer === 1) || (currentPlayer === 2 && parseInt(cell.visibility)<0)){
                 applyFogOfWar(cell);
-                //hide player if on cell
-                if (currentPlayer === 1 && playerPositions.player2 === cell.id) {
-                    player2circle.style.display = 'none';
-                }
-                if (currentPlayer === 2 && playerPositions.player1 === cell.id) {
-                    player1circle.style.display = 'none';
-                }
             }
             if((parseInt(cell.visibility)<=0 && currentPlayer === 1) || (currentPlayer === 2 && parseInt(cell.visibility)>=0)){
                 removeFogOfWar(cell);
-
-                //show player if on cell
-                if(currentPlayer === 1 && playerPositions.player2 === cell.id) {
-                    player2circle.style.display="block";
-                }
-                if(currentPlayer === 2 && playerPositions.player1 === cell.id) {
-                    player1circle.style.display="block";
-                }
             }
-            //console.log("cell : "+cell.id+" /// visibility : "+cell.visibility);
         }
     )
 }
