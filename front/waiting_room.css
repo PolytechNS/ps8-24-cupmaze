@@ -1,0 +1,21 @@
+body {
+    background-image: url("imageResources/cupheadWaiting.gif");
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    background-size: cover; /* Cover the entire body */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Do not repeat the background image */
+    height: 100vh; /* Make the body take up the entire viewport height */
+    display: flex;
+    background-color: #cccccc;
+}
+h1, p {
+    color: white;
+    text-shadow: -1px 1px 0 black,
+    1px 1px 0 black,
+    1px -1px 0 black,
+    -1px -1px 0 black;
+}
+h1{
+    font-size: xxx-large;
+}
