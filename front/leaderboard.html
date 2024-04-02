@@ -3,9 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Leaderboard de Cupmaze :</title>
+    <link rel="stylesheet" href="./leaderboard.css">
 </head>
 <body>
 <h1>Leaderboard de Cupzmaze : </h1>
+
+<input type="text" id="searchInput" placeholder="Rechercher des amis...">
+<button id="searchAccount">Rechercher un joueur</button>
+
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <span class="close" id="closePopup">&times;</span>
+        <p id="name">Nom : </p>
+        <p id="elo">Elo : </p>
+        <p id="classement">Classement : </p>
+    </div>
+</div>
+
 <div id="leaderboard">
     <table id="table-leaderboard">
         <thead>
