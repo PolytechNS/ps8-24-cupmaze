@@ -7,9 +7,9 @@ document.getElementById("login-form").addEventListener("submit", async function 
         password: document.getElementById("password").value,
     };
 
-    await hashPassword(formData.password).then((hash) => {
+    /*await hashPassword(formData.password).then((hash) => {
         formData.password = hash;
-    });
+    });*/
 
     // Envoi de la requête POST
     fetch("http://localhost:8000/api/login", {

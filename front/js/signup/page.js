@@ -9,9 +9,9 @@ document.getElementById("signup-form").addEventListener("submit", async function
     };
 
     // Hachage du mot de passe
-    await hashPassword(formData.password).then((hash) => {
+    /*await hashPassword(formData.password).then((hash) => {
         formData.password = hash;
-    });
+    });*/
 
     // Envoi de la requête POST
     fetch("http://localhost:8000/api/signup", {
@@ -50,14 +50,11 @@ document.getElementById("signup-form").addEventListener("submit", async function
 
 
 async function hashPassword(password) {
-    /*const encoder = new TextEncoder();
+    const encoder = new TextEncoder();
     const data = encoder.encode(password);
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(byte => ('00' + byte.toString(16)).slice(-2)).join('');*/
-    const hash = crypto.createHash('sha256');
-    hash.update(password);
-    return hash.digest('hex');
+    return hashArray.map(byte => ('00' + byte.toString(16)).slice(-2)).join('');
 }
 
 
