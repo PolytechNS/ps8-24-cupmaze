@@ -42,7 +42,7 @@ const params = {
     username: username
 };
 let queryString = new URLSearchParams(params).toString();
-fetch("http://localhost:8000/api/getFriends?$"+queryString, {
+fetch(baseUrl+"/api/getFriends?$"+queryString, {
     method: "GET",
 })
     .then(async response => {
