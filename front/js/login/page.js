@@ -85,3 +85,8 @@ async function hashPassword(password) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(byte => ('00' + byte.toString(16)).slice(-2)).join('');
 }
+
+let buttonBack = document.getElementById("back");
+buttonBack.addEventListener("click", function() {
+    window.location.href = baseUrl;
+});

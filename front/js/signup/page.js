@@ -70,3 +70,8 @@ function hashPassword(password) {
     return encrypted.toString('base64');
 }
  */
+
+let buttonBack = document.getElementById("back");
+buttonBack.addEventListener("click", function () {
+    window.location.href = baseUrl;
+});
