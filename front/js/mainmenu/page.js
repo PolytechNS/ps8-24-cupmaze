@@ -114,8 +114,15 @@ notificationsButton.addEventListener('click', () => {
     socketNotifications.emit("getNotifications", username);
     socketNotifications.on("notifications", (notifications) => {
         console.log(notifications);
-        document.getElementById("element1").innerText = notifications[0];
-        //document.getElementById("element2").innerText = notifications.notifications[1];
+        if(notifications.length === 0){
+            document.getElementById("element1").innerText = "Vous n'avez pas de notifications";
+        }else{
+            //récupérer les 3 dernières notifications dans le tableau
+            let i = 0;
+            for(i = 0; notifications.length -i -1 >=0 && i < 3; i++){
+                document.getElementById("element"+(i+1)).innerText = notifications[notifications.length -i -1];
+            }
+        }
     });
 });
 
