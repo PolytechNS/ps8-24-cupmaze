@@ -43,11 +43,26 @@ class Game {
         this.numberTour = savedGame.numberTour;
         this.playerPosition = savedGame.playerPosition;
         this.lastPlayerPosition = savedGame.lastPlayerPosition;
-        this.elements = savedGame.elements;
+        //console.log("savedGame.elements", this.elementJsonToElement(savedGame.elements));
+        this.elements = this.elementJsonToElement(savedGame.elements);
         this.lastWallsLaid = savedGame.lastWallsLaid;
         this.lastWallLaidsIDHtml = savedGame.lastWallLaidsIDHtml;
 
         this.graph = savedGame.graph;
+    }
+
+    elementJsonToElement(elementJson) {
+        let res = [];
+        elementJson.forEach(element => {
+            if (element.hasOwnProperty("isOccupied")) {
+                res.push(new Case(element.pos_x, element.pos_y, element.isOccupied));
+            } else if (element.hasOwnProperty("inclinaison")) {
+                res.push(new Wall(element.pos_x, element.pos_y, element.isLaid, element.inclinaison));
+            } else {
+                res.push(new Space(element.pos_x, element.pos_y, element.isLaid));
+            }
+        });
+        return res;
     }
 
     init() {

@@ -27,7 +27,8 @@ function createSocket(io) {
                     createGame("error already has game saved").then(() => {
                         socket.emit("goBackToMenu", false);
                     });
-                    // TODO si l'utilisateur a déjà une partie sauvegardée il faut voir s'il veut l'écraser ou pas
+                    // on a déjà une partie sauvegardée pour cet utilisateur
+
                 }
                 else {
                     game.setUserEmail(msg);
@@ -56,9 +57,10 @@ function createSocket(io) {
                 let savedGameObject = JSON.parse(JSON.stringify(savedGame));
                 //console.log(savedGameObject);
                 console.log("Game was succesfully retrieved");
+                //console.log(savedGameObject);
                 game.assignGameContext(savedGameObject);
                 console.log("Game was succesfully assigned to current game");
-                console.log(game);
+                //console.log(game);
                 socket.emit("launchSavedGame", true);
             }
         });
@@ -90,8 +92,8 @@ function createSocket(io) {
                 let saveOldPosition = game.getPlayerCurrentPosition(1);
                 let htmlOldPosition=saveOldPosition[0]+"-"+saveOldPosition[1]+"~cell";
                 let htmlNewPosition=caseWanted.getPos_x()+"-"+caseWanted.getPos_y()+"~cell";
-                game.graph.updateNodeState(saveOldPosition[0], saveOldPosition[1], -1);
-                game.graph.updateNodeState(caseWanted.getPos_x(), caseWanted.getPos_y(), 1);
+                //game.graph.updateNodeState(saveOldPosition[0], saveOldPosition[1], -1);
+                //game.graph.updateNodeState(caseWanted.getPos_x(), caseWanted.getPos_y(), 1);
                 game.movePlayer(1, caseWanted, game.getPlayerCurrentPosition(1));
                 if (saveOldPosition !== null) BotGameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
                 else BotGameNamespace.emit("isNewMoveHumanIsPossible", isPossible, htmlOldPosition, htmlNewPosition);
@@ -111,7 +113,7 @@ function createSocket(io) {
                 let currentCase = game.getCase(game.playerPosition["player1"][0], game.playerPosition["player1"][1]);
                 currentCase.setIsOccupied(false);
                 console.log("currentCase : "+currentCase);
-                game.graph.updateNodeState(game.playerPosition["player1"][0], game.playerPosition["player1"][1], 0);
+                //game.graph.updateNodeState(game.playerPosition["player1"][0], game.playerPosition["player1"][1], 0);
             }
             game.playerPosition["player1"] = game.lastPlayerPosition["player1"];
             game.actionsToDo=1;
@@ -133,7 +135,7 @@ function createSocket(io) {
             game.playerPosition.player1 = [colonne, ligne];
             const caseWanted = game.getCase(colonne, ligne);
             caseWanted.setIsOccupied(true);
-            game.graph.updateNodeState(colonne, ligne, currentPlayer);
+            //game.graph.updateNodeState(colonne, ligne, currentPlayer);
             BotGameNamespace.emit("currentPlayer", currentPlayer, game.playerPosition.player1);
             game.actionsToDo--;
             game.lastActionType = "position"
@@ -159,7 +161,7 @@ function createSocket(io) {
             game.currentPlayer = 2
             game.actionsToDo = 1;
             const cellId = newAIPosition.getPos_x() + "-" + newAIPosition.getPos_y() + "~cell";
-            game.graph.updateNodeState(newAIPosition[0], newAIPosition[1], 2);
+            //game.graph.updateNodeState(newAIPosition[0], newAIPosition[1], 2);
             if(game.actionsToDo === 1){
                 BotGameNamespace.emit("positionAI", cellId, game.currentPlayer, playerPosition);
                 game.movePlayer(2, newAIPosition, game.getPlayerCurrentPosition(2));
@@ -219,7 +221,7 @@ function createSocket(io) {
             const adjacentSpace = findSpace(colonne, ligne, game.elements);
             if (game.actionsToDo > 0 && ((game.currentPlayer === 1 && game.nbWallsPlayer1 > 0) || (game.currentPlayer === 2 && game.nbWallsPlayer2 > 0))) {
                 game.layWall(wall,adjacentWall,adjacentSpace);
-                game.graph.placeWall(colonne,ligne, (wallInclinaison === "vertical") ? 0 : 1)
+                //game.graph.placeWall(colonne,ligne, (wallInclinaison === "vertical") ? 0 : 1)
                 game.actionsToDo--;
                 game.lastActionType = "wall";
                 if (game.currentPlayer === 1) {

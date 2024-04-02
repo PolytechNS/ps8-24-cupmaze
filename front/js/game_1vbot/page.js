@@ -112,33 +112,42 @@ function initializeLoadTable(data) {
     data.elements.forEach((element)=>{
         let i=element.pos_x;
         let j=element.pos_y;
+        if (i == null || j == null) return;
         switch (getNatureOfElement(element)){
             case "case":
-                const cellId = i + "-" + j;
+                console.log("case");
+                const cellId = i + "-" + (9-j+1);
                 const cell = document.createElement("div");
                 cell.id = cellId+"~cell";
+                console.log(cell.id);
                 cell.classList.add("cell");
-                cell.addEventListener("click", choosePositionToBegin);
+                cell.addEventListener("click", movePlayer);
                 board.appendChild(cell);
                 break;
             case "wall":
                 if(element.inclinaison==="vertical") {
+                    if (i === 9) return;
                     const wall = document.createElement("div");
-                    wall.id = "wv~" + i + "-" + j;
+                    wall.id = "wv~" + i + "-" + (9-j+1);
                     wall.classList.add("wall-vertical")
                     board.appendChild(wall);
+                    wall.addEventListener("mouseenter", wallListener);
+                    wall.addEventListener("click", wallLaid);
                     if(element.isLaid) wall.classList.add("wall-laid");
-                }
-                else{
+                } else{
+                    if (j === 9) return;
                     const wall = document.createElement("div");
-                    wall.id = "wh~" + i + "-" + j;
+                    wall.id = "wh~" + i + "-" + (9-j+1);
                     wall.classList.add("wall-horizontal");
                     board.appendChild(wall);
+                    wall.addEventListener("mouseenter", wallListener);
+                    wall.addEventListener("click", wallLaid);
                     if(element.isLaid) wall.classList.add("wall-laid");
                 }
                 break;
             case "space":
-                const spaceId = i + "-" + j;
+                console.log("space");
+                const spaceId = i + "-" + (9-j+1);
                 const space = document.createElement("div");
                 space.id = spaceId+"-space";
                 space.classList.add("space");
@@ -169,10 +178,8 @@ function initializeLoadTable(data) {
 
 function getNatureOfElement(element){
     if(element.hasOwnProperty("isOccupied")) return "case";
-    if(element.hasOwnProperty("isLaid")){
-        if (element.hasOwnProperty("inclinaison")) return "wall";
-        return "space";
-    }
+    else if(element.hasOwnProperty("inclinaison")) return "wall";
+    else return "space";
 }
 
 /** #############################################  ROUND METHODS  ############################################# **/
