@@ -1,3 +1,10 @@
+var baseUrl = '';
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    baseUrl = 'http://localhost:8000';
+} else {
+    baseUrl = 'http://cupmaze.ps8.academy';
+}
+
 document.getElementById("signup-form").addEventListener("submit", async function (event) {
     event.preventDefault(); // Empêche le comportement par défaut du formulaire
 
@@ -14,7 +21,7 @@ document.getElementById("signup-form").addEventListener("submit", async function
     });*/
 
     // Envoi de la requête POST
-    fetch("http://localhost:8000/api/signup", {
+    fetch(baseUrl+"/api/signup", {
         method: "POST",
         body: JSON.stringify(formData),
         headers: {
@@ -29,14 +36,6 @@ document.getElementById("signup-form").addEventListener("submit", async function
                 }
             }
             alert('Inscription réussie !');
-
-            var baseUrl = '';
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                baseUrl = 'http://localhost:8000';
-            } else {
-                baseUrl = 'http://cupmaze.ps8.academy';
-            }
-
             window.location.href = baseUrl;
         })
         .then(data => {
