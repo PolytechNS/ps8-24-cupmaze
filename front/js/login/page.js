@@ -44,7 +44,7 @@ document.getElementById("login-form").addEventListener("submit", async function 
                     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                         baseUrl = 'http://localhost:8000';
                     } else {
-                        baseUrl = 'http://cupzmaze.ps8.academy';
+                        baseUrl = 'http://cupmaze.ps8.academy/';
                     }
                     window.location.href = baseUrl+"/mainMenu.html";
                 });
