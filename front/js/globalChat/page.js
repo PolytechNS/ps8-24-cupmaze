@@ -1,5 +1,6 @@
 let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
 
+
 let socketGlobalChat = io("/api/globalChat");
 socketGlobalChat.emit("setupGlobalChat");
 socketGlobalChat.on("setupGlobalChat", (messages) => {

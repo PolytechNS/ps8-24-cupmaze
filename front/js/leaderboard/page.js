@@ -32,9 +32,18 @@ fetch("http://localhost:8000/api/getLeaderboard?$",{
         console.error('Erreur:', error);
     });
 
+
 let buttonBack = document.getElementById("button-back");
 buttonBack.onclick = function() {
-    window.location.href = 'http://localhost:8000/mainMenu.html';
+
+    var baseUrl = '';
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        baseUrl = 'http://localhost:8000';
+    } else {
+        baseUrl = 'http://cupmaze.ps8.academy';
+    }
+
+    window.location.href = baseUrl+'/mainMenu.html';
 }
 
 

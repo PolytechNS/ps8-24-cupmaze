@@ -33,6 +33,7 @@ document.getElementById("login-form").addEventListener("submit", async function 
                 response.json().then((data) => {
                     console.log(data);
                     let token = data.token;
+
                     // on retire les guillemets
                     token = token.replace(/['"]+/g, '');
                     alert("Connexion réussie !");

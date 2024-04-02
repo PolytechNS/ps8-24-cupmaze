@@ -10,7 +10,7 @@ const params = {
     username: myUsername
 };
 
-const queryString = new URLSearchParams(params).toString();
+let queryString = new URLSearchParams(params).toString();
 
 fetch("http://localhost:8000/api/getStats?$"+queryString, {
     method: "GET",
@@ -56,9 +56,18 @@ fetch("http://localhost:8000/api/getStats?$"+queryString, {
     });
 
 
+
 let buttonBack = document.getElementById("back");
 buttonBack.onclick = function() {
-    window.location.href = 'http://localhost:8000/mainMenu.html';
+
+    var baseUrl = '';
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        baseUrl = 'http://localhost:8000';
+    } else {
+        baseUrl = 'http://cupmaze.ps8.academy';
+    }
+
+    window.location.href = baseUrl +'/mainMenu.html';
 }
 
 

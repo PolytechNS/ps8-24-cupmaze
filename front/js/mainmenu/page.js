@@ -3,20 +3,29 @@ import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
 let socket=io("/api/game");
 //socket.emit("clearGames",username);
+
+var baseUrl = '';
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    baseUrl = 'http://localhost:8000';
+} else {
+    baseUrl = 'http://cupmaze.ps8.academy';
+}
+
+
 document.getElementById('button-play').addEventListener('click', function() {
-    window.location.href = 'http://localhost:8000/launchGame.html';
+    window.location.href = baseUrl +'/launchGame.html';
 });
 document.getElementById('button-leaderboard').addEventListener('click', function() {
-    window.location.href = 'http://localhost:8000/leaderboard.html';
+    window.location.href = baseUrl+'/leaderboard.html';
 });
 document.getElementById('button-prizes').addEventListener('click', function() {
-    window.location.href = 'http://localhost:8000/prizes.html';
+    window.location.href = baseUrl+'/prizes.html';
 });
 document.getElementById('button-options').addEventListener('click', function() {
     //window.location.href = 'http://localhost:8000/options.html';
 });
 document.getElementById('searchFriends').addEventListener('click', function () {
-    window.location.href = 'http://localhost:8000/searchFriends.html';
+    window.location.href = baseUrl +'/searchFriends.html';
 });
 
 const closePopupButton = document.getElementById("closePopup");
@@ -68,9 +77,9 @@ fetch("http://localhost:8000/api/getFriends?$"+queryString, {
                 buttonChat.textContent = 'Chat';
                 buttonChat.onclick = function() {
                     if(username.localeCompare(friend) < 0 ){
-                        window.location.href = 'http://localhost:8000/privateChat.html?idchat='+username+friend;
+                        window.location.href = baseUrl +'/privateChat.html?idchat='+username+friend;
                     } else {
-                        window.location.href = 'http://localhost:8000/privateChat.html?idchat='+friend+username;
+                        window.location.href = baseUrl +'/privateChat.html?idchat='+friend+username;
                     }
                 }
 
@@ -117,7 +126,7 @@ window.addEventListener('beforeunload', () => {
 
 let globalChatButton = document.getElementById('button-globalChat');
 globalChatButton.addEventListener('click', () => {
-    window.location.href = 'http://localhost:8000/globalChat.html';
+    window.location.href = baseUrl +'/globalChat.html';
 });
 
 /* CHALLENGE */
