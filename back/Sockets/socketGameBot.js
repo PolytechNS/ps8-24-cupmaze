@@ -103,16 +103,18 @@ function createSocket(io) {
         socket.on("undoMovePosition", () => {
             let oldPositionHTML=game.playerPosition["player1"][0]+"-"+game.playerPosition["player1"][1]+"~cell";
             let newPositionHtml="";
-            const lastCase = game.getCase(game.lastPlayerPosition["player1"][0], game.lastPlayerPosition["player1"][1]);
-            lastCase.setIsOccupied(false);
-            if(game.lastPlayerPosition["player1"]!==null){
+            if(game.lastPlayerPosition["player1"]!== null){
+                let lastCase = game.getCase(game.lastPlayerPosition["player1"][0], game.lastPlayerPosition["player1"][1]);
+                lastCase.setIsOccupied(true);
+                console.log("lastCase : "+lastCase);
                 newPositionHtml=game.lastPlayerPosition["player1"][0]+"-"+game.lastPlayerPosition["player1"][1]+"~cell";
+                let currentCase = game.getCase(game.playerPosition["player1"][0], game.playerPosition["player1"][1]);
+                currentCase.setIsOccupied(false);
+                console.log("currentCase : "+currentCase);
+                game.graph.updateNodeState(game.playerPosition["player1"][0], game.playerPosition["player1"][1], 0);
             }
-            game.playerPosition["player1"] = game.lastPlayerPosition["player1"]
+            game.playerPosition["player1"] = game.lastPlayerPosition["player1"];
             game.actionsToDo=1;
-            const currentCase = game.getCase(game.playerPosition["player1"][0], game.playerPosition["player1"][1]);
-            currentCase.setIsOccupied(true);
-            game.graph.updateNodeState(game.playerPosition["player1"][0], game.playerPosition["player1"][1], 0);
             BotGameNamespace.emit("undoMove", oldPositionHTML, newPositionHtml, 1, game.numberTour);
         });
 
@@ -154,7 +156,6 @@ function createSocket(io) {
                 newAIPosition = game.getCase(newAIPosition[0], newAIPosition[1])
             }
 
-
             game.currentPlayer = 2
             game.actionsToDo = 1;
             const cellId = newAIPosition.getPos_x() + "-" + newAIPosition.getPos_y() + "~cell";
@@ -188,7 +189,7 @@ function createSocket(io) {
             }
             BotGameNamespace.emit("updateRound",
                 possibleMoves, numberTour,
-                playerPosition, currentplayer,
+                game.playerPosition, currentplayer,
                 nbWallsPlayer1, nbWallsPlayer2);
         });
 
@@ -216,7 +217,6 @@ function createSocket(io) {
                     ? findWall(colonne, ligne-1, wallInclinaison, game.elements)
                     : findWall(colonne+1, ligne, wallInclinaison, game.elements);
             const adjacentSpace = findSpace(colonne, ligne, game.elements);
-
             if (game.actionsToDo > 0 && ((game.currentPlayer === 1 && game.nbWallsPlayer1 > 0) || (game.currentPlayer === 2 && game.nbWallsPlayer2 > 0))) {
                 game.layWall(wall,adjacentWall,adjacentSpace);
                 game.graph.placeWall(colonne,ligne, (wallInclinaison === "vertical") ? 0 : 1)
@@ -232,7 +232,7 @@ function createSocket(io) {
                 } else {
                     adjacentWallId = wallType + "~" + adjacentWall.pos_x + "-" + adjacentWall.pos_y;
                     adjacentSpaceId = adjacentSpace.pos_x + "-" + adjacentSpace.pos_y + "-space";
-                    BotGameNamespace.emit("laidWall",wallType, game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
+                    BotGameNamespace.emit("laidWall",game.currentPlayer, game.nbWallsPlayer1, game.nbWallsPlayer2);
                 }
             }
             game.lastWallLaidsIDHtml = [wallId, adjacentWallId, adjacentSpaceId];

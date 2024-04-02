@@ -145,6 +145,10 @@ function createSocket(io) {
                 console.log("caseWanted", caseWanted +" current player", gameState.game.currentPlayer);
                 gameState.game.actionsToDo--;
                 gameState.game.lastActionType = "position";
+                socket.emit('actionResult', {
+                    showButton: true,
+                    actionType: "button"
+                });
                 WaitingRoomNamespace.to(roomId).emit('actionResult', {
                     valid: true,
                     message: "Position choisie",
@@ -153,6 +157,7 @@ function createSocket(io) {
                     cellId: cellId,
                     actionType: "positionBegin"
                 });
+
             } else {
                 console.log("Begin : Ce n'est pas votre tour");
                 socket.emit('actionResult', {
@@ -196,6 +201,10 @@ function createSocket(io) {
 
                 if (possibleMoves.find((cell) => cell.getPos_x() === colonne && cell.getPos_y() === ligne)) {
                     gameState.game.movePlayer(gameState.game.currentPlayer, caseWanted, playerCurrentPosition);
+                    socket.emit('actionResult', {
+                        showButton: true,
+                        actionType: "button"
+                    });
                     WaitingRoomNamespace.to(roomId).emit('actionResult', {
                         valid: true,
                         message: "Joueur déplacé",
@@ -305,7 +314,10 @@ function createSocket(io) {
                 } else {
                     gameState.game.nbWallsPlayer2--;
                 }
-
+                socket.emit('actionResult', {
+                    showButton: true,
+                    actionType: "button"
+                });
                 WaitingRoomNamespace.to(roomId).emit('actionResult', {
                     valid: true,
                     message: "Mur posé",
@@ -324,7 +336,6 @@ function createSocket(io) {
                 gameState.game.lastWallsLaid = [wall, adjacentWall, adjacentSpace];
                 gameState.game.lastWallLaidsIDHtml = [wallId, adjacentWallId, adjacentSpaceId];
             } else {
-                console.log("Lay Wall : Ce n'est pas votre tour");
                 socket.emit('actionResult', {
                     valid: false,
                     message: "Ce n'est pas votre tour",
@@ -533,8 +544,8 @@ function createSocket(io) {
     }
 
     async function updateElo(roomId, winner) {
-        let player1_elo = getUserById(playersWithRooms[roomId].player1).elo;
-        let player2_elo = getUserById(playersWithRooms[roomId].player2).elo;
+        let player1_elo = await getUserById(playersWithRooms[roomId].player1).elo;
+        let player2_elo = await getUserById(playersWithRooms[roomId].player2).elo;
 
         let player1_Chance = 1 / (1 + Math.pow(10, (player2_elo - player1_elo) / 400));
         let elo_Diff;
@@ -543,10 +554,12 @@ function createSocket(io) {
         }
         if (winner === 1) {
             elo_Diff = Math.round(32 * (1 - player1_Chance));
+            console.log("elo_Diff if ", elo_Diff);
             // on met a jour l'elo du perdant et du gagnant
             await updateStats(playersWithRooms[roomId].player1, playersWithRooms[roomId].player2, elo_Diff);
         } else {
             elo_Diff = Math.round(32 * player1_Chance);
+            console.log("elo_Diff else ", elo_Diff);
             await updateStats(playersWithRooms[roomId].player2, playersWithRooms[roomId].player1, elo_Diff);
         }
         return elo_Diff;
