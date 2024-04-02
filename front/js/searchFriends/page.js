@@ -234,3 +234,9 @@ function main(){
 document.addEventListener("DOMContentLoaded", function() {
     main();
 });
+
+
+let buttonBack = document.getElementById("back");
+buttonBack.addEventListener("click", function() {
+    window.location.href = baseUrl + "/mainMenu.html";
+});
