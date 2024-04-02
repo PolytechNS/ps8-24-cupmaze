@@ -29,7 +29,15 @@ document.getElementById("signup-form").addEventListener("submit", async function
                 }
             }
             alert('Inscription réussie !');
-            window.location.href = 'http://localhost:8000/';
+
+            var baseUrl = '';
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                baseUrl = 'http://localhost:8000';
+            } else {
+                baseUrl = 'http://cupzmaze.ps8.academy';
+            }
+
+            window.location.href = baseUrl;
         })
         .then(data => {
             console.log(data); // Affichage de la réponse du serveur

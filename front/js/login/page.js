@@ -35,11 +35,18 @@ document.getElementById("login-form").addEventListener("submit", async function 
                     let token = data.token;
                     // on retire les guillemets
                     token = token.replace(/['"]+/g, '');
-                    alert("Utilisateur bien présent !" + token);
+                    alert("Connexion réussie !");
                     console.log('token', token);
                     setCookie('jwt', token, 2);
                     setCookie('Nameaccount', response.headers.get('Nameaccount'), 2);
-                    window.location.href = "http://localhost:8000/mainMenu.html";
+
+                    var baseUrl = '';
+                    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                        baseUrl = 'http://localhost:8000';
+                    } else {
+                        baseUrl = 'http://cupzmaze.ps8.academy';
+                    }
+                    window.location.href = baseUrl+"/mainMenu.html";
                 });
                 /*
                 const token = response.headers.get('Set-Cookie');
