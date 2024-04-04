@@ -11,3 +11,21 @@
     border-radius: 15px;
     background: linear-gradient(to right, #4CAF50, #FF8C00);
 }
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.container {
+    display: flex;
+    height: 80%;
+}
+
+.column {
+    flex: 1;
+    border: 1px solid #000;
+    height: 50%; /* Réglez la hauteur de chaque colonne ici */
+    box-sizing: border-box;
+}
