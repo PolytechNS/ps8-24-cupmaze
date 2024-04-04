@@ -31,7 +31,7 @@ fetch(baseUrl+"/api/getStats?$"+queryString, {
             console.log(data);
 
             let elo = data.elo;
-            printElo.innerText = "Vous faites partie de la ligue : " + findLeague(elo)[0] + " avec un elo de " + elo;
+            printElo.innerText = "Vous faites partie de la ligue " + findLeague(elo)[0] + " avec un elo de " + elo;
             document.getElementById("elo-medal").src = findLeague(elo)[1];
             document.getElementById("elo-medal").style.width = "100px";
 
