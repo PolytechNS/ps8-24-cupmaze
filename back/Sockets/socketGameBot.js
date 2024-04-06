@@ -204,12 +204,20 @@ function createSocket(io) {
                 nbWallsPlayer1, nbWallsPlayer2);
         });
 
+        socket.on("wallListen", (firstWall, SecondWall, wallType) => {
+            let colonne1, ligne1, colonne2, ligne2;
+            colonne1 = parseInt(firstWall[0]);
+            ligne1 = parseInt(firstWall[2]);
+            colonne2 = parseInt(SecondWall[0]);
+            ligne2 = parseInt(SecondWall[2]);
+            console.log("colonne1", colonne1, "ligne1", ligne1, "colonne2", colonne2, "ligne2", ligne2);
+            let isBlock = game.isWallBlockingPath(colonne1, ligne1, colonne2, ligne2, wallType);
+            socket.emit("res", !isBlock);
+        });
+
 
         socket.on("wallLaid",(firstWallToColor, wallType, wallPosition, wallId) => {
-            if (game.actionsToDo === 0) {
-                BotGameNamespace.emit("laidWall", null, true, true);
-                return;
-            }
+
             let adjacentWallId = null;
             let adjacentSpaceId = null;
 
@@ -228,6 +236,18 @@ function createSocket(io) {
                     ? findWall(colonne, ligne-1, wallInclinaison, game.elements)
                     : findWall(colonne+1, ligne, wallInclinaison, game.elements);
             const adjacentSpace = findSpace(colonne, ligne, game.elements);
+
+            let isBlock = game.isWallBlockingPath(colonne,ligne, adjacentWall.pos_x, adjacentWall.pos_y, wallInclinaison);
+            if (!isBlock) {
+                BotGameNamespace.emit("illegalWall");
+                return;
+            }
+
+            if (game.actionsToDo === 0) {
+                BotGameNamespace.emit("laidWall", null, true, true);
+                return;
+            }
+
             if (game.actionsToDo > 0 && ((game.currentPlayer === 1 && game.nbWallsPlayer1 > 0) || (game.currentPlayer === 2 && game.nbWallsPlayer2 > 0))) {
                 game.layWall(wall,adjacentWall,adjacentSpace);
                 //game.graph.placeWall(colonne,ligne, (wallInclinaison === "vertical") ? 0 : 1)
