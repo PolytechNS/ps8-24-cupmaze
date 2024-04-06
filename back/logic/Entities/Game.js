@@ -198,7 +198,7 @@ class Game {
         }
         const colonne = this.lastWallsLaid[0].getPos_x();
         const ligne = this.lastWallsLaid[0].getPos_y();
-        this.graph.removeWall(colonne, ligne);
+        //this.graph.removeWall(colonne, ligne);
     }
 }
 

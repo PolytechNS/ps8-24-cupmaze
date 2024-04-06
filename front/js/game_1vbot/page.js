@@ -2,7 +2,7 @@ import {beginningPositionIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {/*startNewRound, setUpNewRound*/} from "../game_local_1v1/roundUtils.js";
-import {setVisionForPlayer} from "./fog_of_war.js";
+import {setVisionForPlayer, calculateVisibility} from "./fog_of_war.js";
 import {updateNumberAction} from "../game_local_1v1/utils.js";
 
 
@@ -133,15 +133,14 @@ function initializeLoadTable(data) {
                     wall.addEventListener("click", wallLaid);
                     if(element.isLaid) {
                         wallToLaid.push(element);
-                        /*
-                        console.log("wall : ", element);
-                        console.log("wall : ", wall);
-                        wall.classList.add("wall-laid");
-                        wall.classList.add("laidBy" + element.player);
-                         */
                     }
                 } else{
-                    if (j === 9) return;
+                    if (j === 9) {
+                        if (element.isLaid) {
+                            wallToLaid.push(element);
+                        }
+                        return;
+                    }
                     const wall = document.createElement("div");
                     wall.id = "wh~" + i + "-" + (9-j+1);
                     wall.classList.add("wall-horizontal");
@@ -150,12 +149,6 @@ function initializeLoadTable(data) {
                     wall.addEventListener("click", wallLaid);
                     if(element.isLaid) {
                         wallToLaid.push(element);
-                        /*
-                        console.log("wall : ", element);
-                        console.log("wall : ", wall);
-                        wall.classList.add("wall-laid");
-                        wall.classList.add("laidBy" + element.player);
-                                                 */
                     }
                 }
                 break;
@@ -167,12 +160,6 @@ function initializeLoadTable(data) {
                 board.appendChild(space);
                 if(element.isLaid) {
                     wallToLaid.push(element);
-                    /*
-                    console.log("space : ", element);
-                    console.log("space : ", space);
-                    space.classList.add("wall-laid");
-                    space.classList.add("laidBy" + element.player);
-                    */
                 }
                 break;
             default:
@@ -205,9 +192,10 @@ function initializeLoadTable(data) {
     }
     let botCell= data.playerPosition.player2!==null?
         document.getElementById(data.playerPosition.player2[0]+"-"+data.playerPosition.player2[1]+"~cell"):null;
-    console.log(botCell)
+    calculateVisibility(data.playerPosition);
+    console.log(botCell, botCell.visibility<=0);
     if(botCell && parseInt(botCell.visibility)<=0) {
-        addPlayerCircle(botCell, 1);
+        addPlayerCircle(botCell, 2);
         botCell.classList.add("occupied");
     }
 }
@@ -242,10 +230,8 @@ function validateRound() {
         console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
         if (playerPosition["player2"] !== null){
             const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
-            console.log("htmlOldPosition", htmlOldPosition);
             removePlayerCircle(htmlOldPosition, currentplayer);
         }
-        console.log("AIPosition", AIPosition);
         let circle_bot = document.getElementById(AIPosition);
         console.log("circle_bot", circle_bot);
         //addPlayerCircle(circle_bot, currentplayer);
