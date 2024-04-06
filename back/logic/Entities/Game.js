@@ -43,11 +43,32 @@ class Game {
         this.numberTour = savedGame.numberTour;
         this.playerPosition = savedGame.playerPosition;
         this.lastPlayerPosition = savedGame.lastPlayerPosition;
-        this.elements = savedGame.elements;
+        //console.log("savedGame.elements", this.elementJsonToElement(savedGame.elements));
+        this.elements = this.elementJsonToElement(savedGame.elements);
         this.lastWallsLaid = savedGame.lastWallsLaid;
         this.lastWallLaidsIDHtml = savedGame.lastWallLaidsIDHtml;
 
         this.graph = savedGame.graph;
+    }
+
+    elementJsonToElement(elementJson) {
+        let res = [];
+        elementJson.forEach(element => {
+            if (element.hasOwnProperty("isOccupied")) {
+                res.push(new Case(element.pos_x, element.pos_y, element.isOccupied));
+            } else if (element.hasOwnProperty("inclinaison")) {
+                console.log("element", element);
+                const wall = new Wall(element.pos_x, element.pos_y, element.isLaid, element.inclinaison);
+                wall.setPlayer(element.player);
+                res.push(wall);
+            } else {
+                const space = new Space(element.pos_x, element.pos_y);
+                space.setIsLaid(element.isLaid);
+                space.setPlayer(element.player);
+                res.push(space);
+            }
+        });
+        return res;
     }
 
     init() {
@@ -132,11 +153,14 @@ class Game {
             if (this.elements[i] instanceof Wall) {
                 if (this.elements[i].equals(firstCase) || this.elements[i].equals(secondCase)) {
                     this.elements[i].setIsLaid(true);
+                    this.elements[i].setPlayer(this.currentPlayer);
+                    console.log("this.elements[i]", this.elements[i]);
                 }
             }
             if (this.elements[i] instanceof Space) {
                 if (this.elements[i].equals(space)) {
                     this.elements[i].setIsLaid(true);
+                    this.elements[i].setPlayer(this.currentPlayer);
                 }
             }
         }
@@ -174,7 +198,7 @@ class Game {
         }
         const colonne = this.lastWallsLaid[0].getPos_x();
         const ligne = this.lastWallsLaid[0].getPos_y();
-        this.graph.removeWall(colonne, ligne);
+        //this.graph.removeWall(colonne, ligne);
     }
 }
 

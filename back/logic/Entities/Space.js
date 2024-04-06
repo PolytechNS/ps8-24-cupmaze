@@ -22,6 +22,14 @@ class Space {
         this.isLaid = isLaid;
     }
 
+    getPlayer(){
+        return this.player;
+    }
+
+    setPlayer(player){
+        this.player = player;
+    }
+
     equals(space){
         return this.pos_x === space.pos_x && this.pos_y === space.pos_y;
     }

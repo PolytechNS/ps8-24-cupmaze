@@ -7,6 +7,7 @@ class Wall{
         this.player = 0;
     }
 
+
     getPos_x(){
         return this.pos_x;
     }
@@ -25,6 +26,18 @@ class Wall{
 
     getInclinaison(){
         return this.inclinaison;
+    }
+
+    setInclinaison(inclinaison) {
+        this.inclinaison = inclinaison;
+    }
+
+    getPlayer(){
+        return this.player;
+    }
+
+    setPlayer(player){
+        this.player = player;
     }
 
     equals(wall){

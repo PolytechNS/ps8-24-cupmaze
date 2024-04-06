@@ -26,6 +26,7 @@ body {
 }
 
 #back, .button{
+    cursor: pointer;
     font-size: xx-large;
     font-weight: bold;
     color: rgba(255, 255, 255);

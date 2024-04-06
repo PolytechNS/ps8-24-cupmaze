@@ -2,7 +2,7 @@ import {beginningPositionIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {/*startNewRound, setUpNewRound*/} from "../game_local_1v1/roundUtils.js";
-import {setVisionForPlayer} from "./fog_of_war.js";
+import {setVisionForPlayer, calculateVisibility} from "./fog_of_war.js";
 import {updateNumberAction} from "../game_local_1v1/utils.js";
 
 
@@ -39,7 +39,6 @@ function main(isLoadGame) {
         socket.emit("retrieveGame",username);
         socket.on("launchSavedGame",(msg)=>{
             if(msg!==true)alert("sorry no game found");
-            else alert("retrieving game");
             socket.emit("loadGame");
         })
         socket.on("data",(data)=>{
@@ -109,46 +108,79 @@ function initializeTable() {
 }
 
 function initializeLoadTable(data) {
+    let wallToLaid = [];
     data.elements.forEach((element)=>{
         let i=element.pos_x;
         let j=element.pos_y;
+        if (i == null || j == null) return;
         switch (getNatureOfElement(element)){
             case "case":
-                const cellId = i + "-" + j;
+                const cellId = i + "-" + (9-j+1);
                 const cell = document.createElement("div");
                 cell.id = cellId+"~cell";
                 cell.classList.add("cell");
-                cell.addEventListener("click", choosePositionToBegin);
+                cell.addEventListener("click", movePlayer);
                 board.appendChild(cell);
                 break;
             case "wall":
                 if(element.inclinaison==="vertical") {
+                    if (i === 9) return;
                     const wall = document.createElement("div");
-                    wall.id = "wv~" + i + "-" + j;
+                    wall.id = "wv~" + i + "-" + (9-j+1);
                     wall.classList.add("wall-vertical")
                     board.appendChild(wall);
-                    if(element.isLaid) wall.classList.add("wall-laid");
-                }
-                else{
+                    wall.addEventListener("mouseenter", wallListener);
+                    wall.addEventListener("click", wallLaid);
+                    if(element.isLaid) {
+                        wallToLaid.push(element);
+                    }
+                } else{
+                    if (j === 9) {
+                        if (element.isLaid) {
+                            wallToLaid.push(element);
+                        }
+                        return;
+                    }
                     const wall = document.createElement("div");
-                    wall.id = "wh~" + i + "-" + j;
+                    wall.id = "wh~" + i + "-" + (9-j+1);
                     wall.classList.add("wall-horizontal");
                     board.appendChild(wall);
-                    if(element.isLaid) wall.classList.add("wall-laid");
+                    wall.addEventListener("mouseenter", wallListener);
+                    wall.addEventListener("click", wallLaid);
+                    if(element.isLaid) {
+                        wallToLaid.push(element);
+                    }
                 }
                 break;
             case "space":
-                const spaceId = i + "-" + j;
+                const spaceId = i + "-" + (9-j+1);
                 const space = document.createElement("div");
                 space.id = spaceId+"-space";
                 space.classList.add("space");
                 board.appendChild(space);
-                if(element.isLaid) space.classList.add("wall-laid");
+                if(element.isLaid) {
+                    wallToLaid.push(element);
+                }
                 break;
             default:
                 console.log("Unexpected Element");
         }
     })
+    wallToLaid.forEach((element)=>{
+        if(element.inclinaison==="vertical") {
+            const wall = document.getElementById("wv~" + element.pos_x + "-" + element.pos_y);
+            wall.classList.add("wall-laid");
+            wall.classList.add("laidBy" + element.player);
+        } else if (element.inclinaison==="horizontal"){
+            const wall = document.getElementById("wh~" + element.pos_x + "-" + element.pos_y);
+            wall.classList.add("wall-laid");
+            wall.classList.add("laidBy" + element.player);
+        } else {
+            const space = document.getElementById(element.pos_x + "-" + element.pos_y + "-space");
+            space.classList.add("wall-laid");
+            space.classList.add("laidBy" + element.player);
+        }
+    });
     let playerCell= data.playerPosition.player1!==null?
         document.getElementById(data.playerPosition.player1[0]+"-"+data.playerPosition.player1[1]+"~cell"):null;
     console.log(playerCell);
@@ -160,19 +192,18 @@ function initializeLoadTable(data) {
     }
     let botCell= data.playerPosition.player2!==null?
         document.getElementById(data.playerPosition.player2[0]+"-"+data.playerPosition.player2[1]+"~cell"):null;
-    console.log(botCell)
+    calculateVisibility(data.playerPosition);
+    console.log(botCell, botCell.visibility<=0);
     if(botCell && parseInt(botCell.visibility)<=0) {
-        addPlayerCircle(botCell, 1);
+        addPlayerCircle(botCell, 2);
         botCell.classList.add("occupied");
     }
 }
 
 function getNatureOfElement(element){
     if(element.hasOwnProperty("isOccupied")) return "case";
-    if(element.hasOwnProperty("isLaid")){
-        if (element.hasOwnProperty("inclinaison")) return "wall";
-        return "space";
-    }
+    else if(element.hasOwnProperty("inclinaison")) return "wall";
+    else return "space";
 }
 
 /** #############################################  ROUND METHODS  ############################################# **/
@@ -196,14 +227,11 @@ function validateRound() {
         socket.off("numberTour");
     });
     socket.on("positionAI", (AIPosition, currentplayer,playerPosition) => {
-        console.log("debug positionAI");
         console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
         if (playerPosition["player2"] !== null){
             const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
-            console.log("htmlOldPosition", htmlOldPosition);
             removePlayerCircle(htmlOldPosition, currentplayer);
         }
-        console.log("AIPosition", AIPosition);
         let circle_bot = document.getElementById(AIPosition);
         console.log("circle_bot", circle_bot);
         //addPlayerCircle(circle_bot, currentplayer);
@@ -275,9 +303,8 @@ function saveGame() {
         socket.on("goBackToMenu",(isWentWell)=>{
             if(isWentWell!==true){
                 alert("Sth went wrong");
-            }
-            else{
-                alert("Partie sauvegardée avec succès !");
+            }else{
+                //alert("Partie sauvegardée avec succès !");
                 window.location.href = "http://localhost:8000/mainMenu.html";
                 socket.off("goBackToMenu");
             }
@@ -315,7 +342,6 @@ function findAdjacentSpace(wallPosition) {
 
     var space = `${colonne}-${ligne}-space`;
     if (colonne < 9  && ligne <= 9) {
-        console.log("space", space);
         return document.getElementById(space);
     } else {
         if (ligne === 9) {
@@ -353,7 +379,6 @@ function wallListener(event) {
     // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
-    console.log(wallType, wallPosition);
     if (wallPosition[0] === "9" || wallPosition[2] === "1") {
         return;
     }
@@ -465,8 +490,6 @@ function choosePositionToBegin(event) {
 
 function movePlayer(event) {
     const target = event.target;
-    console.log(target);
-    console.log(target.id);
     let cellId=target.id;
     // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
     if(target.id.includes("circle")){
