@@ -29,6 +29,7 @@
             Retour
         </p>
     </div>
+    <script src="./js/socket.io.js"></script>
     <script>
 
         var baseUrl = '';
@@ -37,8 +38,8 @@
         } else {
             baseUrl = 'http://cupmaze.ps8.academy';
         }
-
-
+        const socket = io.connect('/api/gameBot');
+      
         document.getElementById('button-launch-botGame').addEventListener('click', function() {
             window.location.href = baseUrl+'/botgame.html';
         });
@@ -46,8 +47,17 @@
             window.location.href = baseUrl+'/game1v1.html'; //Changer le nom de game1v1.html
         });
         document.getElementById('button-retrieveGame').addEventListener('click', function() {
-            window.location.href = baseUrl+'/botgame.html?intent=retrieveGame'; //Changer le nom de game1v1.html
+            const username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+            socket.emit('checkGame', username);
         });
+        socket.on('result', (state) => {
+            if (state === false) {
+                alert('Aucune partie sauvegardée');
+            } else {
+                window.location.href = baseUrl+'/botgame.html?intent=retrieveGame';
+            }
+        });
+      
         document.getElementById('back').addEventListener('click',function () {
             window.location.href = baseUrl+'/mainMenu.html';
         })

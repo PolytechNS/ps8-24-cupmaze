@@ -1,6 +1,6 @@
  import {removePlayerCircle, addPlayerCircle} from "../game_1vbot/movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
-import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
+import {/*startNewRound, setUpNewRound*/} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
 import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 
@@ -96,6 +96,8 @@ function main() {
     socket.on("game", (gameState) => {
         console.log("gameState : ", gameState);
         console.log("gameInformation", gameInformation.roomName);
+        // on affiche pas la popup
+        document.getElementById("popup").style.display = 'none';
         let firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
         if (firstPlayer) {
             player1_name = decodeJWTPayload(getCookie("jwt")).username;
@@ -302,7 +304,7 @@ function undoAction(){
     document.getElementById("button-validate-action").style.display = "none";
     document.getElementById("button-undo-action").style.display = "none";
     //On re-donne la possiblité de sauvegarder
-    document.getElementById("button-save-game").style.display = "flex";
+    //document.getElementById("button-save-game").style.display = "flex";
 
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
@@ -340,6 +342,9 @@ function updateUI(action) {
             case "undoWall":
                 undoWall(action);
                 break;
+            case "button":
+                showButtonVisible()
+                break
     }
 }
 
@@ -349,7 +354,7 @@ function positionBegin(action) {
         addPlayerCircle(document.getElementById(action.cellId), action.current);
         lastActionType = "position";
         if (action.playerPositions === null) {
-            showButtonVisible();
+            //showButtonVisible();
             return;
         }
         const cells = document.querySelectorAll(".cell");
@@ -362,13 +367,12 @@ function positionBegin(action) {
             wall.addEventListener("mouseenter", wallListener);
             wall.addEventListener("click", wallLaid);
         });
-        console.log("board update");
     } else {
         console.log(action.message);
         alert(action.message);
         return;
     }
-    showButtonVisible();
+    //showButtonVisible();
 }
 
 function validate(action) {
@@ -397,7 +401,7 @@ function validate(action) {
 function showButtonVisible(){
     document.getElementById("button-validate-action").style.display = "flex";
     document.getElementById("button-undo-action").style.display = "flex";
-    document.getElementById("button-save-game").style.display = "none";
+    //document.getElementById("button-save-game").style.display = "none";
 }
 
 function move(action) {
@@ -405,11 +409,11 @@ function move(action) {
         if (action.oldPosition !== null) removePlayerCircle(action.oldPosition, action.currentPlayer);
         addPlayerCircle(document.getElementById(action.cellId), action.currentPlayer);
         lastActionType = "position";
-        showButtonVisible();
+        //showButtonVisible();
     } else {
         alert(action.message);
     }
-    showButtonVisible();
+    //showButtonVisible();
 }
 
 function wall(action) {
@@ -425,7 +429,7 @@ function wall(action) {
         firstWallToColor.classList.add("wall-laid", "laidBy" + action.currentPlayer);
         firstWallToColor.removeEventListener("mouseenter", wallListener);
         firstWallToColor.removeEventListener("click", wallLaid);
-        showButtonVisible();
+        //showButtonVisible();
         updateNumberWallsDisplay(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2);
         lastActionType="wall";
     } else {
@@ -505,4 +509,56 @@ function undoWall(action) {
      popup.style.display = 'flex';
      document.getElementById("popup-ready-message").innerHTML = "Victoire de " + winnerText + " !! Félicitations ! ";
      document.getElementById("popup-button").style.display = "none";
+ }
+
+ function startNewRound(){
+     document.getElementById("grid").style.display = 'grid';
+     document.getElementById("display-player-1").style.display = "flex";
+     document.getElementById("display-player-2").style.display = "flex";
+     document.getElementById("display-player-1-walls").style.display = "flex";
+     document.getElementById("display-player-2-walls").style.display = "flex";
+     document.getElementById("display-player-1-number-actions").style.display = "flex";
+     document.getElementById("display-player-2-number-actions").style.display = "flex";
+     document.getElementById("display-number-tour").style.display = "flex";
+     document.getElementById("display-player-turn").style.display = "flex";
+     document.getElementById("player1Image").style.display = "flex";
+     document.getElementById("player2Image").style.display = "flex";
+     //document.getElementById("button-save-game").style.display = "flex";
+ }
+
+
+ /**
+  * Fonction permettant de pouvoir afficher la pop-up pour l'écran anti-triche
+  * On va donc cacher la grille derrière pour éviter la triche
+  */
+ function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
+     console.log("setUpNewRound");
+     document.getElementById("button-validate-action").style.display = "none";
+     document.getElementById("button-undo-action").style.display = "none"
+     //document.getElementById("button-save-game").style.display = "none";
+     document.getElementById("grid").style.display = 'none';
+     document.getElementById("display-player-1").style.display = "none";
+     document.getElementById("display-player-1").innerHTML = player1_name;
+     document.getElementById("display-player-1-walls").style.display = "none";
+     document.getElementById("display-player-1-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer1;
+     document.getElementById("display-player-2").style.display = "none";
+     document.getElementById("display-player-2").innerHTML = player2_name;
+     document.getElementById("display-player-2-walls").style.display = "none";
+     document.getElementById("display-player-2-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer2;
+     document.getElementById("display-player-1-number-actions").innerHTML = "ELO : " + gameInformation.player1_elo;
+     document.getElementById("display-player-1-number-actions").style.display = "none";
+     document.getElementById("display-player-2-number-actions").innerHTML = "ELO : " + gameInformation.player2_elo;
+     document.getElementById("display-player-2-number-actions").style.display = "none";
+     document.getElementById("display-number-tour").innerHTML = "Tour numéro : "+numberTour;
+     let currentName;
+     if (currentPlayer === 1) {
+         currentName = player1_name;
+     } else {
+         currentName = player2_name;
+     }
+     document.getElementById("display-player-turn").innerHTML = "C'est au tour de : "+ currentName;
+     document.getElementById("display-number-tour").style.display = "none";
+     document.getElementById("player1Image").style.display = "none";
+     document.getElementById("player2Image").style.display = "none";
+     startNewRound()
  }

@@ -24,9 +24,14 @@ document.getElementById('button-prizes').addEventListener('click', function() {
 document.getElementById('button-options').addEventListener('click', function() {
     //window.location.href = 'http://localhost:8000/options.html';
 });
+document.getElementById('button-disconnect').addEventListener('click', function () {
+    window.location.href = 'http://localhost:8000/login.html';
+});
 document.getElementById('searchFriends').addEventListener('click', function () {
     window.location.href = baseUrl +'/searchFriends.html';
 });
+
+document.getElementById("welcomeMsg").innerText+=username;
 
 const closePopupButton = document.getElementById("closePopup");
 closePopupButton.onclick = function() {
