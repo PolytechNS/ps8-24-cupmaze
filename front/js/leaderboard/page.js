@@ -1,4 +1,10 @@
-fetch("http://localhost:8000/api/getLeaderboard?$",{
+var baseUrl = '';
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    baseUrl = 'http://localhost:8000';
+} else {
+    baseUrl = 'http://cupmaze.ps8.academy';
+}
+fetch(baseUrl+"/api/getLeaderboard?$",{
     method: "GET",
 })
     .then(async response => {
@@ -32,9 +38,10 @@ fetch("http://localhost:8000/api/getLeaderboard?$",{
         console.error('Erreur:', error);
     });
 
+
 let buttonBack = document.getElementById("button-back");
 buttonBack.onclick = function() {
-    window.location.href = 'http://localhost:8000/mainMenu.html';
+    window.location.href = baseUrl+'/mainMenu.html';
 }
 
 
@@ -46,7 +53,7 @@ closePopup.onclick = function() {
 let buttonResearchAccount = document.getElementById("searchAccount");
 buttonResearchAccount.onclick = function() {
     const username = document.getElementById("searchInput").value;
-    fetch("http://localhost:8000/api/getLeaderboard?$",{
+    fetch(baseUrl+"/api/getLeaderboard?$",{
         method: "GET",
     })
         .then(async response => {

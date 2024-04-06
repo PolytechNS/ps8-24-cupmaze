@@ -1,5 +1,6 @@
 let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
 
+
 let socketGlobalChat = io("/api/globalChat");
 socketGlobalChat.emit("setupGlobalChat");
 socketGlobalChat.on("setupGlobalChat", (messages) => {
@@ -46,4 +47,18 @@ buttonClear.addEventListener("click", () => {
 
 window.addEventListener('beforeunload', () => {
     socketGlobalChat.disconnect();
+});
+
+
+
+var baseUrl = '';
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    baseUrl = 'http://localhost:8000';
+} else {
+    baseUrl = 'http://cupmaze.ps8.academy';
+}
+
+let buttonBack = document.getElementById("back");
+buttonBack.addEventListener("click", function() {
+    window.location.href = baseUrl + "/mainMenu.html";
 });

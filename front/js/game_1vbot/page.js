@@ -206,6 +206,7 @@ function getNatureOfElement(element){
     else return "space";
 }
 
+
 /** #############################################  ROUND METHODS  ############################################# **/
 
 /**

@@ -3,14 +3,23 @@ import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
 let socket=io("/api/game");
 //socket.emit("clearGames",username);
+
+var baseUrl = '';
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    baseUrl = 'http://localhost:8000';
+} else {
+    baseUrl = 'http://cupmaze.ps8.academy';
+}
+
+
 document.getElementById('button-play').addEventListener('click', function() {
-    window.location.href = 'http://localhost:8000/launchGame.html';
+    window.location.href = baseUrl +'/launchGame.html';
 });
 document.getElementById('button-leaderboard').addEventListener('click', function() {
-    window.location.href = 'http://localhost:8000/leaderboard.html';
+    window.location.href = baseUrl+'/leaderboard.html';
 });
 document.getElementById('button-prizes').addEventListener('click', function() {
-    window.location.href = 'http://localhost:8000/prizes.html';
+    window.location.href = baseUrl+'/prizes.html';
 });
 document.getElementById('button-options').addEventListener('click', function() {
     //window.location.href = 'http://localhost:8000/options.html';
@@ -19,7 +28,7 @@ document.getElementById('button-disconnect').addEventListener('click', function 
     window.location.href = 'http://localhost:8000/login.html';
 });
 document.getElementById('searchFriends').addEventListener('click', function () {
-    window.location.href = 'http://localhost:8000/searchFriends.html';
+    window.location.href = baseUrl +'/searchFriends.html';
 });
 
 document.getElementById("welcomeMsg").innerText+=username;
@@ -38,7 +47,7 @@ const params = {
     username: username
 };
 let queryString = new URLSearchParams(params).toString();
-fetch("http://localhost:8000/api/getFriends?$"+queryString, {
+fetch(baseUrl+"/api/getFriends?$"+queryString, {
     method: "GET",
 })
     .then(async response => {
@@ -73,9 +82,9 @@ fetch("http://localhost:8000/api/getFriends?$"+queryString, {
                 buttonChat.textContent = 'Chat';
                 buttonChat.onclick = function() {
                     if(username.localeCompare(friend) < 0 ){
-                        window.location.href = 'http://localhost:8000/privateChat.html?idchat='+username+friend;
+                        window.location.href = baseUrl +'/privateChat.html?idchat='+username+friend;
                     } else {
-                        window.location.href = 'http://localhost:8000/privateChat.html?idchat='+friend+username;
+                        window.location.href = baseUrl +'/privateChat.html?idchat='+friend+username;
                     }
                 }
 
@@ -110,8 +119,15 @@ notificationsButton.addEventListener('click', () => {
     socketNotifications.emit("getNotifications", username);
     socketNotifications.on("notifications", (notifications) => {
         console.log(notifications);
-        document.getElementById("element1").innerText = notifications[0];
-        //document.getElementById("element2").innerText = notifications.notifications[1];
+        if(notifications.length === 0){
+            document.getElementById("element1").innerText = "Vous n'avez pas de notifications";
+        }else{
+            //récupérer les 3 dernières notifications dans le tableau
+            let i = 0;
+            for(i = 0; notifications.length -i -1 >=0 && i < 3; i++){
+                document.getElementById("element"+(i+1)).innerText = notifications[notifications.length -i -1];
+            }
+        }
     });
 });
 
@@ -122,7 +138,7 @@ window.addEventListener('beforeunload', () => {
 
 let globalChatButton = document.getElementById('button-globalChat');
 globalChatButton.addEventListener('click', () => {
-    window.location.href = 'http://localhost:8000/globalChat.html';
+    window.location.href = baseUrl +'/globalChat.html';
 });
 
 /* CHALLENGE */

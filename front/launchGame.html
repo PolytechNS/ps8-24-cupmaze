@@ -31,12 +31,20 @@
     </div>
     <script src="./js/socket.io.js"></script>
     <script>
+
+        var baseUrl = '';
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            baseUrl = 'http://localhost:8000';
+        } else {
+            baseUrl = 'http://cupmaze.ps8.academy';
+        }
         const socket = io.connect('/api/gameBot');
+      
         document.getElementById('button-launch-botGame').addEventListener('click', function() {
-            window.location.href = 'http://localhost:8000/botgame.html';
+            window.location.href = baseUrl+'/botgame.html';
         });
         document.getElementById('button-launch-localGame').addEventListener('click', function() {
-            window.location.href = 'http://localhost:8000/game1v1.html'; //Changer le nom de game1v1.html
+            window.location.href = baseUrl+'/game1v1.html'; //Changer le nom de game1v1.html
         });
         document.getElementById('button-retrieveGame').addEventListener('click', function() {
             const username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
@@ -46,15 +54,16 @@
             if (state === false) {
                 alert('Aucune partie sauvegardée');
             } else {
-                window.location.href = 'http://localhost:8000/botgame.html?intent=retrieveGame';
+                window.location.href = baseUrl+'/botgame.html?intent=retrieveGame';
             }
         });
+      
         document.getElementById('back').addEventListener('click',function () {
-            window.location.href = 'http://localhost:8000/mainMenu.html';
+            window.location.href = baseUrl+'/mainMenu.html';
         })
         document.getElementById('button-launch-onlineGame').addEventListener('click', function() {
             localStorage.setItem('gameType', 'ranked');
-            window.location.href = 'http://localhost:8000/waiting_room.html';
+            window.location.href = baseUrl+'/waiting_room.html';
         });
 
     </script>
