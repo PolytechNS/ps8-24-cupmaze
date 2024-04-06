@@ -57,9 +57,15 @@ class Game {
             if (element.hasOwnProperty("isOccupied")) {
                 res.push(new Case(element.pos_x, element.pos_y, element.isOccupied));
             } else if (element.hasOwnProperty("inclinaison")) {
-                res.push(new Wall(element.pos_x, element.pos_y, element.isLaid, element.inclinaison));
+                console.log("element", element);
+                const wall = new Wall(element.pos_x, element.pos_y, element.isLaid, element.inclinaison);
+                wall.setPlayer(element.player);
+                res.push(wall);
             } else {
-                res.push(new Space(element.pos_x, element.pos_y, element.isLaid));
+                const space = new Space(element.pos_x, element.pos_y);
+                space.setIsLaid(element.isLaid);
+                space.setPlayer(element.player);
+                res.push(space);
             }
         });
         return res;
@@ -147,11 +153,14 @@ class Game {
             if (this.elements[i] instanceof Wall) {
                 if (this.elements[i].equals(firstCase) || this.elements[i].equals(secondCase)) {
                     this.elements[i].setIsLaid(true);
+                    this.elements[i].setPlayer(this.currentPlayer);
+                    console.log("this.elements[i]", this.elements[i]);
                 }
             }
             if (this.elements[i] instanceof Space) {
                 if (this.elements[i].equals(space)) {
                     this.elements[i].setIsLaid(true);
+                    this.elements[i].setPlayer(this.currentPlayer);
                 }
             }
         }

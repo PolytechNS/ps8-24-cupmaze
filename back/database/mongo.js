@@ -131,6 +131,12 @@ async function createGame(game) {
   return game;
 }
 
+async function deleteGame(userEmail) {
+  const db = await getDb();
+  const games = db.collection('games');
+  return games.deleteOne({ userEmail: userEmail });
+}
+
 async function getGame(userEmail) {
   const db = await getDb();
   const games = db.collection('games');
@@ -158,7 +164,6 @@ async function clearGames(userEmail){
   });
   return userEmail;
 }
-
 
 async function clearGameDb() {
   const db = await getDb();
@@ -390,3 +395,5 @@ exports.getUserById = getUserById;
 exports.updateStats = updateStats;
 exports.removeFriend = removeFriend;
 exports.getUsersRank = getUsersRank;
+exports.clearGames = clearGames;
+exports.deleteGame = deleteGame;

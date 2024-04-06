@@ -1,7 +1,7 @@
 const AIEasy = require("../logic/ai.js");
 const { Server } = require("socket.io");
 const { Game } = require("../logic/Entities/Game.js");
-const { getGame, createGame, clearGames} = require("../database/mongo");
+const { getGame, createGame, clearGames, deleteGame} = require("../database/mongo");
 const { Case } = require("../logic/Entities/Case.js");
 const { findWall, findAdjacentWall, findAdjacentSpace,  removeHighlight, findSpace} = require("../logic/utils");
 const { isWallPlacementValid } = require("../logic/wallLayingUtils.js");
@@ -24,13 +24,13 @@ function createSocket(io) {
             getGame(msg).then((savedGame) => {
                 if (savedGame) {
                     console.log("Already have a saved game");
-                    createGame("error already has game saved").then(() => {
-                        socket.emit("goBackToMenu", false);
+                    deleteGame(msg).then(() => {
+                        game.setUserEmail(msg);
+                        createGame(JSON.parse(JSON.stringify(game.toJSON()))).then(() => {
+                            socket.emit("goBackToMenu", true);
+                        });
                     });
-                    // on a déjà une partie sauvegardée pour cet utilisateur
-
-                }
-                else {
+                } else {
                     game.setUserEmail(msg);
                     console.log("userEmail received was : " + msg)
                     createGame(JSON.parse(JSON.stringify(game.toJSON()))).then(() => {
@@ -47,13 +47,22 @@ function createSocket(io) {
             })
         });
 
-        socket.on("retrieveGame", async (msg) => {
+        socket.on("checkGame", async (msg) => {
             let savedGame = await getGame(msg);
             if (!savedGame) {
                 console.log("No game found");
-                // TODO si l'utilisateur n'a aucune une partie sauvegardée
+                socket.emit("result", false);
+            } else {
+                socket.emit("result", true);
             }
-            else {
+        });
+
+        socket.on("retrieveGame", async (msg) => {
+            console.log(msg)
+            let savedGame = await getGame(msg);
+            if (!savedGame) {
+                console.log("No game found");
+            } else {
                 let savedGameObject = JSON.parse(JSON.stringify(savedGame));
                 //console.log(savedGameObject);
                 console.log("Game was succesfully retrieved");

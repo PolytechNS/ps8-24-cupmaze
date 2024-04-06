@@ -39,7 +39,6 @@ function main(isLoadGame) {
         socket.emit("retrieveGame",username);
         socket.on("launchSavedGame",(msg)=>{
             if(msg!==true)alert("sorry no game found");
-            else alert("retrieving game");
             socket.emit("loadGame");
         })
         socket.on("data",(data)=>{
@@ -109,17 +108,16 @@ function initializeTable() {
 }
 
 function initializeLoadTable(data) {
+    let wallToLaid = [];
     data.elements.forEach((element)=>{
         let i=element.pos_x;
         let j=element.pos_y;
         if (i == null || j == null) return;
         switch (getNatureOfElement(element)){
             case "case":
-                console.log("case");
                 const cellId = i + "-" + (9-j+1);
                 const cell = document.createElement("div");
                 cell.id = cellId+"~cell";
-                console.log(cell.id);
                 cell.classList.add("cell");
                 cell.addEventListener("click", movePlayer);
                 board.appendChild(cell);
@@ -133,7 +131,15 @@ function initializeLoadTable(data) {
                     board.appendChild(wall);
                     wall.addEventListener("mouseenter", wallListener);
                     wall.addEventListener("click", wallLaid);
-                    if(element.isLaid) wall.classList.add("wall-laid");
+                    if(element.isLaid) {
+                        wallToLaid.push(element);
+                        /*
+                        console.log("wall : ", element);
+                        console.log("wall : ", wall);
+                        wall.classList.add("wall-laid");
+                        wall.classList.add("laidBy" + element.player);
+                         */
+                    }
                 } else{
                     if (j === 9) return;
                     const wall = document.createElement("div");
@@ -142,22 +148,52 @@ function initializeLoadTable(data) {
                     board.appendChild(wall);
                     wall.addEventListener("mouseenter", wallListener);
                     wall.addEventListener("click", wallLaid);
-                    if(element.isLaid) wall.classList.add("wall-laid");
+                    if(element.isLaid) {
+                        wallToLaid.push(element);
+                        /*
+                        console.log("wall : ", element);
+                        console.log("wall : ", wall);
+                        wall.classList.add("wall-laid");
+                        wall.classList.add("laidBy" + element.player);
+                                                 */
+                    }
                 }
                 break;
             case "space":
-                console.log("space");
                 const spaceId = i + "-" + (9-j+1);
                 const space = document.createElement("div");
                 space.id = spaceId+"-space";
                 space.classList.add("space");
                 board.appendChild(space);
-                if(element.isLaid) space.classList.add("wall-laid");
+                if(element.isLaid) {
+                    wallToLaid.push(element);
+                    /*
+                    console.log("space : ", element);
+                    console.log("space : ", space);
+                    space.classList.add("wall-laid");
+                    space.classList.add("laidBy" + element.player);
+                    */
+                }
                 break;
             default:
                 console.log("Unexpected Element");
         }
     })
+    wallToLaid.forEach((element)=>{
+        if(element.inclinaison==="vertical") {
+            const wall = document.getElementById("wv~" + element.pos_x + "-" + element.pos_y);
+            wall.classList.add("wall-laid");
+            wall.classList.add("laidBy" + element.player);
+        } else if (element.inclinaison==="horizontal"){
+            const wall = document.getElementById("wh~" + element.pos_x + "-" + element.pos_y);
+            wall.classList.add("wall-laid");
+            wall.classList.add("laidBy" + element.player);
+        } else {
+            const space = document.getElementById(element.pos_x + "-" + element.pos_y + "-space");
+            space.classList.add("wall-laid");
+            space.classList.add("laidBy" + element.player);
+        }
+    });
     let playerCell= data.playerPosition.player1!==null?
         document.getElementById(data.playerPosition.player1[0]+"-"+data.playerPosition.player1[1]+"~cell"):null;
     console.log(playerCell);
@@ -203,7 +239,6 @@ function validateRound() {
         socket.off("numberTour");
     });
     socket.on("positionAI", (AIPosition, currentplayer,playerPosition) => {
-        console.log("debug positionAI");
         console.log("newAIPosition", AIPosition, currentplayer, playerPosition);
         if (playerPosition["player2"] !== null){
             const htmlOldPosition=playerPosition["player2"][0]+"-"+playerPosition["player2"][1]+"~cell";
@@ -282,9 +317,8 @@ function saveGame() {
         socket.on("goBackToMenu",(isWentWell)=>{
             if(isWentWell!==true){
                 alert("Sth went wrong");
-            }
-            else{
-                alert("Partie sauvegardée avec succès !");
+            }else{
+                //alert("Partie sauvegardée avec succès !");
                 window.location.href = "http://localhost:8000/mainMenu.html";
                 socket.off("goBackToMenu");
             }
@@ -322,7 +356,6 @@ function findAdjacentSpace(wallPosition) {
 
     var space = `${colonne}-${ligne}-space`;
     if (colonne < 9  && ligne <= 9) {
-        console.log("space", space);
         return document.getElementById(space);
     } else {
         if (ligne === 9) {
@@ -360,7 +393,6 @@ function wallListener(event) {
     // on parse les ID pour avoir les coordonnées des murs
     const wallId = firstWallToColor.id;
     const { wallType, wallPosition } = extractWallInfo(wallId);
-    console.log(wallType, wallPosition);
     if (wallPosition[0] === "9" || wallPosition[2] === "1") {
         return;
     }
@@ -472,8 +504,6 @@ function choosePositionToBegin(event) {
 
 function movePlayer(event) {
     const target = event.target;
-    console.log(target);
-    console.log(target.id);
     let cellId=target.id;
     // il faudra mettre des verif ici quand on aura extrait le graphe du plateau
     if(target.id.includes("circle")){
