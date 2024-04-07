@@ -6,11 +6,20 @@
     <link rel="stylesheet" href="globalChat.css">
 </head>
 <body>
-<h1>Chat privé : </h1>
-<div id="messages-container">
+<div id="main-container">
+    <h1 class="main_tile">Chat privé de CupMaze : </h1>
+    <div id="chat-container">
+        <div id="messages-container">
+            <!-- Vos messages seront affichés ici -->
+        </div>
+        <div id="chat-controls">
+            <input type="text" id="messageInput" placeholder="Envoyer un message...">
+            <button id="sendButton">Envoyer</button>
+            <button id="clearButton">Effacer le chat</button>
+            <button id="back">Retour en arrière</button>
+        </div>
+    </div>
 </div>
-<input type="text" id="messageInput" placeholder="Envoyer un message...">
-<button id="sendButton">Envoyer</button>
 <script src="./js/socket.io.js"></script>
 <script src="./js/privateChat/page.js"></script>
 </body>
