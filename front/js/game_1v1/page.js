@@ -1,7 +1,7 @@
  import {removePlayerCircle, addPlayerCircle} from "../game_1vbot/movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
 import {/*startNewRound, setUpNewRound*/} from "../game_local_1v1/roundUtils.js";
-import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
+import {setVisionForPlayer} from "../game_1vbot/fog_of_war.js";
 import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 
 let socket;
@@ -105,6 +105,7 @@ function main() {
             const elo_player1 = gameInformation.player1_elo;
             console.log("elo_player1", elo_player1);
             console.log("player1_name", player1_name, "player2_name", player2_name);
+            //setVisionForPlayer(1, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
         } else {
             player2_name = decodeJWTPayload(getCookie("jwt")).username;
@@ -112,6 +113,7 @@ function main() {
             const elo_player2 = gameInformation.player2_elo;
             console.log("elo_player2", elo_player2);
             console.log("player1_name", player1_name, "player2_name", player2_name);
+            //setVisionForPlayer(2, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
         }
 
