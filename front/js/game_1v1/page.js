@@ -1,6 +1,5 @@
  import {removePlayerCircle, addPlayerCircle} from "../game_1vbot/movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
-import {/*startNewRound, setUpNewRound*/} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_1vbot/fog_of_war.js";
 import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 
@@ -111,13 +110,20 @@ function main() {
         console.log("gameInformation", gameInformation.roomName);
         // on affiche pas la popup
         document.getElementById("popup").style.display = 'none';
+
+        board = document.getElementById("grid");
+        document.getElementById("popup-button").addEventListener("click",startNewRound);
+        document.getElementById("button-validate-action").addEventListener("click",validateRound);
+        document.getElementById("button-undo-action").addEventListener("click",undoAction);
+        initializeTable();
+
         if (firstPlayer) {
             player1_name = decodeJWTPayload(getCookie("jwt")).username;
             player2_name = gameInformation.opponentName;
             const elo_player1 = gameInformation.player1_elo;
             console.log("elo_player1", elo_player1);
             console.log("player1_name", player1_name, "player2_name", player2_name);
-            //setVisionForPlayer(1, {player1: null, player2: null})
+            setVisionForPlayer(1, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
         } else {
             player2_name = decodeJWTPayload(getCookie("jwt")).username;
@@ -125,16 +131,9 @@ function main() {
             const elo_player2 = gameInformation.player2_elo;
             console.log("elo_player2", elo_player2);
             console.log("player1_name", player1_name, "player2_name", player2_name);
-            //setVisionForPlayer(2, {player1: null, player2: null})
+            setVisionForPlayer(2, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
         }
-
-        board = document.getElementById("grid");
-        document.getElementById("popup-button").addEventListener("click",startNewRound);
-        document.getElementById("button-validate-action").addEventListener("click",validateRound);
-        document.getElementById("button-undo-action").addEventListener("click",undoAction);
-        initializeTable();
-        //setVisionForPlayer(player_number, {player1: null, player2: null});
         //setUpNewRound(player1_name,10,10,1);
         socket.on("actionResult", (action) => updateUI(action));
         socket.off("game");
@@ -391,6 +390,12 @@ function positionBegin(action) {
 
 function validate(action) {
     if (action.valid) {
+        if(firstPlayer){
+            setVisionForPlayer(1, action.playerPosition);
+        }else {
+            setVisionForPlayer(2, action.playerPosition);
+        }
+
         setUpNewRound(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2, action.numberTour);
     } else {
         switch (action.case) {
