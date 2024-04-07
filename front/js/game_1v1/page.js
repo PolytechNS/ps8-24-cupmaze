@@ -105,14 +105,14 @@ function main() {
             const elo_player1 = gameInformation.player1_elo;
             console.log("elo_player1", elo_player1);
             console.log("player1_name", player1_name, "player2_name", player2_name);
-            setUpNewRound(player1_name,10,10,1)
+            setUpNewRound(1,10,10,1)
         } else {
             player2_name = decodeJWTPayload(getCookie("jwt")).username;
             player1_name = gameInformation.opponentName;
             const elo_player2 = gameInformation.player2_elo;
             console.log("elo_player2", elo_player2);
             console.log("player1_name", player1_name, "player2_name", player2_name);
-            setUpNewRound(player2_name,10,10,1)
+            setUpNewRound(1,10,10,1)
         }
 
         board = document.getElementById("grid");
