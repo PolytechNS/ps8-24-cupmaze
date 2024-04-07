@@ -511,6 +511,9 @@ function undoWall(action) {
      popup.style.display = 'flex';
      document.getElementById("popup-ready-message").innerHTML = "Victoire de " + winnerText + " !! Félicitations ! ";
      document.getElementById("popup-button").style.display = "none";
+     setTimeout(() => {
+         window.location.href = `/mainMenu.html`;
+     }, 3000);
  }
 
  function startNewRound(){
