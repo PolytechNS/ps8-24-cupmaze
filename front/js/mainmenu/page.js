@@ -148,7 +148,6 @@ function sendChallenge(friend) {
         "senderToken": getCookie('jwt'),
         "friend": friend
     }
-
     socketNotifications.emit('sendChallenge', sendChallenge);
 }
 
@@ -210,6 +209,6 @@ function onChallengeInit(challengeInit) {
         localStorage.setItem('opponentId', challengeInit.opponentId);
         localStorage.setItem('player1_elo', challengeInit.player1_elo);
         localStorage.setItem('player2_elo', challengeInit.player2_elo);
-        window.location.href = `/1v1game.html`;
+        window.location.href = `/online1v1.html`;
     }, 2000);
 }

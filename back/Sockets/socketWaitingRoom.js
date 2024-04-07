@@ -373,16 +373,29 @@ function createSocket(io) {
 
                 const winner = gameState.game.isGameOver(gameState.game.playerPosition);
                 if (winner[0]) {
-                    const eloGame = updateElo(roomId, winner[1]);
-                    WaitingRoomNamespace.to(roomId).emit('actionResult', {
-                        valid: false,
-                        message: "Le joueur " + winner[1] + " a gagné",
-                        winner: winner[1],
-                        eloGame: eloGame,
-                        case: "victory",
-                        actionType: "validateRound"
-                    });
-                    return;
+                    if (playersWithRooms[roomId].gameMode === "ranked") {
+                        const eloGame = updateElo(roomId, winner[1]);
+                        WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                            valid: false,
+                            message: "Le joueur " + winner[1] + " a gagné",
+                            winner: winner[1],
+                            eloGame: eloGame,
+                            case: "victory",
+                            actionType: "validateRound"
+                        });
+                        return;
+                    } else {
+                        WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                            valid: false,
+                            message: "Le joueur " + winner[1] + " a gagné",
+                            winner: winner[1],
+                            eloGame: 0,
+                            case: "victory",
+                            actionType: "validateRound"
+                        });
+                        return;
+                    }
+
                 }
 
                 if (gameState.game.numberTour === 101){
@@ -553,7 +566,7 @@ function createSocket(io) {
 
         let player1_Chance = 1 / (1 + Math.pow(10, (player2_elo - player1_elo) / 400));
         let elo_Diff;
-        if (winner === 0 || winner === -1 || playersWithRooms[roomId].gameMode === undefined) {
+        if (winner === 0 || winner === -1) {
             return 0;
         }
         if (winner === 1) {
