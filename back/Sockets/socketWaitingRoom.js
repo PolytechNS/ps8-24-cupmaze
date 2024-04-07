@@ -544,9 +544,12 @@ function createSocket(io) {
     }
 
     async function updateElo(roomId, winner) {
-        let player1_elo = await getUserById(playersWithRooms[roomId].player1).elo;
-        let player2_elo = await getUserById(playersWithRooms[roomId].player2).elo;
-        console.log("player1_elo", player1_elo, "player2_elo", player2_elo);
+        let player1 = await getUserById(playersWithRooms[roomId].player1);
+        console.log("player1", player1);
+        let player2 = await getUserById(playersWithRooms[roomId].player2);
+        console.log("player2", player2);
+        let player1_elo = player1.elo
+        let player2_elo = player2.elo;
 
         let player1_Chance = 1 / (1 + Math.pow(10, (player2_elo - player1_elo) / 400));
         let elo_Diff;

@@ -102,6 +102,8 @@ async function getUserById(id) {
             'id': user._id,
             'username': user.username,
             'elo': user.elo,
+            'gamesWin': user.gamesWin,
+            'gamesLoose': user.gamesLoose,
         }
     } catch (error) {
         console.error('Erreur lors de la récupération des données :', error);
@@ -296,8 +298,12 @@ async function updateStats(winnerId, looserId, eloDiff) {
             { $set: { elo: (looser.elo - eloDiff) > 0 ? looser.elo - eloDiff : 0 } }
         );
 
-        await updateGameWin(winnerId);
-        await updateGameLose(looserId);
+        await users.updateOne(
+            { _id: winner.id },
+            { $set: { gamesWin: winner.gamesWin + 1 } });
+        await users.updateOne(
+            { _id: looser.id },
+            { $set: { gamesLoose: looser.gamesLoose + 1 } });
 
         console.log('Opérations de mise à jour réussies');
         return 'Opérations de mise à jour réussies';
@@ -341,32 +347,6 @@ async function getUsersRank(){
     const db = await getDb();
     const users = db.collection('users');
     return users.find().sort({elo: -1}).toArray();
-}
-
-
-async function updateGameWin(idPlayer){
-    const db = await getDb();
-    const users = db.collection('users');
-    await users.updateOne(
-        {
-            _id: idPlayer
-        },
-        {
-            $inc: {gamesWin: 1}
-
-        });
-}
-
-async function updateGameLose(idPlayer){
-    const db = await getDb();
-    const users = db.collection('users');
-    await users.updateOne(
-        {
-            _id: idPlayer
-        },
-        {
-            $inc: {gamesLoose: 1}
-        });
 }
 
 
