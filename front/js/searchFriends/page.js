@@ -158,12 +158,15 @@ function retrieveFriends(params){
                     buttonDiv.classList.add("buttonDiv");
 
                     const challengeButton = document.createElement("button");
-                    challengeButton.textContent = "Défier";
+                    const challengeIcone = document.createElement("img");
+                    challengeIcone.src = "imageResources/icone_defi.png";
+                    challengeIcone.style.width = "25px"; // Réduire la largeur de l'image
+                    challengeIcone.style.height = "25px"; // Réduire la hauteur de l'image
+                    challengeButton.appendChild(challengeIcone);
                     buttonDiv.appendChild(challengeButton);
-                    console.log("Défier", friend);
+
                     challengeButton.onclick = (function(friend) {
                         return function() {
-                            console.log("Défier", friend);
                             sendChallenge(friend);
                         };
                     })(friend);
@@ -205,7 +208,7 @@ function retrieveWaitingFriendsRequests(params){
         .then(async response => {
             if (!response.ok) {
                 alert("ERROR"+response.status);
-            }else{
+            } else {
                 let ret = await response.json();
                 console.log("myWaitingFriendsRequests succes");
                 console.log(ret);
@@ -297,7 +300,6 @@ function init() {
 
 function onReceiveChallenge(receiveChallenge) {
     // on affiche une popup pour accepter ou refuser le challenge
-    console.log("receiveChallenge", receiveChallenge.token);
     const popup = document.getElementById('popup-notif');
     popup.style.display = 'block';
     popup.style.backgroundColor = 'red';
