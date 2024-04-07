@@ -6,10 +6,7 @@
     <link rel="stylesheet" href="./leaderboard.css">
 </head>
 <body>
-<h1>Leaderboard de Cupzmaze : </h1>
-
-<input type="text" id="searchInput" placeholder="Rechercher des amis...">
-<button id="searchAccount">Rechercher un joueur</button>
+<h1 id="main_tile_prize">Leaderboard de Cupzmaze : </h1>
 
 <div id="popup" class="popup">
     <div class="popup-content">
@@ -31,9 +28,12 @@
         </thead>
         <tbody id="body-leaderboard">
         </tbody>
+
+        <input type="text" id="searchInput" placeholder="Rechercher des joueurs...">
+        <button id="searchAccount">Rechercher un joueur</button>
     </table>
 </div>
-<button id="button-back">Retour</button>
+<button id="button-back" class="button">Retour</button>
 <script src="./js/leaderboard/page.js"></script>
 </body>
 </html>

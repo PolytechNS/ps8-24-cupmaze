@@ -1,12 +1,22 @@
 let socketNotifications;
 
+
+var baseUrl = '';
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    baseUrl = 'http://localhost:8000';
+} else {
+    baseUrl = 'http://cupmaze.ps8.academy';
+}
+
+
+
 function searchAccountOnDB(){
     const usernameWanted = document.getElementById("searchInput").value;
     const params = {
         username: usernameWanted
     };
     const queryString = new URLSearchParams(params).toString();
-    fetch("http://localhost:8000/api/searchAccount?$"+queryString, {
+    fetch(baseUrl+"/api/searchAccount?$"+queryString, {
         method: "GET",
     })
         .then(async response => {
@@ -46,7 +56,7 @@ function addFriendRequest(usernameToAdd) {
     }
 
     const queryString = new URLSearchParams(params).toString();
-    fetch("http://localhost:8000/api/addFriend?$"+queryString, {
+    fetch(baseUrl+"/api/addFriend?$"+queryString, {
         method: "GET",
     })
         .then(async response => {
@@ -70,7 +80,7 @@ function acceptFriendRequest(usernameAdder) {
         usernameToAdd: usernameAdder
     };
     const queryString = new URLSearchParams(params).toString();
-    fetch("http://localhost:8000/api/acceptFriendRequest?$"+queryString, {
+    fetch(baseUrl+"/api/acceptFriendRequest?$"+queryString, {
         method: "GET",
     })
         .then(async response => {
@@ -96,7 +106,7 @@ function deleteFriend(usernameToDelete) {
         usernameToDelete: usernameToDelete
     };
     const queryString = new URLSearchParams(params).toString();
-    fetch("http://localhost:8000/api/removeFriend?$"+queryString, {
+    fetch(baseUrl+"/api/removeFriend?$"+queryString, {
         method: "GET",
     })
         .then(async response => {
@@ -128,7 +138,7 @@ function retrieveFriends(params){
 
     //On va mettre a jour notre liste d'amis
     let queryString = new URLSearchParams(params).toString();
-    fetch("http://localhost:8000/api/getFriends?$"+queryString, {
+    fetch(baseUrl+"/api/getFriends?$"+queryString, {
         method: "GET",
     })
         .then(async response => {
@@ -172,7 +182,7 @@ function retrieveWaitingFriendsRequests(params){
 
     // On va retrouver la liste des demandes qui attendent le joueur
     queryString = new URLSearchParams(params).toString();
-    fetch("http://localhost:8000/api/getWaitingFriendsRequests?$"+queryString, {
+    fetch(baseUrl+"/api/getWaitingFriendsRequests?$"+queryString, {
         method: "GET",
     })
         .then(async response => {
@@ -223,4 +233,10 @@ function main(){
 // Appeler main() lorsque le DOM est complètement chargé
 document.addEventListener("DOMContentLoaded", function() {
     main();
+});
+
+
+let buttonBack = document.getElementById("back");
+buttonBack.addEventListener("click", function() {
+    window.location.href = baseUrl + "/mainMenu.html";
 });

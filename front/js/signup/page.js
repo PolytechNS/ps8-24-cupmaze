@@ -1,3 +1,10 @@
+var baseUrl = '';
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    baseUrl = 'http://localhost:8000';
+} else {
+    baseUrl = 'http://cupmaze.ps8.academy';
+}
+
 document.getElementById("signup-form").addEventListener("submit", async function (event) {
     event.preventDefault(); // Empêche le comportement par défaut du formulaire
 
@@ -9,12 +16,12 @@ document.getElementById("signup-form").addEventListener("submit", async function
     };
 
     // Hachage du mot de passe
-    await hashPassword(formData.password).then((hash) => {
+    /*await hashPassword(formData.password).then((hash) => {
         formData.password = hash;
-    });
+    });*/
 
     // Envoi de la requête POST
-    fetch("http://localhost:8000/api/signup", {
+    fetch(baseUrl+"/api/signup", {
         method: "POST",
         body: JSON.stringify(formData),
         headers: {
@@ -29,7 +36,7 @@ document.getElementById("signup-form").addEventListener("submit", async function
                 }
             }
             alert('Inscription réussie !');
-            window.location.href = 'http://localhost:8000/';
+            window.location.href = baseUrl;
         })
         .then(data => {
             console.log(data); // Affichage de la réponse du serveur
@@ -63,3 +70,8 @@ function hashPassword(password) {
     return encrypted.toString('base64');
 }
  */
+
+let buttonBack = document.getElementById("back");
+buttonBack.addEventListener("click", function () {
+    window.location.href = baseUrl;
+});

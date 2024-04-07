@@ -2,8 +2,7 @@ const { Wall } = require('./Wall.js');
 const { Case } = require('./Case.js');
 const { Space } = require('./Space.js');
 const { getPossibleMoves } = require('../movePlayerReferee.js');
-
-const { Node, Graph, NodeWall, PriorityQueue } = require('../CupMaze.js');
+const {findWall} = require("../utils");
 
 class Game {
     constructor() {
@@ -27,7 +26,6 @@ class Game {
         this.lastWallsLaid = [];
         this.lastWallLaidsIDHtml = [];
 
-        this.graph = new Graph(9, 9);
         this.casePosition = [];
         this.wallPossible = [];
         this.gameState = {};
@@ -43,11 +41,30 @@ class Game {
         this.numberTour = savedGame.numberTour;
         this.playerPosition = savedGame.playerPosition;
         this.lastPlayerPosition = savedGame.lastPlayerPosition;
-        this.elements = savedGame.elements;
+        this.elements = this.elementJsonToElement(savedGame.elements);
         this.lastWallsLaid = savedGame.lastWallsLaid;
         this.lastWallLaidsIDHtml = savedGame.lastWallLaidsIDHtml;
 
-        this.graph = savedGame.graph;
+        //this.graph = savedGame.graph;
+    }
+
+    elementJsonToElement(elementJson) {
+        let res = [];
+        elementJson.forEach(element => {
+            if (element.hasOwnProperty("isOccupied")) {
+                res.push(new Case(element.pos_x, element.pos_y, element.isOccupied));
+            } else if (element.hasOwnProperty("inclinaison")) {
+                const wall = new Wall(element.pos_x, element.pos_y, element.isLaid, element.inclinaison);
+                wall.setPlayer(element.player);
+                res.push(wall);
+            } else {
+                const space = new Space(element.pos_x, element.pos_y);
+                space.setIsLaid(element.isLaid);
+                space.setPlayer(element.player);
+                res.push(space);
+            }
+        });
+        return res;
     }
 
     init() {
@@ -103,15 +120,7 @@ class Game {
         return this.playerPosition[`player${index}`];
     }
 
-
-    getPlayerLastPosition(index) {
-        return this.lastPlayerPosition[index - 1];
-    }
-
     movePlayer(number, caseWanted, playerCurrentPosition) {
-        console.log("number", number);
-        console.log(this.playerPosition[`player${number}`]);
-        console.log(this.lastPlayerPosition[`player${number}`]);
         const coordinates = [caseWanted.getPos_x(), caseWanted.getPos_y()];
 
         this.lastPlayerPosition[`player${number}`] = this.playerPosition[`player${number}`];
@@ -132,11 +141,13 @@ class Game {
             if (this.elements[i] instanceof Wall) {
                 if (this.elements[i].equals(firstCase) || this.elements[i].equals(secondCase)) {
                     this.elements[i].setIsLaid(true);
+                    this.elements[i].setPlayer(this.currentPlayer);
                 }
             }
             if (this.elements[i] instanceof Space) {
                 if (this.elements[i].equals(space)) {
                     this.elements[i].setIsLaid(true);
+                    this.elements[i].setPlayer(this.currentPlayer);
                 }
             }
         }
@@ -168,14 +179,112 @@ class Game {
             lastWallLaidsIDHtml: this.lastWallLaidsIDHtml
         };
     }
+
     undoWalls(){
         for(let i=0; i!==this.lastWallsLaid.length; i++){
             this.lastWallsLaid[i].setIsLaid(false);
         }
-        const colonne = this.lastWallsLaid[0].getPos_x();
-        const ligne = this.lastWallsLaid[0].getPos_y();
-        this.graph.removeWall(colonne, ligne);
     }
+
+    buildGraphFromElements(){
+        let graph = {};
+        for(let i= 0; i < 9;i++){
+            graph[i] = [];
+            for (let j = 0; j < 9; j++){
+                /// on creer les edges
+                graph[i][j] = [];
+                if (i > 0) { graph[i][j].push([i,j+1]); }
+                if (i < 8) { graph[i][j].push([i+2, j+1]); }
+                if (j > 0) { graph[i][j].push([i+1, j]);  }
+                if (j < 8) { graph[i][j].push([i+1, j+2]); }
+            }
+        }
+        // on ajoute les murs
+        this.elements.forEach(element => {
+            if(element instanceof Wall) {
+                if (element.isLaid) {
+                    const x = element.getPos_x();
+                    const y = element.getPos_y();
+                    if (element.inclinaison === "horizontal") {
+                        graph[x - 1][y - 2] = graph[x - 1][y - 2].filter(edge => !(edge[0] === x && edge[1] === y));
+                        graph[x - 1][y - 1] = graph[x - 1][y - 1].filter(edge => !(edge[0] === x && edge[1] === y - 1));
+                    }
+                    if (element.inclinaison === "vertical") {
+                        graph[x][y - 1] = graph[x][y - 1].filter(edge => !(edge[0] === x && edge[1] === y));
+                        graph[x - 1][y - 1] = graph[x - 1][y - 1].filter(edge => !(edge[0] === x+1 && edge[1] === y));
+                    }
+                }
+            }
+        });
+        return graph;
+    }
+
+    isWallBlockingPath(colonne1, ligne1, colonne2, ligne2, inclinaison){
+        // on ajoute les 2 mur
+        let wall1 = findWall(colonne1, ligne1, inclinaison, this.elements);
+        let wall2 = findWall(colonne2, ligne2, inclinaison, this.elements);
+        console.log("wall1", wall1, "wall2", wall2);
+        // on les cherche dans le element et on les mmet occupé
+        for (let i = 0; i < this.elements.length; i++) {
+            if (this.elements[i] instanceof Wall) {
+                if (this.elements[i].equals(wall1) || this.elements[i].equals(wall2)) {
+                    this.elements[i].setIsLaid(true);
+                    //this.elements[i].setPlayer(this.currentPlayer);
+                }
+            }
+        }
+        let graph = this.buildGraphFromElements();
+
+        // on verifie si il y a un chemin
+        let res = this.dfs(graph, this.playerPosition.player1, 9);
+        let res2 = this.dfs(graph, this.playerPosition.player2,1);
+
+        // on retire les mur
+        for (let i = 0; i < this.elements.length; i++) {
+            if (this.elements[i] instanceof Wall) {
+                if (this.elements[i].equals(wall1) || this.elements[i].equals(wall2)) {
+                    this.elements[i].setIsLaid(false);
+                }
+            }
+        }
+
+        // si il y a un chemin pour les 2 joueurs on renvoit true
+        if (res && res2) {
+            return true;
+        }
+    }
+
+    dfs(graph, playerPosition, number) {
+        // on recupere la position du joueur
+        console.log("playerPosition", playerPosition, number);
+        const colonne = playerPosition[0];
+        const ligne = playerPosition[1];
+
+        // on creer un tableau pour savoir si on a deja visite une case
+        let visited = Array(9).fill(false).map(() => Array(9).fill(false));
+        // on creer un tableau pour savoir si on a deja visite une case
+        let stack = [];
+        stack.push([colonne, ligne]);
+        visited[colonne-1][ligne-1] = true;
+        while (stack.length !== 0) {
+            let current = stack.pop();
+            let x = current[0];
+            let y = current[1];
+            //console.log("current", x, y);
+            if (y === number) {
+                return true;
+            }
+            for (let i = 0; i < graph[x-1][y-1].length; i++) {
+                let next = graph[x-1][y-1][i];
+                if (!visited[next[0]-1][next[1]-1]) {
+                    visited[next[0]-1][next[1]-1] = true;
+                    stack.push(next);
+                }
+            }
+        }
+        return false;
+    }
+
 }
 
 

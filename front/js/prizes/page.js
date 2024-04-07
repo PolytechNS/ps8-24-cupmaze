@@ -10,9 +10,17 @@ const params = {
     username: myUsername
 };
 
-const queryString = new URLSearchParams(params).toString();
+let queryString = new URLSearchParams(params).toString();
 
-fetch("http://localhost:8000/api/getStats?$"+queryString, {
+
+var baseUrl = '';
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    baseUrl = 'http://localhost:8000';
+} else {
+    baseUrl = 'http://cupmaze.ps8.academy';
+}
+
+fetch(baseUrl+"/api/getStats?$"+queryString, {
     method: "GET",
 })
     .then(async response => {
@@ -23,8 +31,9 @@ fetch("http://localhost:8000/api/getStats?$"+queryString, {
             console.log(data);
 
             let elo = data.elo;
-            printElo.innerText = "Vous faites partie de la ligue : " + findLeague(elo)[0] + " avec un elo de " + elo;
+            printElo.innerText = "Vous faites partie de la ligue " + findLeague(elo)[0] + " avec un elo de " + elo;
             document.getElementById("elo-medal").src = findLeague(elo)[1];
+            document.getElementById("elo-medal").style.width = "100px";
 
             let friends = data.friendsList.length;
             let data_to_put = friends % 5;
@@ -56,9 +65,10 @@ fetch("http://localhost:8000/api/getStats?$"+queryString, {
     });
 
 
+
 let buttonBack = document.getElementById("back");
 buttonBack.onclick = function() {
-    window.location.href = 'http://localhost:8000/mainMenu.html';
+    window.location.href = baseUrl +'/mainMenu.html';
 }
 
 

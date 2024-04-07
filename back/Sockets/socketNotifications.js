@@ -1,5 +1,7 @@
 const { Server } = require("socket.io");
-const {addNotification, removeNotification, getNotifications, decodeJWTPayload, getUserByName, getUserById} = require("../database/mongo");
+const {addNotification, removeNotification, getNotifications, decodeJWTPayload, getUserByName, getUserById,
+    acceptFriendRequest
+} = require("../database/mongo");
 const {verify} = require("jsonwebtoken");
 const {setupChallenge} = require("./socketWaitingRoom");
 function createSocket(io) {
@@ -49,6 +51,7 @@ function createSocket(io) {
         console.log('User', userInformation.username, 'connected to notifications');
         socket.join(userInformation.id);
     }
+
     async function onSendChallenge(socket, data) {
         console.log('Challenge sent to', data.friend);
         let senderToken = data.senderToken;
@@ -85,25 +88,26 @@ function createSocket(io) {
         if (!verify(senderToken, 'secret')) { return; }
 
         let userInformation = decodeJWTPayload(senderToken);
+        let userDB = await getUserById(userId);
+        let friendDB = await getUserById(friendId);
+        console.log('friendDB', friendDB);
 
         notifications.to(userId).emit("challengeInit", {
             'opponentName': friendName,
             'opponentId': friendId,
-            'player1_elo': userInformation.elo,
-            'player2_elo': await getUserById(friendId).elo,
+            'player1_elo': userDB.elo,
+            'player2_elo': friendDB.elo,
             'room': userId
         });
 
         notifications.to(friendId).emit("challengeInit", {
             'opponentName': userInformation.username,
             'opponentId': userId,
-            'player1_elo': await getUserById(friendId).elo,
-            'player2_elo': userInformation.elo,
+            'player1_elo': userDB.elo,
+            'player2_elo': friendDB.elo,
             'room': userId
         });
         setupChallenge(userId, friendId);
-
-
     }
 
 }

@@ -1,5 +1,6 @@
 export {
-    setVisionForPlayer
+    setVisionForPlayer,
+    calculateVisibility
 }
 const INFINITY = 9999;
 function calculateVisibility(playerPositions) {
