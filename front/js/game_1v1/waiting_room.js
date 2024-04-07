@@ -4,6 +4,9 @@ const token = getCookie('jwt');
 
 document.addEventListener('DOMContentLoaded', init, false);
 
+document.getElementById("button-leave-waiting").addEventListener('click',
+    () => {window.location.href = '/launchGame.html';});
+
 function init() {
     console.log('connected to the waiting room');
     socket.emit('waiting_room',

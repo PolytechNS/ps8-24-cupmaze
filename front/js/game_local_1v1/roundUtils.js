@@ -17,7 +17,7 @@ function startNewRound(){
     document.getElementById("display-number-tour").style.display = "flex";
     document.getElementById("player1Image").style.display = "flex";
     document.getElementById("player2Image").style.display = "flex";
-    document.getElementById("button-save-game").style.display = "flex";
+    document.getElementById("button-leave-game").style.display = "flex";
 }
 
 
@@ -28,8 +28,19 @@ function startNewRound(){
 function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
     document.getElementById("button-validate-action").style.display = "none";
     document.getElementById("button-undo-action").style.display = "none"
-    document.getElementById("button-save-game").style.display = "none";
+    const leaveGameButtonStyle = document.getElementById("button-leave-game").style;
+    leaveGameButtonStyle.display = "none";
     document.getElementById("popup-ready-message").innerHTML = "C'est à vous de jouer : Joueur " +currentPlayer;
+    if(currentPlayer===2) {
+        leaveGameButtonStyle.background = "rgba(94,174,200, 0.7)";
+        leaveGameButtonStyle.removeProperty("left");
+        leaveGameButtonStyle.float = "right";
+    }
+    else {
+        leaveGameButtonStyle.left = "0%";
+        leaveGameButtonStyle.removeProperty("float");
+        leaveGameButtonStyle.background = "rgba(200, 94, 94, 0.7)";
+    }
     document.getElementById("popup").style.display = 'flex';
     document.getElementById("grid").style.display = 'none';
     document.getElementById("display-player-1").style.display = "none";

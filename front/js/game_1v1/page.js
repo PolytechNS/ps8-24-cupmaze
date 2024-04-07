@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", main,false);
 let gameInformation;
 let player1_name;
 let player2_name;
+let firstPlayer;
 function searchToObject() {
     gameInformation = {
         'roomName': localStorage.getItem('room'),
@@ -24,7 +25,6 @@ function searchToObject() {
 }
 
 function main() {
-
     let reactionButton = document.getElementById("sendReaction");
     reactionButton.addEventListener("click", () => {
         let reaction = document.getElementById("popup-reaction");
@@ -62,6 +62,19 @@ function main() {
     socket = io("/api/waitingRoom");
     searchToObject();
 
+    firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
+    let leaveGameButtonStyle = document.getElementById("button-leave-game").style;
+    if(firstPlayer) {
+        leaveGameButtonStyle.background = "rgba(94,174,200, 0.7)";
+        leaveGameButtonStyle.removeProperty("left");
+        leaveGameButtonStyle.float = "right";
+    }
+    else {
+        leaveGameButtonStyle.left = "0%";
+        leaveGameButtonStyle.removeProperty("float");
+        leaveGameButtonStyle.background = "rgba(200, 94, 94, 0.7)";
+    }
+
 
     socket.on("reaction", (reaction, usernameSender) => {
         if(usernameSender !== decodeJWTPayload(getCookie("jwt")).username) {
@@ -98,7 +111,6 @@ function main() {
         console.log("gameInformation", gameInformation.roomName);
         // on affiche pas la popup
         document.getElementById("popup").style.display = 'none';
-        let firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
         if (firstPlayer) {
             player1_name = decodeJWTPayload(getCookie("jwt")).username;
             player2_name = gameInformation.opponentName;
@@ -528,7 +540,6 @@ function undoWall(action) {
      document.getElementById("display-player-turn").style.display = "flex";
      document.getElementById("player1Image").style.display = "flex";
      document.getElementById("player2Image").style.display = "flex";
-     //document.getElementById("button-save-game").style.display = "flex";
  }
 
 
@@ -539,8 +550,7 @@ function undoWall(action) {
  function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
      console.log("setUpNewRound");
      document.getElementById("button-validate-action").style.display = "none";
-     document.getElementById("button-undo-action").style.display = "none"
-     //document.getElementById("button-save-game").style.display = "none";
+     document.getElementById("button-undo-action").style.display = "none";
      document.getElementById("grid").style.display = 'none';
      document.getElementById("display-player-1").style.display = "none";
      document.getElementById("display-player-1").innerHTML = player1_name;
