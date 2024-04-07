@@ -58,7 +58,7 @@ function createSocket(io) {
         let match = await matchmaking.joinWaitingRoom(user.id, user.username, gameType);
         if (!match) { return; }
         const matchDB = await getUserByName(match.username);
-        console.log("match found " + match.elo + " vs " + user.username);
+        console.log("match found " + match.username + " vs " + user.username);
         console.log("elo " + matchDB.elo + " vs " + userDB.elo);
         WaitingRoomNamespace.to(user.id).emit('matchFound', {
             'opponentName': match.username,
@@ -546,6 +546,7 @@ function createSocket(io) {
     async function updateElo(roomId, winner) {
         let player1_elo = await getUserById(playersWithRooms[roomId].player1).elo;
         let player2_elo = await getUserById(playersWithRooms[roomId].player2).elo;
+        console.log("player1_elo", player1_elo, "player2_elo", player2_elo);
 
         let player1_Chance = 1 / (1 + Math.pow(10, (player2_elo - player1_elo) / 400));
         let elo_Diff;

@@ -389,10 +389,23 @@ function wallListener(event) {
     const secondWallToColor = findAdjacentWall(wallType, wallPosition);
     const spaceToColor = findAdjacentSpace(wallPosition);
 
+    socket.emit("wallListen" ,firstWallToColor.id.split("~")[1], secondWallToColor.id.split("~")[1], wallType === "wv" ? "vertical" : "horizontal");
+    let block;
+    socket.on("res", (msg) => {
+        block = msg;
+        if (block === true) {
+            removeHighlight(firstWallToColor, secondWallToColor, spaceToColor);
+            return;
+        }
+        socket.off("res");
+    });
+
     if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
         removeHighlight(firstWallToColor, secondWallToColor, spaceToColor)
         return;
     }
+
+
 
     // on rajoute les classes pour colorier
     highlightElements(firstWallToColor, secondWallToColor, spaceToColor);
@@ -419,27 +432,37 @@ function wallLaid(event) {
     if(isWallPlacementValid(firstWallToColor, adjacentWall, adjacentSpace) === false) {
         return;
     }
-
-    socket.emit("wallLaid", firstWallToColor, wallType, wallPosition, wallId);
-    socket.on("laidWall", (currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
-        if (currentPlayer === null) {
-            alert("Vous n'avez plus d'actions disponibles");
-            return;
+    let illegalWall = false;
+    const handleIllegalWall = () => {
+        if (!illegalWall) {
+            illegalWall = true;
         }
-        adjacentWall.classList.add("wall-laid", "laidBy" + currentPlayer);
-        adjacentWall.removeEventListener("mouseenter", wallListener);
-        adjacentWall.removeEventListener("click", wallLaid);
+        socket.off("illegalWall");
+    }
+    socket.once("illegalWall", handleIllegalWall);
 
-        adjacentSpace.classList.add("wall-laid", "laidBy" + currentPlayer);
+    socket.once("laidWall", (currentPlayer, nbWallsPlayer1, nbWallsPlayer2) => {
+        if (!illegalWall) {
+            if (currentPlayer === null) {
+                alert("Vous n'avez plus d'actions disponibles");
+                return;
+            }
+            adjacentWall.classList.add("wall-laid", "laidBy" + currentPlayer);
+            adjacentWall.removeEventListener("mouseenter", wallListener);
+            adjacentWall.removeEventListener("click", wallLaid);
 
-        firstWallToColor.classList.add("wall-laid", "laidBy" + currentPlayer);
-        firstWallToColor.removeEventListener("mouseenter", wallListener);
-        firstWallToColor.removeEventListener("click", wallLaid);
-        updateDueToAction(currentPlayer);
-        updateNumberWallsDisplay(currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
-        socket.off("laidWall");
-        lastActionType="wall";
+            adjacentSpace.classList.add("wall-laid", "laidBy" + currentPlayer);
+
+            firstWallToColor.classList.add("wall-laid", "laidBy" + currentPlayer);
+            firstWallToColor.removeEventListener("mouseenter", wallListener);
+            firstWallToColor.removeEventListener("click", wallLaid);
+            updateDueToAction(currentPlayer);
+            updateNumberWallsDisplay(currentPlayer, nbWallsPlayer1, nbWallsPlayer2);
+            socket.off("laidWall");
+            lastActionType = "wall";
+        }
     });
+    socket.emit("wallLaid", firstWallToColor, wallType, wallPosition, wallId);
 }
 
 /** #############################################  MOVE PLAYER METHODS  ############################################# **/

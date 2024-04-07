@@ -975,4 +975,31 @@ exports.updateBoard = function updateBoard(gameState){
 
 /*-------------------------------------------------------------------------------*/
 
+
+function build(){
+    let graph = {};
+    for(let i= 0; i < 9;i++){
+        graph[i] = [];
+        for (let j = 0; j < 9; j++){
+            /// on creer les edges
+            graph[i][j] = [];
+            if (i > 0) {
+                graph[i][j].push([i,j+1]);
+            }
+            if (i < 8) {
+                graph[i][j].push([i+2, j+1]);
+            }
+            if (j > 0) {
+                graph[i][j].push([i+1, j]);
+            }
+            if (j < 8) {
+                graph[i][j].push([i+1, j+2]);
+            }
+        }
+    }
+    return graph;
+}
+
+const g = build();
+console.log(g[8][8]);
 module.exports = { Node, Graph, PriorityQueue, NodeWall};
