@@ -373,16 +373,29 @@ function createSocket(io) {
 
                 const winner = gameState.game.isGameOver(gameState.game.playerPosition);
                 if (winner[0]) {
-                    const eloGame = updateElo(roomId, winner[1]);
-                    WaitingRoomNamespace.to(roomId).emit('actionResult', {
-                        valid: false,
-                        message: "Le joueur " + winner[1] + " a gagné",
-                        winner: winner[1],
-                        eloGame: eloGame,
-                        case: "victory",
-                        actionType: "validateRound"
-                    });
-                    return;
+                    if (playersWithRooms[roomId].gameMode === "ranked") {
+                        const eloGame = updateElo(roomId, winner[1]);
+                        WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                            valid: false,
+                            message: "Le joueur " + winner[1] + " a gagné",
+                            winner: winner[1],
+                            eloGame: eloGame,
+                            case: "victory",
+                            actionType: "validateRound"
+                        });
+                        return;
+                    } else {
+                        WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                            valid: false,
+                            message: "Le joueur " + winner[1] + " a gagné",
+                            winner: winner[1],
+                            eloGame: 0,
+                            case: "victory",
+                            actionType: "validateRound"
+                        });
+                        return;
+                    }
+
                 }
 
                 if (gameState.game.numberTour === 101){
@@ -544,13 +557,16 @@ function createSocket(io) {
     }
 
     async function updateElo(roomId, winner) {
-        let player1_elo = await getUserById(playersWithRooms[roomId].player1).elo;
-        let player2_elo = await getUserById(playersWithRooms[roomId].player2).elo;
-        console.log("player1_elo", player1_elo, "player2_elo", player2_elo);
+        let player1 = await getUserById(playersWithRooms[roomId].player1);
+        console.log("player1", player1);
+        let player2 = await getUserById(playersWithRooms[roomId].player2);
+        console.log("player2", player2);
+        let player1_elo = player1.elo
+        let player2_elo = player2.elo;
 
         let player1_Chance = 1 / (1 + Math.pow(10, (player2_elo - player1_elo) / 400));
         let elo_Diff;
-        if (winner === 0 || winner === -1 || playersWithRooms[roomId].gameMode === undefined) {
+        if (winner === 0 || winner === -1) {
             return 0;
         }
         if (winner === 1) {
