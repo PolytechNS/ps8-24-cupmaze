@@ -2,7 +2,6 @@ import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 
 let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
 let socket=io("/api/game");
-//socket.emit("clearGames",username);
 
 var baseUrl = '';
 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
