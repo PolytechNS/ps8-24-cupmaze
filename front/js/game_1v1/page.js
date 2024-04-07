@@ -62,7 +62,7 @@ function main() {
     socket = io("/api/waitingRoom");
     searchToObject();
 
-    let firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
+    firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
     let leaveGameButtonStyle = document.getElementById("button-leave-game").style;
     if(firstPlayer) {
         leaveGameButtonStyle.background = "rgba(94,174,200, 0.7)";
