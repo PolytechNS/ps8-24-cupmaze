@@ -30,7 +30,6 @@ function main() {
         reaction.style.display = "block";
     });
 
-    console.log("etape1");
 
     let closeReaction = document.getElementById("closePopup");
     closeReaction.addEventListener("click", () => {
@@ -38,7 +37,6 @@ function main() {
         reaction.style.display = "none";
     });
 
-    console.log("etape2");
 
     for(let i = 1; i < 5; i++) {
         let nameEmoji = "reaction" + i;
@@ -55,7 +53,6 @@ function main() {
         });
     }
 
-    console.log("etape3");
 
 
     socket = io("/api/waitingRoom");
@@ -106,8 +103,6 @@ function main() {
     socket.emit("joinRoom", gameInformation.roomName);
 
     socket.on("game", (gameState) => {
-        console.log("gameState : ", gameState);
-        console.log("gameInformation", gameInformation.roomName);
         // on affiche pas la popup
         document.getElementById("popup").style.display = 'none';
 
@@ -121,16 +116,12 @@ function main() {
             player1_name = decodeJWTPayload(getCookie("jwt")).username;
             player2_name = gameInformation.opponentName;
             const elo_player1 = gameInformation.player1_elo;
-            console.log("elo_player1", elo_player1);
-            console.log("player1_name", player1_name, "player2_name", player2_name);
             setVisionForPlayer(1, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
         } else {
             player2_name = decodeJWTPayload(getCookie("jwt")).username;
             player1_name = gameInformation.opponentName;
             const elo_player2 = gameInformation.player2_elo;
-            console.log("elo_player2", elo_player2);
-            console.log("player1_name", player1_name, "player2_name", player2_name);
             setVisionForPlayer(2, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
         }
@@ -252,6 +243,23 @@ function wallListener(event) {
     const secondWallToColor = findAdjacentWall(wallType, wallPosition);
     const spaceToColor = findAdjacentSpace(wallPosition);
 
+    socket.emit("wallListen" ,{
+        'roomId': gameInformation.roomName,
+        'tokens': getCookie("jwt"),
+        'firstWall': firstWallToColor.id.split("~")[1],
+        'secondWall': secondWallToColor.id.split("~")[1],
+        'wallType': wallType === "wv" ? "vertical" : "horizontal"
+        });
+    let block;
+    socket.on("res", (msg) => {
+        block = msg;
+        if (block === true) {
+            removeHighlight(firstWallToColor, secondWallToColor, spaceToColor);
+            return;
+        }
+        socket.off("res");
+    });
+
     if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
         removeHighlight(firstWallToColor, secondWallToColor, spaceToColor)
         return;
@@ -275,7 +283,6 @@ function wallLaid(event) {
     if(isWallPlacementValid(firstWallToColor, adjacentWall, adjacentSpace) === false) {
         return;
     }
-    console.log("wallLaid", firstWallToColor, wallType, wallPosition, wallId, adjacentWall, adjacentSpace);
     socket.emit("layWall", {
         'roomId': gameInformation.roomName,
         'tokens': getCookie("jwt"),
@@ -387,7 +394,6 @@ function positionBegin(action) {
             wall.addEventListener("click", wallLaid);
         });
     } else {
-        console.log(action.message);
         alert(action.message);
         return;
     }
@@ -469,7 +475,6 @@ function move(action) {
 
 function wall(action) {
     if (action.valid) {
-        console.log("wall valid", action.adjacentWall);
         const adjacentWall = document.getElementById(action.adjacentWall);
         const adjacentSpace = document.getElementById(action.adjacentSpace);
         const firstWallToColor = document.getElementById(action.firstWallToColor);
@@ -484,7 +489,7 @@ function wall(action) {
         updateNumberWallsDisplay(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2);
         lastActionType="wall";
     } else {
-        alert(action.message);
+        //alert(action.message);
     }
 }
 
@@ -519,7 +524,6 @@ function undoMovePosition(action) {
 
 function undoWall(action) {
     if (action.valid){
-        console.log("undoWall", action.tabIDHTML);
         document.getElementById(action.tabIDHTML[0]).classList.remove("wall-laid","laidBy"+action.currentPlayer);
         document.getElementById(action.tabIDHTML[0]).addEventListener("mouseenter",wallListener);
         document.getElementById(action.tabIDHTML[0]).addEventListener("click",wallLaid);
@@ -585,7 +589,6 @@ function undoWall(action) {
   * On va donc cacher la grille derrière pour éviter la triche
   */
  function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
-     console.log("setUpNewRound");
      document.getElementById("button-validate-action").style.display = "none";
      document.getElementById("button-undo-action").style.display = "none";
      document.getElementById("grid").style.display = 'none';

@@ -49,7 +49,7 @@ function createSocket(io) {
         if (!verify(token, 'secret')) { return; }
         let userInformation = decodeJWTPayload(token);
         console.log('User', userInformation.username, 'connected to notifications');
-        console.log('User', userInformation.username, 'connected to notifications');
+        console.log('User', userInformation.id, 'connected to notifications');
         socket.join(userInformation.id);
     }
 
@@ -116,9 +116,6 @@ function createSocket(io) {
         });
         setupChallenge(userId, friendId);
     }
-
-
-
 }
 
 

@@ -3,7 +3,7 @@ let socketNotifications;
 
 let friendsOfUser;
 let waitingListOfFriendsRequests;
-
+let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
 
 var baseUrl = '';
 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -189,6 +189,7 @@ function retrieveFriends(params){
                             sendChallenge(friend);
                         };
                     })(friend);
+
                     const deleteButton = document.createElement("button");
                     deleteButton.textContent = "Supprimer l'ami";
                     buttonDiv.appendChild(deleteButton);
@@ -197,6 +198,21 @@ function retrieveFriends(params){
                             deleteFriend(friend);
                         };
                     })(friend);
+
+                    const buttonChat = document.createElement("button");
+                    buttonChat.classList.add('chat');
+                    buttonChat.textContent = 'Chat';
+                    buttonDiv.appendChild(buttonChat);
+                    buttonChat.onclick = (function(friend) {
+                        return function() {
+                            if(username.localeCompare(friend) < 0 ){
+                                window.location.href = baseUrl +'/privateChat.html?idchat='+username+friend;
+                            } else {
+                                window.location.href = baseUrl +'/privateChat.html?idchat='+friend+username;
+                            }
+                        };
+                    })(friend);
+
                     resultDiv.appendChild(usernameParagraph);
                     resultDiv.appendChild(buttonDiv);
                 }
@@ -241,7 +257,7 @@ function retrieveWaitingFriendsRequests(params){
                     addButton.textContent = "Accepter la demande";
                     addButton.addEventListener("click", () => {
                         acceptFriendRequest(friendsRequest.split('&')[0]);
-                        alert(`L'utilisateur ${friendsRequest.split('&')[0]} a été ajouté à votre liste d'amis.`);
+                        //alert(`L'utilisateur ${friendsRequest.split('&')[0]} a été ajouté à votre liste d'amis.`);
                     });
                     resultDiv.appendChild(addButton);
                 }

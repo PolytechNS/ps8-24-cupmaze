@@ -109,7 +109,7 @@ class Game {
         for (let i = 0; i < this.elements.length; i++) {
             if(this.elements[i] instanceof Case){
                 if(this.elements[i].getPos_x()===parseInt(x) && this.elements[i].getPos_y()===parseInt(y)){
-                    console.log("getCase", this.elements[i]);
+
                     return this.elements[i];
                 }
             }
@@ -223,7 +223,6 @@ class Game {
         // on ajoute les 2 mur
         let wall1 = findWall(colonne1, ligne1, inclinaison, this.elements);
         let wall2 = findWall(colonne2, ligne2, inclinaison, this.elements);
-        console.log("wall1", wall1, "wall2", wall2);
         // on les cherche dans le element et on les mmet occupé
         for (let i = 0; i < this.elements.length; i++) {
             if (this.elements[i] instanceof Wall) {
@@ -235,7 +234,7 @@ class Game {
         }
         let graph = this.buildGraphFromElements();
 
-        // on verifie si il y a un chemin
+        // on verifie si il y a un
         let res = this.dfs(graph, this.playerPosition.player1, 9);
         let res2 = this.dfs(graph, this.playerPosition.player2,1);
 
@@ -249,14 +248,13 @@ class Game {
         }
 
         // si il y a un chemin pour les 2 joueurs on renvoit true
-        if (res && res2) {
+        if (res === true && res2 === true) {
             return true;
         }
     }
 
     dfs(graph, playerPosition, number) {
         // on recupere la position du joueur
-        console.log("playerPosition", playerPosition, number);
         const colonne = playerPosition[0];
         const ligne = playerPosition[1];
 
@@ -270,7 +268,6 @@ class Game {
             let current = stack.pop();
             let x = current[0];
             let y = current[1];
-            //console.log("current", x, y);
             if (y === number) {
                 return true;
             }
