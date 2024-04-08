@@ -20,9 +20,7 @@ document.getElementById('button-leaderboard').addEventListener('click', function
 document.getElementById('button-prizes').addEventListener('click', function() {
     window.location.href = baseUrl+'/prizes.html';
 });
-document.getElementById('button-options').addEventListener('click', function() {
-    //window.location.href = 'http://localhost:8000/options.html';
-});
+
 document.getElementById('button-disconnect').addEventListener('click', function () {
     window.location.href = baseUrl +'/login.html';
 });
@@ -30,7 +28,7 @@ document.getElementById('searchFriends').addEventListener('click', function () {
     window.location.href = baseUrl +'/searchFriends.html';
 });
 
-document.getElementById("welcomeMsg").innerText+=username;
+document.getElementById("welcomeMsg").innerText+= " " + username + " !";
 
 const closePopupButton = document.getElementById("closePopup");
 closePopupButton.onclick = function() {
@@ -139,75 +137,3 @@ let globalChatButton = document.getElementById('button-globalChat');
 globalChatButton.addEventListener('click', () => {
     window.location.href = baseUrl +'/globalChat.html';
 });
-
-/* CHALLENGE */
-
-function sendChallenge(friend) {
-    let sendChallenge = {
-        "senderToken": getCookie('jwt'),
-        "friend": friend
-    }
-    socketNotifications.emit('sendChallenge', sendChallenge);
-}
-
-
-document.addEventListener('DOMContentLoaded', init, false);
-
-function init() {
-    console.log('connected to the notifications room');
-    socketNotifications.emit('social', getCookie('jwt'));
-    socketNotifications.on('receiveChallenge', (receiveChallenge) => onReceiveChallenge(receiveChallenge));
-    socketNotifications.on('challengeInit', (challengeInit) => onChallengeInit(challengeInit));
-}
-
-function onReceiveChallenge(receiveChallenge) {
-    // on affiche une popup pour accepter ou refuser le challenge
-    console.log("receiveChallenge", receiveChallenge.token);
-    const popup = document.getElementById('popup-notif');
-    popup.style.display = 'block';
-    popup.style.backgroundColor = 'red';
-    popup.style.color = 'white';
-    popup.style.border = '2px solid black';
-    const message = document.getElementById('popup-notif-content');
-    message.innerText = `${receiveChallenge.senderName} vous a défié !`;
-    const acceptButton = document.createElement('button');
-    acceptButton.innerText = 'Accepter';
-    popup.appendChild(acceptButton);
-    acceptButton.addEventListener('click', () => challengeDecision(receiveChallenge.senderId, receiveChallenge.senderName, receiveChallenge.token, true));
-    const declineButton = document.createElement('button');
-    declineButton.innerText = 'Refuser';
-    popup.appendChild(declineButton);
-    declineButton.addEventListener('click', () => challengeDecision(receiveChallenge.senderId, receiveChallenge.senderName, receiveChallenge.token, false));
-}
-
-function challengeDecision(senderId, senderName, senderToken, decision) {
-    if (decision === true) {
-        console.log('Challenge accepted');
-        let challengeDecision = {
-            "senderToken": getCookie('jwt'),
-            "userId": decodeJWTPayload(getCookie('jwt')).id,
-            "friendId": senderId,
-            "friendName": senderName,
-            "friendToken": senderToken,
-            "decision": "accept"
-        }
-        socketNotifications.emit('challengeDecision', challengeDecision);
-    } else {
-        console.log('Challenge refused');
-    }
-    // on ferme la popup
-    const popup = document.getElementById('popup-notif');
-    popup.remove();
-}
-
-function onChallengeInit(challengeInit) {
-    console.log('Challenge init', challengeInit);
-    setTimeout(() => {
-        localStorage.setItem('room', challengeInit.room);
-        localStorage.setItem('opponentName', challengeInit.opponentName);
-        localStorage.setItem('opponentId', challengeInit.opponentId);
-        localStorage.setItem('player1_elo', challengeInit.player1_elo);
-        localStorage.setItem('player2_elo', challengeInit.player2_elo);
-        window.location.href = `/online1v1.html`;
-    }, 2000);
-}

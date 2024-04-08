@@ -147,3 +147,13 @@ body {
     background: rgba(55, 84, 76, 0.7);
     border: none;
 }
+
+#button-disconnect{
+    cursor: pointer;
+    color: rgba(255, 255, 255);
+    margin: 2%;
+    font-size: xx-large;
+    font-weight: bold;
+    padding: 2%;
+    background: rgba(55, 84, 76, 0.7);
+}
