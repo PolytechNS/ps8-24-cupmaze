@@ -39,12 +39,6 @@ socketGlobalChat.on("sendMessage", (messages) => {
     }
 });
 
-let buttonClear = document.getElementById("clearButton");
-buttonClear.addEventListener("click", () => {
-    console.log("clearGlobalChat");
-    socketGlobalChat.emit("clearGlobalChat");
-});
-
 window.addEventListener('beforeunload', () => {
     socketGlobalChat.disconnect();
 });
