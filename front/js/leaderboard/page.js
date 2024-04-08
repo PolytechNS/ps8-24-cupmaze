@@ -15,22 +15,25 @@ fetch(baseUrl+"/api/getLeaderboard?$",{
             console.log(ret);
             for(let i=0; i<ret.length; i++){
                 let player = ret[i];
-                let playerDiv = document.createElement("tr");
 
-                let playerRank = document.createElement("td");
-                playerRank.textContent = i+1;
+                if(i+1 <=5){
+                    let playerDiv = document.createElement("tr");
 
-                let username = document.createElement("td");
-                username.textContent = player.username;
+                    let playerRank = document.createElement("td");
+                    playerRank.textContent = i+1;
 
-                let rank = document.createElement("td");
-                rank.textContent = player.elo;
+                    let username = document.createElement("td");
+                    username.textContent = player.username;
 
-                playerDiv.appendChild(playerRank);
-                playerDiv.appendChild(username);
-                playerDiv.appendChild(rank);
+                    let rank = document.createElement("td");
+                    rank.textContent = player.elo;
 
-                document.getElementById("body-leaderboard").appendChild(playerDiv);
+                    playerDiv.appendChild(playerRank);
+                    playerDiv.appendChild(username);
+                    playerDiv.appendChild(rank);
+
+                    document.getElementById("body-leaderboard").appendChild(playerDiv);
+                }
             }
         }
     })
