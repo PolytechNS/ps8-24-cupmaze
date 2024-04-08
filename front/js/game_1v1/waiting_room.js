@@ -4,6 +4,9 @@ const token = getCookie('jwt');
 
 document.addEventListener('DOMContentLoaded', init, false);
 
+document.getElementById("button-leave-waiting").addEventListener('click',
+    () => {window.location.href = '/launchGame.html';});
+
 function init() {
     console.log('connected to the waiting room');
     socket.emit('waiting_room',
@@ -21,6 +24,6 @@ function onMatchFound(matchInfo) {
         localStorage.setItem('opponentId', matchInfo.opponentId);
         localStorage.setItem('player1_elo', matchInfo.player1_elo);
         localStorage.setItem('player2_elo', matchInfo.player2_elo);
-        window.location.href = `/1v1game.html`;
+        window.location.href = `/online1v1.html`;
     }, 2000);
 }

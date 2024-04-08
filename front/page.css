@@ -1,3 +1,5 @@
+@import "buttons.css";
+
 body {
     background-image: url('imageResources/cupheadInGame2.jpg');
     background-size: cover;
@@ -114,6 +116,15 @@ img{
     transform: translateX(-50%);
 }
 
+#display-player-turn{
+    position: absolute;
+    font-size: 3vw;
+    left: 50%; /* Position h1 50% from the left of the body */
+    transform: translateX(-50%);
+    /* put under the display-number-tour */
+    top: 10%;
+}
+
 h1, h2{
     color: white;
     text-shadow: -1px 1px 0 black,
@@ -144,6 +155,15 @@ h2{
     border: none;
     padding: 1%;
 }
+
+#button-leave-game {
+    font-size: 1vw;
+    color: white;
+    font-family: "Times New Roman", Times, serif;
+    border: none;
+    padding: 1%;
+}
+
 
 #button-validate-action, #button-undo-action{
     position: absolute;
@@ -176,23 +196,54 @@ table{
     padding-right: 0;
 }
 
-#popup-reaction {
-    display: none;
-    position: fixed; /* Change de fixed à absolute */
-    bottom: 20px; /* Ajuste la position verticale selon vos besoins */
-    right: 20px; /* Ajuste la position horizontale selon vos besoins */
-    max-width: calc(100% - 40px); /* Taille flexible */
-    background-color: rgba(0, 0, 0, 0.5);
+#reaction1{
+    cursor: pointer;
 }
 
-.popup-content {
-    background-color: #fefefe;
-    padding: 20px;
-    border: 1px solid #888;
+#reaction2{
+    cursor: pointer;
+}
+
+#reaction3{
+    cursor: pointer;
+}
+
+#reaction4{
+    cursor: pointer;
+}
+
+.popup-reaction {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
-    width: 100%; /* Ajuste la largeur à 100% */
+    padding: 10px;
+    display: none;
+    z-index: 9999;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
+#popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 999;
+    color: white;
+    font-size: xx-large;
+}
+
+#popup-button{
+    position: relative;
+}
 
 .popup-notif {
     display: none;
@@ -205,6 +256,23 @@ table{
     border-radius: 5px;
     z-index: 9999;
 }
+
+.popup-content {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
 .popup-notif-content {
+    cursor: pointer;
     text-align: center;
+}
+
+#sendReaction {
+    /* put the button in the left-bottom corner */
+    position: absolute;
+    bottom: 15%;
+    left: 47%;
+    text-align: center;
+    width: 7%;
+    border-radius: 10px;
 }

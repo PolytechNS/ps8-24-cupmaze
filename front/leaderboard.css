@@ -1,0 +1,101 @@
+@import "buttons.css";
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Transparence du fond */
+}
+
+.popup-content {
+    background-color: #fefefe;
+    margin: 20% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+}
+
+
+#main_tile_prize
+{
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    color: rgba(255, 255, 255);
+    font-weight: bolder;
+    text-shadow: -1px 1px 0 darkgreen,
+    1px 1px 0 darkgreen,
+    1px -1px 0 darkgreen,
+    -1px -1px 0 darkgreen;
+    font-size: xxx-large;
+}
+
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh; /* Hauteur de la fenêtre visible */
+    width: 100vw; /* Largeur de la fenêtre visible */
+    background-size: cover; /* Cover the entire body */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat;
+    background-image: url("imageResources/leaderboard_illustration.jpg");
+    background-color: rgba(255, 255, 255, 0.9); /* Couleur de fond avec transparence */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 2px solid black; /* Ajout d'un contour noir au tableau */
+    margin: 0;
+    padding: 0;
+    table-layout: fixed;
+    background-color: white;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 15px;
+    text-align: left;
+    vertical-align: middle;
+    color: black;
+    font-family: Verdana, sans-serif
+}
+
+th {
+    font-weight: bold;
+    font-size: x-large;
+}
+
+td {
+    font-size: x-large;
+}
+
+/* Ajout d'une couleur de fond pour chaque ligne impaire */
+tbody tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+
+
+.button{
+    color: rgba(255, 255, 255);
+    margin-left: 45%;
+    margin-top: 5%;
+    font-size: xx-large;
+    font-weight: bold;
+    background: rgba(55, 84, 76, 0.7);
+    border: none;
+    text-align: center;
+    padding: 20px;
+}
+
+#leaderboard {
+    max-width: 800px; /* Définissez la largeur maximale souhaitée */
+    margin: 0 auto; /* Pour centrer le tableau horizontalement */
+}
+

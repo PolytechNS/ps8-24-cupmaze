@@ -1,0 +1,34 @@
+@import "buttons.css";
+
+body {
+    background-image: url("imageResources/cupheadWaiting.gif");
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    background-size: cover; /* Cover the entire body */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Do not repeat the background image */
+    height: 100vh; /* Make the body take up the entire viewport height */
+    background-color: #cccccc;
+    text-align: center;
+}
+h1, p, #button-leave-waiting{
+    color: white;
+    text-shadow: -1px 1px 0 black,
+    1px 1px 0 black,
+    1px -1px 0 black,
+    -1px -1px 0 black;
+}
+h1{
+    font-size: xxx-large;
+}
+#button-leave-waiting{
+    font-size: xx-large;
+    padding: 1%;
+    border: none;
+    background: rgba(255, 255, 255, 0.7);
+    font-family: "Times New Roman", Times, serif;
+    position: fixed;
+    bottom: 2%;
+    left: 45%;
+    right: 45%;
+}

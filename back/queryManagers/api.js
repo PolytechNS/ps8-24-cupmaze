@@ -1,4 +1,4 @@
-const { createUser, getUser, createGame, getGame, getUserByName, addFriendRequest,removeFriend, acceptFriendRequest, clearUsersDb, clearPrivateChatDb} = require('../database/mongo');
+const { createUser, getUser, getUsersRank,createGame, getGame, getUserByName, addFriendRequest,removeFriend, acceptFriendRequest, clearUsersDb, clearPrivateChatDb} = require('../database/mongo');
 
 const jwt = require('jsonwebtoken');
 
@@ -46,10 +46,44 @@ function manageRequest(request, response) {
         case 'removeFriend':
             removeFriendAPI(request, response);
             break;
+        case 'getLeaderboard':
+            getLeaderboard(request, response);
+            break;
+        case 'getStats':
+            getStats(request, response);
+            break;
+
         default:
             response.statusCode = 404;
             response.end('Not Found');
     }
+}
+
+
+function getStats(request, response) {
+    let username = (request.url).toString().split("=")[1].split("&")[0];
+    getUserByName(username).then((user) => {
+        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.end(JSON.stringify(user));
+    }).catch((error) =>{
+        response.statusCode = 500;
+        response.end('Erreur interne du serveur');
+        console.log("Erreur lors de la récupération du leaderboard:", error)
+    })
+}
+
+function getLeaderboard(request, response) {
+    getUsersRank().then((users) => {
+        response.writeHead(200, {'Content-Type': 'application/json'});
+        //retourner la paire username, elo et trier par elo
+        response.end(JSON.stringify(users.sort((a, b) => b.elo - a.elo).map((user) => {
+            return { username: user.username, elo: user.elo};
+        })));
+    }).catch((error) => {
+        response.statusCode = 500;
+        response.end('Erreur interne du serveur');
+        console.error('Erreur lors de la récupération du leaderboard:', error);
+    });
 }
 
 function clearPrivateChatDbAPI(request, response) {
@@ -148,7 +182,7 @@ function searchAccountOnDB(request, response) {
     });
 }
 
-function addPlayerFriendList(request, response){
+async function addPlayerFriendList(request, response) {
     let usernameAdder = (request.url).toString().split("=")[1].split("&")[0];
     let usernameToAdd = (request.url).toString().split("=")[2].split("&")[0];
 
@@ -156,12 +190,12 @@ function addPlayerFriendList(request, response){
         .then(() => {
             console.log("Demande d'ami ajoutée avec succès");
             response.writeHead(200, {'Content-Type': 'application/json'});
-            response.end(JSON.stringify({ content: "AddFriendRequestDone" }));
+            response.end(JSON.stringify({content: "AddFriendRequestDone"}));
         })
         .catch((error) => {
             console.error("Erreur lors de l'ajout de la demande d'ami :", error);
             response.writeHead(401, {'Content-Type': 'application/json'});
-            response.end(JSON.stringify({ content: "ErrorAddFriendRequest" }));
+            response.end(JSON.stringify({content: "ErrorAddFriendRequest"}));
         });
 }
 
@@ -266,7 +300,7 @@ function creationOfUser(email, username, password, response) {
         // TODO : hash du mot de passe
 
         // on cree l'utilisateur
-        createUser({ email, username, password, friendsList:[], friendsRequests: [], notifications: [], elo:400 }).then(() => {
+        createUser({ email, username, password, friendsList:[], friendsRequests: [], notifications: [], elo:400, gamesWin:0, gamesLoose:0}).then(() => {
             response.statusCode = 201;
             response.end('Utilisateur créé');
         });

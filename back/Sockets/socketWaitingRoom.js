@@ -58,7 +58,7 @@ function createSocket(io) {
         let match = await matchmaking.joinWaitingRoom(user.id, user.username, gameType);
         if (!match) { return; }
         const matchDB = await getUserByName(match.username);
-        console.log("match found " + match.elo + " vs " + user.username);
+        console.log("match found " + match.username + " vs " + user.username);
         console.log("elo " + matchDB.elo + " vs " + userDB.elo);
         WaitingRoomNamespace.to(user.id).emit('matchFound', {
             'opponentName': match.username,
@@ -122,7 +122,6 @@ function createSocket(io) {
                         message: "Il faut commencer sur votre ligne de depart",
                         actionType: "positionBegin"
                     })
-                    console.log("Il faut commencer sur votre ligne de depart");
                     return;
                 }
                 if (gameState.game.actionsToDo === 0) {
@@ -142,9 +141,12 @@ function createSocket(io) {
 
                 const caseWanted = gameState.game.getCase(colonne, ligne);
                 caseWanted.setIsOccupied(true);
-                console.log("caseWanted", caseWanted +" current player", gameState.game.currentPlayer);
                 gameState.game.actionsToDo--;
                 gameState.game.lastActionType = "position";
+                socket.emit('actionResult', {
+                    showButton: true,
+                    actionType: "button"
+                });
                 WaitingRoomNamespace.to(roomId).emit('actionResult', {
                     valid: true,
                     message: "Position choisie",
@@ -153,6 +155,7 @@ function createSocket(io) {
                     cellId: cellId,
                     actionType: "positionBegin"
                 });
+
             } else {
                 console.log("Begin : Ce n'est pas votre tour");
                 socket.emit('actionResult', {
@@ -188,14 +191,15 @@ function createSocket(io) {
                 const ligne = parseInt(cellId.split("-")[1]);
 
                 const playerCurrentPosition = gameState.game.getPlayerCurrentPosition(gameState.game.currentPlayer);
-                console.log("playerCurrentPosition", playerCurrentPosition);
                 const possibleMoves = gameState.game.getPossibleMoves(playerCurrentPosition);
-                console.log("possibleMoves", possibleMoves);
-                console.log("colonne", colonne, "ligne", ligne);
                 const caseWanted = gameState.game.getCase(colonne, ligne);
 
                 if (possibleMoves.find((cell) => cell.getPos_x() === colonne && cell.getPos_y() === ligne)) {
                     gameState.game.movePlayer(gameState.game.currentPlayer, caseWanted, playerCurrentPosition);
+                    socket.emit('actionResult', {
+                        showButton: true,
+                        actionType: "button"
+                    });
                     WaitingRoomNamespace.to(roomId).emit('actionResult', {
                         valid: true,
                         message: "Joueur déplacé",
@@ -223,11 +227,29 @@ function createSocket(io) {
                     actionType: "movePlayer"
                 });
             }
+        });
 
+        socket.on("wallListen", (data) => {
+            let roomId = data.roomId; // room id
+            let token = data.tokens; // token
+            let gameState = GameState[roomId];
+            let user = decodeJWTPayload(token);
+            if (!gameState || !roomId) { return; }
+
+            let firstWall = data.firstWall;
+            let SecondWall = data.secondWall;
+            let wallType = data.wallType;
+
+            let colonne1, ligne1, colonne2, ligne2;
+            colonne1 = parseInt(firstWall[0]);
+            ligne1 = parseInt(firstWall[2]);
+            colonne2 = parseInt(SecondWall[0]);
+            ligne2 = parseInt(SecondWall[2]);
+            let isBlock = gameState.game.isWallBlockingPath(colonne1, ligne1, colonne2, ligne2, wallType);
+            socket.emit("res", !isBlock);
         });
 
         socket.on("layWall", (data) => {
-            console.log("layWall", data);
             let roomId = data.roomId; // room id
             let token = data.tokens; // token
             let gameState = GameState[roomId];
@@ -235,7 +257,6 @@ function createSocket(io) {
             if (!gameState || !roomId) { return; }
 
             let firstWallToColor = data.firstWallToColor;
-            console.log(data.adjacentWall);
             let wallType = data.wallType;
             let wallPosition = data.wallPosition;
             let wallId = data.wallId;
@@ -297,6 +318,17 @@ function createSocket(io) {
                         : findWall(colonne+1, ligne, wallInclinaison, gameState.game.elements);
                 const adjacentSpace = findSpace(colonne, ligne, gameState.game.elements);
 
+                let isBlock = gameState.game.isWallBlockingPath(colonne,ligne, adjacentWall.pos_x, adjacentWall.pos_y, wallInclinaison);
+                if (!isBlock) {
+                    socket.emit("actionResult", {
+                        valid: false,
+                        message: "Ce mur bloque le passage",
+                        case: "blockPath",
+                        actionType: "layWall"
+                    });
+                    return;
+                }
+
                 gameState.game.layWall(wall, adjacentWall, adjacentSpace);
                 gameState.game.actionsToDo--;
                 gameState.game.lastActionType = "wall";
@@ -305,7 +337,10 @@ function createSocket(io) {
                 } else {
                     gameState.game.nbWallsPlayer2--;
                 }
-
+                socket.emit('actionResult', {
+                    showButton: true,
+                    actionType: "button"
+                });
                 WaitingRoomNamespace.to(roomId).emit('actionResult', {
                     valid: true,
                     message: "Mur posé",
@@ -324,7 +359,6 @@ function createSocket(io) {
                 gameState.game.lastWallsLaid = [wall, adjacentWall, adjacentSpace];
                 gameState.game.lastWallLaidsIDHtml = [wallId, adjacentWallId, adjacentSpaceId];
             } else {
-                console.log("Lay Wall : Ce n'est pas votre tour");
                 socket.emit('actionResult', {
                     valid: false,
                     message: "Ce n'est pas votre tour",
@@ -362,16 +396,29 @@ function createSocket(io) {
 
                 const winner = gameState.game.isGameOver(gameState.game.playerPosition);
                 if (winner[0]) {
-                    const eloGame = updateElo(roomId, winner[1]);
-                    WaitingRoomNamespace.to(roomId).emit('actionResult', {
-                        valid: false,
-                        message: "Le joueur " + winner[1] + " a gagné",
-                        winner: winner[1],
-                        eloGame: eloGame,
-                        case: "victory",
-                        actionType: "validateRound"
-                    });
-                    return;
+                    if (playersWithRooms[roomId].gameMode === "ranked") {
+                        const eloGame = updateElo(roomId, winner[1]);
+                        WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                            valid: false,
+                            message: "Le joueur " + winner[1] + " a gagné",
+                            winner: winner[1],
+                            eloGame: eloGame,
+                            case: "victory",
+                            actionType: "validateRound"
+                        });
+                        return;
+                    } else {
+                        WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                            valid: false,
+                            message: "Le joueur " + winner[1] + " a gagné",
+                            winner: winner[1],
+                            eloGame: 0,
+                            case: "victory",
+                            actionType: "validateRound"
+                        });
+                        return;
+                    }
+
                 }
 
                 if (gameState.game.numberTour === 101){
@@ -530,23 +577,51 @@ function createSocket(io) {
                 });
             }
         });
+
+        socket.on("leaveRoom", (data) => {
+            let roomId = data.roomId;
+            let token = data.tokens;
+            let gameState = GameState[roomId];
+            // c'est le joueur qui a abandonné
+            let user = decodeJWTPayload(token);
+            if (!gameState || !roomId) { return; }
+
+                let winner = gameState.game.currentPlayer === 1 ? 2 : 1;
+                if (playersWithRooms[roomId].gameMode === "ranked") {
+                    const eloGame = updateElo(roomId, winner);
+                }
+                WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                    valid: true,
+                    message: "Le joueur " + winner + " a gagné",
+                    winner: winner,
+                    case: "victory",
+                    actionType: "leaveRoom"
+                });
+        });
     }
 
+
     async function updateElo(roomId, winner) {
-        let player1_elo = getUserById(playersWithRooms[roomId].player1).elo;
-        let player2_elo = getUserById(playersWithRooms[roomId].player2).elo;
+        let player1 = await getUserById(playersWithRooms[roomId].player1);
+        console.log("player1", player1);
+        let player2 = await getUserById(playersWithRooms[roomId].player2);
+        console.log("player2", player2);
+        let player1_elo = player1.elo
+        let player2_elo = player2.elo;
 
         let player1_Chance = 1 / (1 + Math.pow(10, (player2_elo - player1_elo) / 400));
         let elo_Diff;
-        if (winner === 0 || winner === -1 || playersWithRooms[roomId].gameMode === undefined) {
+        if (winner === 0 || winner === -1) {
             return 0;
         }
         if (winner === 1) {
             elo_Diff = Math.round(32 * (1 - player1_Chance));
+            console.log("elo_Diff if ", elo_Diff);
             // on met a jour l'elo du perdant et du gagnant
             await updateStats(playersWithRooms[roomId].player1, playersWithRooms[roomId].player2, elo_Diff);
         } else {
             elo_Diff = Math.round(32 * player1_Chance);
+            console.log("elo_Diff else ", elo_Diff);
             await updateStats(playersWithRooms[roomId].player2, playersWithRooms[roomId].player1, elo_Diff);
         }
         return elo_Diff;

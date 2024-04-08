@@ -1,7 +1,6 @@
  import {removePlayerCircle, addPlayerCircle} from "../game_1vbot/movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
-import {startNewRound, setUpNewRound} from "../game_local_1v1/roundUtils.js";
-import {setVisionForPlayer} from "../game_local_1v1/fog_of_war.js";
+import {setVisionForPlayer} from "../game_1vbot/fog_of_war.js";
 import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 
 let socket;
@@ -13,6 +12,7 @@ document.addEventListener("DOMContentLoaded", main,false);
 let gameInformation;
 let player1_name;
 let player2_name;
+let firstPlayer;
 function searchToObject() {
     gameInformation = {
         'roomName': localStorage.getItem('room'),
@@ -24,14 +24,12 @@ function searchToObject() {
 }
 
 function main() {
-
     let reactionButton = document.getElementById("sendReaction");
     reactionButton.addEventListener("click", () => {
         let reaction = document.getElementById("popup-reaction");
         reaction.style.display = "block";
     });
 
-    console.log("etape1");
 
     let closeReaction = document.getElementById("closePopup");
     closeReaction.addEventListener("click", () => {
@@ -39,7 +37,6 @@ function main() {
         reaction.style.display = "none";
     });
 
-    console.log("etape2");
 
     for(let i = 1; i < 5; i++) {
         let nameEmoji = "reaction" + i;
@@ -56,11 +53,23 @@ function main() {
         });
     }
 
-    console.log("etape3");
 
 
     socket = io("/api/waitingRoom");
     searchToObject();
+
+    firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
+    let leaveGameButtonStyle = document.getElementById("button-leave-game").style;
+    if(firstPlayer) {
+        leaveGameButtonStyle.left = "0%";
+        leaveGameButtonStyle.removeProperty("float");
+        leaveGameButtonStyle.background = "rgba(200, 94, 94, 0.7)";
+    }
+    else {
+        leaveGameButtonStyle.background = "rgba(94,174,200, 0.7)";
+        leaveGameButtonStyle.removeProperty("left");
+        leaveGameButtonStyle.float = "right";
+    }
 
 
     socket.on("reaction", (reaction, usernameSender) => {
@@ -94,34 +103,41 @@ function main() {
     socket.emit("joinRoom", gameInformation.roomName);
 
     socket.on("game", (gameState) => {
-        console.log("gameState : ", gameState);
-        console.log("gameInformation", gameInformation.roomName);
-        let firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
-        if (firstPlayer) {
-            player1_name = decodeJWTPayload(getCookie("jwt")).username;
-            player2_name = gameInformation.opponentName;
-            const elo_player1 = gameInformation.player1_elo;
-            console.log("elo_player1", elo_player1);
-            console.log("player1_name", player1_name, "player2_name", player2_name);
-            setUpNewRound(player1_name,10,10,1)
-        } else {
-            player2_name = decodeJWTPayload(getCookie("jwt")).username;
-            player1_name = gameInformation.opponentName;
-            const elo_player2 = gameInformation.player2_elo;
-            console.log("elo_player2", elo_player2);
-            console.log("player1_name", player1_name, "player2_name", player2_name);
-            setUpNewRound(player2_name,10,10,1)
-        }
+        // on affiche pas la popup
+        document.getElementById("popup").style.display = 'none';
 
         board = document.getElementById("grid");
         document.getElementById("popup-button").addEventListener("click",startNewRound);
         document.getElementById("button-validate-action").addEventListener("click",validateRound);
         document.getElementById("button-undo-action").addEventListener("click",undoAction);
         initializeTable();
-        //setVisionForPlayer(player_number, {player1: null, player2: null});
+        console.log(gameInformation)
+        if (firstPlayer) {
+            player1_name = decodeJWTPayload(getCookie("jwt")).username;
+            player2_name = gameInformation.opponentName;
+            //console.log(gameInformation)
+            const elo_player1 = gameInformation.player1_elo;
+            setVisionForPlayer(1, {player1: null, player2: null})
+            setUpNewRound(1,10,10,1)
+        } else {
+            player2_name = decodeJWTPayload(getCookie("jwt")).username;
+            player1_name = gameInformation.opponentName;
+            //console.log(gameInformation)
+            const elo_player2 = gameInformation.player2_elo;
+            setVisionForPlayer(2, {player1: null, player2: null})
+            setUpNewRound(1,10,10,1)
+        }
         //setUpNewRound(player1_name,10,10,1);
         socket.on("actionResult", (action) => updateUI(action));
         socket.off("game");
+    });
+
+    let leaveGameButton = document.getElementById("button-leave-game");
+    leaveGameButton.addEventListener("click", () => {
+        socket.emit("leaveRoom", {
+            'roomId': gameInformation.roomName,
+            'tokens': getCookie("jwt")
+        });
     });
 }
 
@@ -237,6 +253,23 @@ function wallListener(event) {
     const secondWallToColor = findAdjacentWall(wallType, wallPosition);
     const spaceToColor = findAdjacentSpace(wallPosition);
 
+    socket.emit("wallListen" ,{
+        'roomId': gameInformation.roomName,
+        'tokens': getCookie("jwt"),
+        'firstWall': firstWallToColor.id.split("~")[1],
+        'secondWall': secondWallToColor.id.split("~")[1],
+        'wallType': wallType === "wv" ? "vertical" : "horizontal"
+        });
+    let block;
+    socket.on("res", (msg) => {
+        block = msg;
+        if (block === true) {
+            removeHighlight(firstWallToColor, secondWallToColor, spaceToColor);
+            return;
+        }
+        socket.off("res");
+    });
+
     if (isWallPlacementValid(firstWallToColor, secondWallToColor, spaceToColor) === false) {
         removeHighlight(firstWallToColor, secondWallToColor, spaceToColor)
         return;
@@ -260,7 +293,6 @@ function wallLaid(event) {
     if(isWallPlacementValid(firstWallToColor, adjacentWall, adjacentSpace) === false) {
         return;
     }
-    console.log("wallLaid", firstWallToColor, wallType, wallPosition, wallId, adjacentWall, adjacentSpace);
     socket.emit("layWall", {
         'roomId': gameInformation.roomName,
         'tokens': getCookie("jwt"),
@@ -302,7 +334,7 @@ function undoAction(){
     document.getElementById("button-validate-action").style.display = "none";
     document.getElementById("button-undo-action").style.display = "none";
     //On re-donne la possiblité de sauvegarder
-    document.getElementById("button-save-game").style.display = "flex";
+    //document.getElementById("button-save-game").style.display = "flex";
 
     //On vérifie si la dernière action est un mouvement de pion
     if(lastActionType === "position"){
@@ -340,16 +372,28 @@ function updateUI(action) {
             case "undoWall":
                 undoWall(action);
                 break;
+            case "button":
+                showButtonVisible()
+                break
+            case "leaveRoom":
+                leaveGame(action);
+                break;
     }
 }
 
 function positionBegin(action) {
     if (action.valid) {
         document.getElementById(action.cellId).classList.add("occupied");
-        addPlayerCircle(document.getElementById(action.cellId), action.current);
+        //addPlayerCircle(document.getElementById(action.cellId), action.current);
+        if(firstPlayer){
+            if(action.current===1) addPlayerCircle(document.getElementById(action.cellId), 1);
+        }else {
+            if(action.current===2) addPlayerCircle(document.getElementById(action.cellId), 2);
+        }
+
         lastActionType = "position";
         if (action.playerPositions === null) {
-            showButtonVisible();
+            //showButtonVisible();
             return;
         }
         const cells = document.querySelectorAll(".cell");
@@ -362,17 +406,41 @@ function positionBegin(action) {
             wall.addEventListener("mouseenter", wallListener);
             wall.addEventListener("click", wallLaid);
         });
-        console.log("board update");
     } else {
-        console.log(action.message);
         alert(action.message);
         return;
     }
-    showButtonVisible();
+    //showButtonVisible();
 }
 
 function validate(action) {
     if (action.valid) {
+        if(firstPlayer){
+            setVisionForPlayer(1, action.playerPosition);
+            if(action.playerPosition.player2!==null) {
+                let opp_circle = document.getElementById(action.playerPosition.player2[0] + "-" + action.playerPosition.player2[1] + "~cell");
+                if (parseInt(opp_circle.visibility) > 0) {
+                    console.log("hide player 2");
+                    removePlayerCircle(action.playerPosition.player2[0] + "-" + action.playerPosition.player2[1] + "~cell", 2);
+                } else if (document.getElementsByClassName("player2-circle").length === 0){
+                    console.log("show player 2")
+                    addPlayerCircle(opp_circle, 2);
+                }
+            }
+        }else {
+            setVisionForPlayer(2, action.playerPosition);
+            if (action.playerPosition.player1 !== null) {
+                let opp_circle = document.getElementById(action.playerPosition.player1[0] + "-" + action.playerPosition.player1[1] + "~cell");
+                if (parseInt(opp_circle.visibility) < 0) {
+                    console.log("hide player 1")
+                    removePlayerCircle(action.playerPosition.player1[0] + "-" + action.playerPosition.player1[1] + "~cell", 1);
+                } else if( document.getElementsByClassName("player1-circle").length === 0){
+                    console.log("show player 1")
+                    addPlayerCircle(opp_circle, 1);
+                }
+            }
+        }
+
         setUpNewRound(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2, action.numberTour);
     } else {
         switch (action.case) {
@@ -397,24 +465,29 @@ function validate(action) {
 function showButtonVisible(){
     document.getElementById("button-validate-action").style.display = "flex";
     document.getElementById("button-undo-action").style.display = "flex";
-    document.getElementById("button-save-game").style.display = "none";
+    //document.getElementById("button-save-game").style.display = "none";
 }
 
 function move(action) {
     if (action.valid) {
         if (action.oldPosition !== null) removePlayerCircle(action.oldPosition, action.currentPlayer);
-        addPlayerCircle(document.getElementById(action.cellId), action.currentPlayer);
+        if(firstPlayer){
+            if(action.currentPlayer===1) addPlayerCircle(document.getElementById(action.cellId), 1);
+            if(action.currentPlayer===2 && document.getElementById(action.cellId).visibility<=0) addPlayerCircle(document.getElementById(action.cellId), 2);
+        }else {
+            if(action.currentPlayer===2) addPlayerCircle(document.getElementById(action.cellId), 2);
+            if(action.currentPlayer===1 && document.getElementById(action.cellId).visibility>=0) addPlayerCircle(document.getElementById(action.cellId), 1);
+        }
         lastActionType = "position";
-        showButtonVisible();
+        //showButtonVisible();
     } else {
         alert(action.message);
     }
-    showButtonVisible();
+    //showButtonVisible();
 }
 
 function wall(action) {
     if (action.valid) {
-        console.log("wall valid", action.adjacentWall);
         const adjacentWall = document.getElementById(action.adjacentWall);
         const adjacentSpace = document.getElementById(action.adjacentSpace);
         const firstWallToColor = document.getElementById(action.firstWallToColor);
@@ -425,11 +498,11 @@ function wall(action) {
         firstWallToColor.classList.add("wall-laid", "laidBy" + action.currentPlayer);
         firstWallToColor.removeEventListener("mouseenter", wallListener);
         firstWallToColor.removeEventListener("click", wallLaid);
-        showButtonVisible();
+        //showButtonVisible();
         updateNumberWallsDisplay(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2);
         lastActionType="wall";
     } else {
-        alert(action.message);
+        //alert(action.message);
     }
 }
 
@@ -464,7 +537,6 @@ function undoMovePosition(action) {
 
 function undoWall(action) {
     if (action.valid){
-        console.log("undoWall", action.tabIDHTML);
         document.getElementById(action.tabIDHTML[0]).classList.remove("wall-laid","laidBy"+action.currentPlayer);
         document.getElementById(action.tabIDHTML[0]).addEventListener("mouseenter",wallListener);
         document.getElementById(action.tabIDHTML[0]).addEventListener("click",wallLaid);
@@ -505,4 +577,99 @@ function undoWall(action) {
      popup.style.display = 'flex';
      document.getElementById("popup-ready-message").innerHTML = "Victoire de " + winnerText + " !! Félicitations ! ";
      document.getElementById("popup-button").style.display = "none";
+     setTimeout(() => {
+         window.location.href = `/mainMenu.html`;
+     }, 3000);
+ }
+
+ function startNewRound(){
+     document.getElementById("grid").style.display = 'grid';
+     document.getElementById("display-player-1").style.display = "flex";
+     document.getElementById("display-player-2").style.display = "flex";
+     document.getElementById("display-player-1-walls").style.display = "flex";
+     document.getElementById("display-player-2-walls").style.display = "flex";
+     document.getElementById("display-player-1-number-actions").style.display = "flex";
+     document.getElementById("display-player-2-number-actions").style.display = "flex";
+     document.getElementById("display-number-tour").style.display = "flex";
+     document.getElementById("display-player-turn").style.display = "flex";
+     document.getElementById("player1Image").style.display = "flex";
+     document.getElementById("player2Image").style.display = "flex";
+ }
+
+
+ /**
+  * Fonction permettant de pouvoir afficher la pop-up pour l'écran anti-triche
+  * On va donc cacher la grille derrière pour éviter la triche
+  */
+ function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
+     document.getElementById("button-validate-action").style.display = "none";
+     document.getElementById("button-undo-action").style.display = "none";
+     document.getElementById("grid").style.display = 'none';
+     document.getElementById("display-player-1").style.display = "none";
+     document.getElementById("display-player-1").innerHTML = player1_name;
+     document.getElementById("display-player-1-walls").style.display = "none";
+     document.getElementById("display-player-1-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer1;
+     document.getElementById("display-player-2").style.display = "none";
+     document.getElementById("display-player-2").innerHTML = player2_name;
+     document.getElementById("display-player-2-walls").style.display = "none";
+     document.getElementById("display-player-2-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer2;
+     let elo1;
+     if (firstPlayer) {
+         elo1 = gameInformation.player1_elo;
+     } else {
+         elo1 = gameInformation.player2_elo;
+     }
+     document.getElementById("display-player-1-number-actions").innerHTML = "ELO : " + elo1;
+     document.getElementById("display-player-1-number-actions").style.display = "none";
+     let elo2;
+        if (firstPlayer) {
+            elo2 = gameInformation.player2_elo;
+        } else {
+            elo2 = gameInformation.player1_elo;
+        }
+     document.getElementById("display-player-2-number-actions").innerHTML = "ELO : " + elo2;
+     document.getElementById("display-player-2-number-actions").style.display = "none";
+     document.getElementById("display-number-tour").innerHTML = "Tour numéro : "+numberTour;
+     let currentName;
+     if (currentPlayer === 1) {
+         currentName = player1_name;
+     } else {
+         currentName = player2_name;
+     }
+     document.getElementById("display-player-turn").innerHTML = "C'est au tour de : "+ currentName;
+     document.getElementById("display-number-tour").style.display = "none";
+     document.getElementById("player1Image").style.display = "none";
+     document.getElementById("player2Image").style.display = "none";
+     startNewRound()
+ }
+
+ function leaveGame(action){
+        if (action.valid) {
+            let popup = document.getElementById("popup");
+            popup.style.display = 'flex';
+            let winnerText;
+            let leaverText;
+            if (gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id) {
+                if (action.winner === 1) {
+                    winnerText = player1_name;
+                    leaverText = player2_name;
+                } else {
+                    winnerText = player2_name;
+                    leaverText = player1_name;
+                }
+            } else {
+                if (action.winner === 1) {
+                    winnerText = player1_name;
+                    leaverText = player2_name;
+                } else {
+                    winnerText = player2_name;
+                    leaverText = player1_name;
+                }
+            }
+            document.getElementById("popup-ready-message").innerHTML = "Le joueur " + leaverText + " a quitté la partie.<br> Victoire de " + winnerText + " !! Félicitations ! ";
+            document.getElementById("popup-button").style.display = "none";
+            setTimeout(() => {
+                window.location.href = `/mainMenu.html`;
+            }, 3000);
+        }
  }

@@ -102,6 +102,8 @@ async function getUserById(id) {
             'id': user._id,
             'username': user.username,
             'elo': user.elo,
+            'gamesWin': user.gamesWin,
+            'gamesLoose': user.gamesLoose,
         }
     } catch (error) {
         console.error('Erreur lors de la récupération des données :', error);
@@ -131,6 +133,12 @@ async function createGame(game) {
   return game;
 }
 
+async function deleteGame(userEmail) {
+  const db = await getDb();
+  const games = db.collection('games');
+  return games.deleteOne({ userEmail: userEmail });
+}
+
 async function getGame(userEmail) {
   const db = await getDb();
   const games = db.collection('games');
@@ -158,7 +166,6 @@ async function clearGames(userEmail){
   });
   return userEmail;
 }
-
 
 async function clearGameDb() {
   const db = await getDb();
@@ -290,6 +297,14 @@ async function updateStats(winnerId, looserId, eloDiff) {
             { _id: looser.id },
             { $set: { elo: (looser.elo - eloDiff) > 0 ? looser.elo - eloDiff : 0 } }
         );
+
+        await users.updateOne(
+            { _id: winner.id },
+            { $set: { gamesWin: winner.gamesWin + 1 } });
+        await users.updateOne(
+            { _id: looser.id },
+            { $set: { gamesLoose: looser.gamesLoose + 1 } });
+
         console.log('Opérations de mise à jour réussies');
         return 'Opérations de mise à jour réussies';
     } catch (error) {
@@ -327,6 +342,13 @@ async function removeFriend(usernameRemover, usernameToRemove){
     );
 }
 
+async function getUsersRank(){
+    //return users sorted by elo
+    const db = await getDb();
+    const users = db.collection('users');
+    return users.find().sort({elo: -1}).toArray();
+}
+
 
 exports.createUser = createUser;
 exports.getUser = getUser;
@@ -352,3 +374,6 @@ exports.clearPrivateChatDb = clearPrivateChatDb;
 exports.getUserById = getUserById;
 exports.updateStats = updateStats;
 exports.removeFriend = removeFriend;
+exports.getUsersRank = getUsersRank;
+exports.clearGames = clearGames;
+exports.deleteGame = deleteGame;
