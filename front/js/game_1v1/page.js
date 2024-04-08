@@ -111,16 +111,18 @@ function main() {
         document.getElementById("button-validate-action").addEventListener("click",validateRound);
         document.getElementById("button-undo-action").addEventListener("click",undoAction);
         initializeTable();
-
+        console.log(gameInformation)
         if (firstPlayer) {
             player1_name = decodeJWTPayload(getCookie("jwt")).username;
             player2_name = gameInformation.opponentName;
+            //console.log(gameInformation)
             const elo_player1 = gameInformation.player1_elo;
             setVisionForPlayer(1, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
         } else {
             player2_name = decodeJWTPayload(getCookie("jwt")).username;
             player1_name = gameInformation.opponentName;
+            //console.log(gameInformation)
             const elo_player2 = gameInformation.player2_elo;
             setVisionForPlayer(2, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
@@ -128,6 +130,14 @@ function main() {
         //setUpNewRound(player1_name,10,10,1);
         socket.on("actionResult", (action) => updateUI(action));
         socket.off("game");
+    });
+
+    let leaveGameButton = document.getElementById("button-leave-game");
+    leaveGameButton.addEventListener("click", () => {
+        socket.emit("leaveRoom", {
+            'roomId': gameInformation.roomName,
+            'tokens': getCookie("jwt")
+        });
     });
 }
 
@@ -365,6 +375,9 @@ function updateUI(action) {
             case "button":
                 showButtonVisible()
                 break
+            case "leaveRoom":
+                leaveGame(action);
+                break;
     }
 }
 
@@ -600,9 +613,21 @@ function undoWall(action) {
      document.getElementById("display-player-2").innerHTML = player2_name;
      document.getElementById("display-player-2-walls").style.display = "none";
      document.getElementById("display-player-2-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer2;
-     document.getElementById("display-player-1-number-actions").innerHTML = "ELO : " + gameInformation.player1_elo;
+     let elo1;
+     if (firstPlayer) {
+         elo1 = gameInformation.player1_elo;
+     } else {
+         elo1 = gameInformation.player2_elo;
+     }
+     document.getElementById("display-player-1-number-actions").innerHTML = "ELO : " + elo1;
      document.getElementById("display-player-1-number-actions").style.display = "none";
-     document.getElementById("display-player-2-number-actions").innerHTML = "ELO : " + gameInformation.player2_elo;
+     let elo2;
+        if (firstPlayer) {
+            elo2 = gameInformation.player2_elo;
+        } else {
+            elo2 = gameInformation.player1_elo;
+        }
+     document.getElementById("display-player-2-number-actions").innerHTML = "ELO : " + elo2;
      document.getElementById("display-player-2-number-actions").style.display = "none";
      document.getElementById("display-number-tour").innerHTML = "Tour numéro : "+numberTour;
      let currentName;
@@ -616,4 +641,35 @@ function undoWall(action) {
      document.getElementById("player1Image").style.display = "none";
      document.getElementById("player2Image").style.display = "none";
      startNewRound()
+ }
+
+ function leaveGame(action){
+        if (action.valid) {
+            let popup = document.getElementById("popup");
+            popup.style.display = 'flex';
+            let winnerText;
+            let leaverText;
+            if (gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id) {
+                if (action.winner === 1) {
+                    winnerText = player1_name;
+                    leaverText = player2_name;
+                } else {
+                    winnerText = player2_name;
+                    leaverText = player1_name;
+                }
+            } else {
+                if (action.winner === 1) {
+                    winnerText = player1_name;
+                    leaverText = player2_name;
+                } else {
+                    winnerText = player2_name;
+                    leaverText = player1_name;
+                }
+            }
+            document.getElementById("popup-ready-message").innerHTML = "Le joueur " + leaverText + " a quitté la partie.<br> Victoire de " + winnerText + " !! Félicitations ! ";
+            document.getElementById("popup-button").style.display = "none";
+            setTimeout(() => {
+                window.location.href = `/mainMenu.html`;
+            }, 3000);
+        }
  }

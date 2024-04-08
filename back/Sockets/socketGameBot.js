@@ -267,7 +267,6 @@ function createSocket(io) {
             socket.emit("idWallToUndo", game.lastWallLaidsIDHtml, 1, game.nbWallsPlayer1);
             game.undoWalls();
         });
-
     });
 }
 
