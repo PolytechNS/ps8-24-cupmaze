@@ -65,14 +65,14 @@ function main() {
     firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
     let leaveGameButtonStyle = document.getElementById("button-leave-game").style;
     if(firstPlayer) {
-        leaveGameButtonStyle.background = "rgba(94,174,200, 0.7)";
-        leaveGameButtonStyle.removeProperty("left");
-        leaveGameButtonStyle.float = "right";
-    }
-    else {
         leaveGameButtonStyle.left = "0%";
         leaveGameButtonStyle.removeProperty("float");
         leaveGameButtonStyle.background = "rgba(200, 94, 94, 0.7)";
+    }
+    else {
+        leaveGameButtonStyle.background = "rgba(94,174,200, 0.7)";
+        leaveGameButtonStyle.removeProperty("left");
+        leaveGameButtonStyle.float = "right";
     }
 
 
