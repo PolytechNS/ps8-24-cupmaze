@@ -43,62 +43,6 @@ closePopupButtonNotif.onclick = function() {
 const params = {
     username: username
 };
-let queryString = new URLSearchParams(params).toString();
-fetch(baseUrl+"/api/getFriends?$"+queryString, {
-    method: "GET",
-})
-    .then(async response => {
-        if (!response.ok) {
-            alert("ERROR"+response.status);
-        }else{
-            let ret = await response.json();
-            console.log(ret);
-            const friendsList = document.getElementById("friend-list");
-            ret.forEach(friend => {
-                const listItem = document.createElement("li");
-                listItem.classList.add('friend');
-
-                const nameDiv = document.createElement("div");
-                nameDiv.classList.add('name');
-                nameDiv.textContent = friend;
-                nameDiv.onclick = function() {
-                    document.getElementById("popup").style.display = "block";
-                    document.getElementById("element1").innerText = "Nom d'utilisateur: "+friend;
-                    document.getElementById("element2").innerText = "Elo de l'utilisateur: "+255;
-                }
-
-                const buttonChallenge = document.createElement("button");
-                buttonChallenge.classList.add('challenge');
-                buttonChallenge.textContent = 'Challenge!';
-                buttonChallenge.onclick = function () {
-                    sendChallenge(friend);
-                }
-
-                const buttonChat = document.createElement("button");
-                buttonChat.classList.add('chat');
-                buttonChat.textContent = 'Chat';
-                buttonChat.onclick = function() {
-                    if(username.localeCompare(friend) < 0 ){
-                        window.location.href = baseUrl +'/privateChat.html?idchat='+username+friend;
-                    } else {
-                        window.location.href = baseUrl +'/privateChat.html?idchat='+friend+username;
-                    }
-                }
-
-                listItem.appendChild(nameDiv);
-                listItem.appendChild(buttonChallenge);
-                listItem.appendChild(buttonChat);
-
-                friendsList.appendChild(listItem);
-
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Erreur:', error);
-    });
-
-
 let socketNotifications = io("/notifications");
 socketNotifications.emit('joinRoom', username);
 socketNotifications.on('friendRequestNotification', (data) => {
