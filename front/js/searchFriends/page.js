@@ -1,3 +1,4 @@
+
 let socketNotifications;
 
 
@@ -152,14 +153,33 @@ function retrieveFriends(params){
                     const resultDiv = document.getElementById("friendsList");
                     const usernameParagraph = document.createElement("p");
                     usernameParagraph.textContent = `Nom d'utilisateur : ${friend}`;
+
+                    const buttonDiv = document.createElement("div");
+                    buttonDiv.classList.add("buttonDiv");
+
+                    const challengeButton = document.createElement("button");
+                    const challengeIcone = document.createElement("img");
+                    challengeIcone.src = "imageResources/icone_defi.png";
+                    challengeIcone.style.width = "25px"; // Réduire la largeur de l'image
+                    challengeIcone.style.height = "25px"; // Réduire la hauteur de l'image
+                    challengeButton.appendChild(challengeIcone);
+                    buttonDiv.appendChild(challengeButton);
+
+                    challengeButton.onclick = (function(friend) {
+                        return function() {
+                            sendChallenge(friend);
+                        };
+                    })(friend);
                     const deleteButton = document.createElement("button");
                     deleteButton.textContent = "Supprimer l'ami";
-                    deleteButton.addEventListener("click", () => {
-                        deleteFriend(friend);
-                        alert(`L'utilisateur ${friend} a été supprimé de votre liste d'amis.`);
-                    });
+                    buttonDiv.appendChild(deleteButton);
+                    deleteButton.onclick = (function(friend) {
+                        return function() {
+                            deleteFriend(friend);
+                        };
+                    })(friend);
                     resultDiv.appendChild(usernameParagraph);
-                    resultDiv.appendChild(deleteButton);
+                    resultDiv.appendChild(buttonDiv);
                 }
             }
         })
@@ -188,7 +208,7 @@ function retrieveWaitingFriendsRequests(params){
         .then(async response => {
             if (!response.ok) {
                 alert("ERROR"+response.status);
-            }else{
+            } else {
                 let ret = await response.json();
                 console.log("myWaitingFriendsRequests succes");
                 console.log(ret);
@@ -240,3 +260,135 @@ let buttonBack = document.getElementById("back");
 buttonBack.addEventListener("click", function() {
     window.location.href = baseUrl + "/mainMenu.html";
 });
+
+
+/* CHALLENGE */
+
+function decodeJWTPayload(token) {
+    const payload = token.split('.')[1];
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+}
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+function sendChallenge(friend) {
+    console.log('sendChallenge', friend);
+    let sendChallenge = {
+        "senderToken": getCookie('jwt'),
+        "friend": friend
+    }
+    socketNotifications.emit('sendChallenge', sendChallenge);
+}
+
+document.addEventListener('DOMContentLoaded', init, false);
+
+function init() {
+    console.log('connected to the notifications room');
+    socketNotifications.emit('social', getCookie('jwt'));
+    socketNotifications.on('receiveChallenge', (receiveChallenge) => onReceiveChallenge(receiveChallenge));
+    socketNotifications.on('challengeInit', (challengeInit) => onChallengeInit(challengeInit));
+    socketNotifications.on('challengeRefused', (challengeRefused) => onChallengeRefused(challengeRefused));
+}
+
+function onReceiveChallenge(receiveChallenge) {
+    // on affiche une popup pour accepter ou refuser le challenge
+    const popup = document.getElementById('popup-notif');
+    popup.style.display = 'block';
+    popup.style.backgroundColor = 'red';
+    popup.style.color = 'white';
+    popup.style.border = '2px solid black';
+    const message = document.getElementById('popup-notif-content');
+    message.innerText = `${receiveChallenge.senderName} vous a défié !`;
+    const acceptButton = document.createElement('button');
+    acceptButton.innerText = 'Accepter';
+    popup.appendChild(acceptButton);
+    acceptButton.addEventListener('click', () => challengeDecision(receiveChallenge.senderId, receiveChallenge.senderName, receiveChallenge.token, true));
+    const declineButton = document.createElement('button');
+    declineButton.innerText = 'Refuser';
+    popup.appendChild(declineButton);
+    declineButton.addEventListener('click', () => challengeDecision(receiveChallenge.senderId, receiveChallenge.senderName, receiveChallenge.token, false));
+}
+
+function challengeDecision(senderId, senderName, senderToken, decision) {
+    if (decision === true) {
+        console.log('Challenge accepted');
+        let challengeDecision = {
+            "senderToken": getCookie('jwt'),
+            "userId": decodeJWTPayload(getCookie('jwt')).id,
+            "friendId": senderId,
+            "friendName": senderName,
+            "friendToken": senderToken,
+            "decision": "accept"
+        }
+        socketNotifications.emit('challengeDecision', challengeDecision);
+        const popup = document.getElementById('popup-notif');
+        popup.removeChild(popup.lastChild);
+        popup.removeChild(popup.lastChild);
+        const message = document.getElementById('popup-notif-content');
+        message.innerText = 'Défie accepté !';
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 1500);
+    } else {
+        const popup = document.getElementById('popup-notif');
+        popup.removeChild(popup.lastChild);
+        popup.removeChild(popup.lastChild);
+        const message = document.getElementById('popup-notif-content');
+        message.innerText = 'Défie refusé !';
+        let challengeDecision = {
+            "senderToken": getCookie('jwt'),
+            "userId": decodeJWTPayload(getCookie('jwt')).id,
+            "friendId": senderId,
+            "friendName": senderName,
+            "friendToken": senderToken,
+            "decision": "refuse"
+        }
+        socketNotifications.emit('challengeDecision', challengeDecision);
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 1500);
+
+    }
+}
+
+function onChallengeRefused(challengeRefused) {
+    console.log('Challenge refused', challengeRefused);
+    const popup = document.getElementById('popup-notif');
+    popup.style.display = 'block';
+    popup.style.backgroundColor = 'red';
+    popup.style.color = 'white';
+    const message = document.getElementById('popup-notif-content');
+    message.innerText = `${challengeRefused.opponentName} a refusé votre défi.`;
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 1500);
+}
+
+function onChallengeInit(challengeInit) {
+    console.log('Challenge init', challengeInit);
+    const popup = document.getElementById('popup-notif');
+    popup.style.display = 'block';
+    popup.style.backgroundColor = 'green';
+    popup.style.color = 'white';
+    const message = document.getElementById('popup-notif-content');
+    message.innerText = `Défie accepté, vous allez être redirigé vers la partie en ligne.`;
+
+    setTimeout(() => {
+        localStorage.setItem('room', challengeInit.room);
+        localStorage.setItem('opponentName', challengeInit.opponentName);
+        localStorage.setItem('opponentId', challengeInit.opponentId);
+        localStorage.setItem('player1_elo', challengeInit.player1_elo);
+        localStorage.setItem('player2_elo', challengeInit.player2_elo);
+        popup.style.display = 'none';
+        window.location.href = `/online1v1.html`;
+    }, 2000);
+}
+

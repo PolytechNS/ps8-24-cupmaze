@@ -49,6 +49,7 @@ function createSocket(io) {
         if (!verify(token, 'secret')) { return; }
         let userInformation = decodeJWTPayload(token);
         console.log('User', userInformation.username, 'connected to notifications');
+        console.log('User', userInformation.username, 'connected to notifications');
         socket.join(userInformation.id);
     }
 
@@ -63,18 +64,18 @@ function createSocket(io) {
             return;
         }
 
-        let friendInformation = decodeJWTPayload(senderToken);
+        let senderInformation = decodeJWTPayload(senderToken);
         // on va chercher le friendName dans la base de données
-        const userDB = await getUserByName(friendName);
-        if (userDB === null) {
+        const friendInformation = await getUserByName(friendName);
+        if (friendInformation === null) {
             return;
         }
-        notifications.to(userDB._id.toString()).emit("receiveChallenge", {
-            'senderId': friendInformation.id,
-            'senderName': friendInformation.username,
+        notifications.to(friendInformation._id.toString()).emit("receiveChallenge", {
+            'senderId': senderInformation.id,
+            'senderName': senderInformation.username,
             'token': senderToken
         });
-        console.log('Challenge sent to', userDB._id.toString());
+        console.log('Challenge sent to', friendInformation._id.toString());
     }
 
     async function onChallengeDecision(socket, data) {
@@ -91,7 +92,13 @@ function createSocket(io) {
         let userDB = await getUserById(userId);
         let friendDB = await getUserById(friendId);
         console.log('friendDB', friendDB);
-
+        if (data.decision === 'refuse') {
+            notifications.to(friendId).emit("challengeRefused", {
+                'opponentName': userInformation.username,
+                'opponentId': userId
+            });
+            return;
+        }
         notifications.to(userId).emit("challengeInit", {
             'opponentName': friendName,
             'opponentId': friendId,
@@ -109,6 +116,8 @@ function createSocket(io) {
         });
         setupChallenge(userId, friendId);
     }
+
+
 
 }
 
