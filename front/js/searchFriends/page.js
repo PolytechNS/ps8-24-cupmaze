@@ -369,7 +369,7 @@ function challengeDecision(senderId, senderName, senderToken, decision) {
         popup.removeChild(popup.lastChild);
         popup.removeChild(popup.lastChild);
         const message = document.getElementById('popup-notif-content');
-        message.innerText = 'Défie accepté !';
+        message.innerText = 'Défi accepté !';
         setTimeout(() => {
             popup.style.display = 'none';
         }, 1500);
@@ -378,7 +378,7 @@ function challengeDecision(senderId, senderName, senderToken, decision) {
         popup.removeChild(popup.lastChild);
         popup.removeChild(popup.lastChild);
         const message = document.getElementById('popup-notif-content');
-        message.innerText = 'Défie refusé !';
+        message.innerText = 'Défi refusé !';
         let challengeDecision = {
             "senderToken": getCookie('jwt'),
             "userId": decodeJWTPayload(getCookie('jwt')).id,
@@ -415,7 +415,7 @@ function onChallengeInit(challengeInit) {
     popup.style.backgroundColor = 'green';
     popup.style.color = 'white';
     const message = document.getElementById('popup-notif-content');
-    message.innerText = `Défie accepté, vous allez être redirigé vers la partie en ligne.`;
+    message.innerText = `Défi accepté, vous allez être redirigé vers la partie en ligne.`;
 
     setTimeout(() => {
         localStorage.setItem('room', challengeInit.room);
