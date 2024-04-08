@@ -1,6 +1,9 @@
 
 let socketNotifications;
 
+let friendsOfUser;
+let waitingListOfFriendsRequests;
+
 
 var baseUrl = '';
 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -56,15 +59,30 @@ function addFriendRequest(usernameToAdd) {
         return;
     }
 
+    if(friendsOfUser.includes(usernameToAdd)){
+        alert("Vous êtes déjà ami avec cet utilisateur.");
+        return;
+    }
+
+    if(waitingListOfFriendsRequests.includes(usernameToAdd)){
+        alert("Veuillez accepter la demande d'ami de cet utilisateur.");
+        return;
+    }
+
     const queryString = new URLSearchParams(params).toString();
     fetch(baseUrl+"/api/addFriend?$"+queryString, {
         method: "GET",
     })
         .then(async response => {
             if (!response.ok) {
-                alert("ERROR"+response.status);
+                if(response.status === 402){
+                    alert("Vous êtes déjà ami avec cet utilisateur.");
+                } else {
+                    alert("ERROR "+response.status);
+                }
             }else{
                 console.log("Invitation d'ami bien envoyée");
+                alert("Invitation d'ami bien envoyée");
                 socketNotifications.emit('addFriendRequest', { sender: myUsername, receiver: usernameToAdd });
             }
         })
@@ -149,6 +167,7 @@ function retrieveFriends(params){
                 let ret = await response.json();
                 console.log("myFriends succes");
                 console.log(ret);
+                friendsOfUser = ret;
                 for (friend of ret){
                     const resultDiv = document.getElementById("friendsList");
                     const usernameParagraph = document.createElement("p");
@@ -212,6 +231,7 @@ function retrieveWaitingFriendsRequests(params){
                 let ret = await response.json();
                 console.log("myWaitingFriendsRequests succes");
                 console.log(ret);
+                waitingListOfFriendsRequests = ret;
                 for (friendsRequest of ret){
                     const resultDiv = document.getElementById("friendsRequests");
                     const usernameParagraph = document.createElement("p");
