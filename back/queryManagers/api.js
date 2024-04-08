@@ -182,7 +182,7 @@ function searchAccountOnDB(request, response) {
     });
 }
 
-function addPlayerFriendList(request, response){
+async function addPlayerFriendList(request, response) {
     let usernameAdder = (request.url).toString().split("=")[1].split("&")[0];
     let usernameToAdd = (request.url).toString().split("=")[2].split("&")[0];
 
@@ -190,12 +190,12 @@ function addPlayerFriendList(request, response){
         .then(() => {
             console.log("Demande d'ami ajoutée avec succès");
             response.writeHead(200, {'Content-Type': 'application/json'});
-            response.end(JSON.stringify({ content: "AddFriendRequestDone" }));
+            response.end(JSON.stringify({content: "AddFriendRequestDone"}));
         })
         .catch((error) => {
             console.error("Erreur lors de l'ajout de la demande d'ami :", error);
             response.writeHead(401, {'Content-Type': 'application/json'});
-            response.end(JSON.stringify({ content: "ErrorAddFriendRequest" }));
+            response.end(JSON.stringify({content: "ErrorAddFriendRequest"}));
         });
 }
 
