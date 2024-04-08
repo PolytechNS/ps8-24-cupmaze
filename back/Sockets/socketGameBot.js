@@ -117,12 +117,9 @@ function createSocket(io) {
             if(game.lastPlayerPosition["player1"]!== null){
                 let lastCase = game.getCase(game.lastPlayerPosition["player1"][0], game.lastPlayerPosition["player1"][1]);
                 lastCase.setIsOccupied(true);
-                console.log("lastCase : "+lastCase);
                 newPositionHtml=game.lastPlayerPosition["player1"][0]+"-"+game.lastPlayerPosition["player1"][1]+"~cell";
                 let currentCase = game.getCase(game.playerPosition["player1"][0], game.playerPosition["player1"][1]);
                 currentCase.setIsOccupied(false);
-                console.log("currentCase : "+currentCase);
-                //game.graph.updateNodeState(game.playerPosition["player1"][0], game.playerPosition["player1"][1], 0);
             }
             game.playerPosition["player1"] = game.lastPlayerPosition["player1"];
             game.actionsToDo=1;
@@ -144,11 +141,9 @@ function createSocket(io) {
             game.playerPosition.player1 = [colonne, ligne];
             const caseWanted = game.getCase(colonne, ligne);
             caseWanted.setIsOccupied(true);
-            //game.graph.updateNodeState(colonne, ligne, currentPlayer);
             BotGameNamespace.emit("currentPlayer", currentPlayer, game.playerPosition.player1);
             game.actionsToDo--;
             game.lastActionType = "position"
-            console.log("choosePositionToBegin", game.playerPosition.player1);
         });
 
         socket.on("validateRound", (msg) => {
@@ -162,7 +157,6 @@ function createSocket(io) {
 
             BotGameNamespace.emit("numberTour", numberTour, possibleMoves);
             let newAIPosition = AIEasy.computeMove(possibleMoves, playerPosition.player2);
-            //console.log("newAIPosition", newAIPosition);
             if (!(newAIPosition instanceof Case)) {
                 newAIPosition = game.getCase(newAIPosition[0], newAIPosition[1])
             }
@@ -210,7 +204,6 @@ function createSocket(io) {
             ligne1 = parseInt(firstWall[2]);
             colonne2 = parseInt(SecondWall[0]);
             ligne2 = parseInt(SecondWall[2]);
-            console.log("colonne1", colonne1, "ligne1", ligne1, "colonne2", colonne2, "ligne2", ligne2);
             let isBlock = game.isWallBlockingPath(colonne1, ligne1, colonne2, ligne2, wallType);
             socket.emit("res", !isBlock);
         });
@@ -223,7 +216,6 @@ function createSocket(io) {
 
             const colonne = parseInt(wallPosition[0]);
             const ligne = parseInt(wallPosition[2]);
-            console.log("colonne", colonne, "ligne", ligne);
             let wallInclinaison;
             if (firstWallToColor === null) { return;}
 

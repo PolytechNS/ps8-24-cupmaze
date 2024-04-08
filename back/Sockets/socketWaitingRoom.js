@@ -122,7 +122,6 @@ function createSocket(io) {
                         message: "Il faut commencer sur votre ligne de depart",
                         actionType: "positionBegin"
                     })
-                    console.log("Il faut commencer sur votre ligne de depart");
                     return;
                 }
                 if (gameState.game.actionsToDo === 0) {
@@ -142,7 +141,6 @@ function createSocket(io) {
 
                 const caseWanted = gameState.game.getCase(colonne, ligne);
                 caseWanted.setIsOccupied(true);
-                console.log("caseWanted", caseWanted +" current player", gameState.game.currentPlayer);
                 gameState.game.actionsToDo--;
                 gameState.game.lastActionType = "position";
                 socket.emit('actionResult', {
@@ -193,10 +191,7 @@ function createSocket(io) {
                 const ligne = parseInt(cellId.split("-")[1]);
 
                 const playerCurrentPosition = gameState.game.getPlayerCurrentPosition(gameState.game.currentPlayer);
-                console.log("playerCurrentPosition", playerCurrentPosition);
                 const possibleMoves = gameState.game.getPossibleMoves(playerCurrentPosition);
-                console.log("possibleMoves", possibleMoves);
-                console.log("colonne", colonne, "ligne", ligne);
                 const caseWanted = gameState.game.getCase(colonne, ligne);
 
                 if (possibleMoves.find((cell) => cell.getPos_x() === colonne && cell.getPos_y() === ligne)) {
@@ -232,11 +227,29 @@ function createSocket(io) {
                     actionType: "movePlayer"
                 });
             }
+        });
 
+        socket.on("wallListen", (data) => {
+            let roomId = data.roomId; // room id
+            let token = data.tokens; // token
+            let gameState = GameState[roomId];
+            let user = decodeJWTPayload(token);
+            if (!gameState || !roomId) { return; }
+
+            let firstWall = data.firstWall;
+            let SecondWall = data.secondWall;
+            let wallType = data.wallType;
+
+            let colonne1, ligne1, colonne2, ligne2;
+            colonne1 = parseInt(firstWall[0]);
+            ligne1 = parseInt(firstWall[2]);
+            colonne2 = parseInt(SecondWall[0]);
+            ligne2 = parseInt(SecondWall[2]);
+            let isBlock = gameState.game.isWallBlockingPath(colonne1, ligne1, colonne2, ligne2, wallType);
+            socket.emit("res", !isBlock);
         });
 
         socket.on("layWall", (data) => {
-            console.log("layWall", data);
             let roomId = data.roomId; // room id
             let token = data.tokens; // token
             let gameState = GameState[roomId];
@@ -244,7 +257,6 @@ function createSocket(io) {
             if (!gameState || !roomId) { return; }
 
             let firstWallToColor = data.firstWallToColor;
-            console.log(data.adjacentWall);
             let wallType = data.wallType;
             let wallPosition = data.wallPosition;
             let wallId = data.wallId;
@@ -305,6 +317,17 @@ function createSocket(io) {
                         ? findWall(colonne, ligne-1, wallInclinaison, gameState.game.elements)
                         : findWall(colonne+1, ligne, wallInclinaison, gameState.game.elements);
                 const adjacentSpace = findSpace(colonne, ligne, gameState.game.elements);
+
+                let isBlock = gameState.game.isWallBlockingPath(colonne,ligne, adjacentWall.pos_x, adjacentWall.pos_y, wallInclinaison);
+                if (!isBlock) {
+                    socket.emit("actionResult", {
+                        valid: false,
+                        message: "Ce mur bloque le passage",
+                        case: "blockPath",
+                        actionType: "layWall"
+                    });
+                    return;
+                }
 
                 gameState.game.layWall(wall, adjacentWall, adjacentSpace);
                 gameState.game.actionsToDo--;
