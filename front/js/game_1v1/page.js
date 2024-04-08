@@ -364,7 +364,13 @@ function updateUI(action) {
 function positionBegin(action) {
     if (action.valid) {
         document.getElementById(action.cellId).classList.add("occupied");
-        addPlayerCircle(document.getElementById(action.cellId), action.current);
+        //addPlayerCircle(document.getElementById(action.cellId), action.current);
+        if(firstPlayer){
+            if(action.current===1) addPlayerCircle(document.getElementById(action.cellId), 1);
+        }else {
+            if(action.current===2) addPlayerCircle(document.getElementById(action.cellId), 2);
+        }
+
         lastActionType = "position";
         if (action.playerPositions === null) {
             //showButtonVisible();
@@ -392,8 +398,28 @@ function validate(action) {
     if (action.valid) {
         if(firstPlayer){
             setVisionForPlayer(1, action.playerPosition);
+            if(action.playerPosition.player2!==null) {
+                let opp_circle = document.getElementById(action.playerPosition.player2[0] + "-" + action.playerPosition.player2[1] + "~cell");
+                if (parseInt(opp_circle.visibility) > 0) {
+                    console.log("hide player 2");
+                    removePlayerCircle(action.playerPosition.player2[0] + "-" + action.playerPosition.player2[1] + "~cell", 2);
+                } else if (document.getElementsByClassName("player2-circle").length === 0){
+                    console.log("show player 2")
+                    addPlayerCircle(opp_circle, 2);
+                }
+            }
         }else {
             setVisionForPlayer(2, action.playerPosition);
+            if (action.playerPosition.player1 !== null) {
+                let opp_circle = document.getElementById(action.playerPosition.player1[0] + "-" + action.playerPosition.player1[1] + "~cell");
+                if (parseInt(opp_circle.visibility) < 0) {
+                    console.log("hide player 1")
+                    removePlayerCircle(action.playerPosition.player1[0] + "-" + action.playerPosition.player1[1] + "~cell", 1);
+                } else if( document.getElementsByClassName("player1-circle").length === 0){
+                    console.log("show player 1")
+                    addPlayerCircle(opp_circle, 1);
+                }
+            }
         }
 
         setUpNewRound(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2, action.numberTour);
@@ -426,7 +452,13 @@ function showButtonVisible(){
 function move(action) {
     if (action.valid) {
         if (action.oldPosition !== null) removePlayerCircle(action.oldPosition, action.currentPlayer);
-        addPlayerCircle(document.getElementById(action.cellId), action.currentPlayer);
+        if(firstPlayer){
+            if(action.currentPlayer===1) addPlayerCircle(document.getElementById(action.cellId), 1);
+            if(action.currentPlayer===2 && document.getElementById(action.cellId).visibility<=0) addPlayerCircle(document.getElementById(action.cellId), 2);
+        }else {
+            if(action.currentPlayer===2) addPlayerCircle(document.getElementById(action.cellId), 2);
+            if(action.currentPlayer===1 && document.getElementById(action.cellId).visibility>=0) addPlayerCircle(document.getElementById(action.cellId), 1);
+        }
         lastActionType = "position";
         //showButtonVisible();
     } else {
