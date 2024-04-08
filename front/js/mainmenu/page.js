@@ -24,6 +24,9 @@ document.getElementById('button-prizes').addEventListener('click', function() {
 document.getElementById('button-disconnect').addEventListener('click', function () {
     window.location.href = baseUrl +'/login.html';
 });
+document.getElementById('logOutMsg').addEventListener('click', function () {
+    window.location.href = baseUrl +'/login.html';
+});
 document.getElementById('searchFriends').addEventListener('click', function () {
     window.location.href = baseUrl +'/searchFriends.html';
 });

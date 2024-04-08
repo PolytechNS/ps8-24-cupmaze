@@ -1,3 +1,5 @@
+@import "buttons.css";
+
 .popup {
     display: none;
     position: fixed;
@@ -43,7 +45,6 @@ body {
     background-repeat: no-repeat;
     background-image: url("imageResources/leaderboard_illustration.jpg");
     background-color: rgba(255, 255, 255, 0.9); /* Couleur de fond avec transparence */
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Ajoute une ombre box */
 }
 
 table {
@@ -83,8 +84,8 @@ tbody tr:nth-child(odd) {
 
 .button{
     color: rgba(255, 255, 255);
-    margin-top: 10%;
     margin-left: 45%;
+    margin-top: 5%;
     font-size: xx-large;
     font-weight: bold;
     background: rgba(55, 84, 76, 0.7);
