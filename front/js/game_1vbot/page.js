@@ -1,7 +1,7 @@
 import {beginningPositionIsValid} from "../game_local_1v1/movePlayerReferee.js";
 import {removePlayerCircle, addPlayerCircle} from "./movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
-import {setVisionForPlayer} from "./fog_of_war.js";
+import {setVisionForPlayer, calculateVisibility} from "./fog_of_war.js";
 import {updateNumberAction} from "../game_local_1v1/utils.js";
 
 
