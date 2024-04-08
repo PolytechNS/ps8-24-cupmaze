@@ -17,19 +17,18 @@
     background: linear-gradient(to right, #4CAF50, #FF8C00);
 }
 
-body
-{
+body {
     margin: 0;
     padding: 0;
     height: 100%;
 
-    background-size: cover; /* Cover the entire body */
-    background-position: center; /* Center the background image */
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
     background-image: url("imageResources/wall_paper_prizes.jpg");
 
-    background-color: rgba(255, 255, 255, 0.9); /* Couleur de fond avec transparence */
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Ajoute une ombre box */
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .container
@@ -97,7 +96,7 @@ body
 
 .button{
     color: rgba(255, 255, 255);
-    margin-top: 5%;
+    margin-top: 15%;
     margin-left: 45%;
     font-size: xx-large;
     font-weight: bold;
