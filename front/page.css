@@ -194,14 +194,35 @@ table{
     padding-right: 0;
 }
 
-#popup-reaction {
-    display: none;
-    position: fixed; /* Change de fixed à absolute */
-    bottom: 20px; /* Ajuste la position verticale selon vos besoins */
-    right: 20px; /* Ajuste la position horizontale selon vos besoins */
-    max-width: calc(100% - 40px); /* Taille flexible */
-    background-color: rgba(0, 0, 0, 0.5);
+#reaction1{
+    cursor: pointer;
 }
+
+#reaction2{
+    cursor: pointer;
+}
+
+#reaction3{
+    cursor: pointer;
+}
+
+#reaction4{
+    cursor: pointer;
+}
+
+.popup-reaction {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 10px;
+    display: none;
+    z-index: 9999;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
 #popup {
     display: none;
     position: fixed;
@@ -222,7 +243,6 @@ table{
     position: relative;
 }
 
-
 .popup-notif {
     display: none;
     position: fixed;
@@ -234,15 +254,23 @@ table{
     border-radius: 5px;
     z-index: 9999;
 }
+
+.popup-content {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
 .popup-notif-content {
+    cursor: pointer;
     text-align: center;
 }
 
 #sendReaction {
     /* put the button in the left-bottom corner */
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    bottom: 15%;
+    left: 47%;
     text-align: center;
+    width: 7%;
+    border-radius: 10px;
 }
