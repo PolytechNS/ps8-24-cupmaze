@@ -131,6 +131,14 @@ function main() {
         socket.on("actionResult", (action) => updateUI(action));
         socket.off("game");
     });
+
+    let leaveGameButton = document.getElementById("button-leave-game");
+    leaveGameButton.addEventListener("click", () => {
+        socket.emit("leaveRoom", {
+            'roomId': gameInformation.roomName,
+            'tokens': getCookie("jwt")
+        });
+    });
 }
 
 function initializeTable() {
@@ -367,6 +375,9 @@ function updateUI(action) {
             case "button":
                 showButtonVisible()
                 break
+            case "leaveRoom":
+                leaveGame(action);
+                break;
     }
 }
 
@@ -630,4 +641,35 @@ function undoWall(action) {
      document.getElementById("player1Image").style.display = "none";
      document.getElementById("player2Image").style.display = "none";
      startNewRound()
+ }
+
+ function leaveGame(action){
+        if (action.valid) {
+            let popup = document.getElementById("popup");
+            popup.style.display = 'flex';
+            let winnerText;
+            let leaverText;
+            if (gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id) {
+                if (action.winner === 1) {
+                    winnerText = player1_name;
+                    leaverText = player2_name;
+                } else {
+                    winnerText = player2_name;
+                    leaverText = player1_name;
+                }
+            } else {
+                if (action.winner === 1) {
+                    winnerText = player1_name;
+                    leaverText = player2_name;
+                } else {
+                    winnerText = player2_name;
+                    leaverText = player1_name;
+                }
+            }
+            document.getElementById("popup-ready-message").innerHTML = "Le joueur " + leaverText + " a quitté la partie.<br> Victoire de " + winnerText + " !! Félicitations ! ";
+            document.getElementById("popup-button").style.display = "none";
+            setTimeout(() => {
+                window.location.href = `/mainMenu.html`;
+            }, 3000);
+        }
  }

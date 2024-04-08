@@ -577,7 +577,29 @@ function createSocket(io) {
                 });
             }
         });
+
+        socket.on("leaveRoom", (data) => {
+            let roomId = data.roomId;
+            let token = data.tokens;
+            let gameState = GameState[roomId];
+            // c'est le joueur qui a abandonné
+            let user = decodeJWTPayload(token);
+            if (!gameState || !roomId) { return; }
+
+                let winner = gameState.game.currentPlayer === 1 ? 2 : 1;
+                if (playersWithRooms[roomId].gameMode === "ranked") {
+                    const eloGame = updateElo(roomId, winner);
+                }
+                WaitingRoomNamespace.to(roomId).emit('actionResult', {
+                    valid: true,
+                    message: "Le joueur " + winner + " a gagné",
+                    winner: winner,
+                    case: "victory",
+                    actionType: "leaveRoom"
+                });
+        });
     }
+
 
     async function updateElo(roomId, winner) {
         let player1 = await getUserById(playersWithRooms[roomId].player1);
