@@ -50,7 +50,7 @@ socketNotifications.on('friendRequestNotification', (data) => {
     const popup = document.getElementById('popup-notif');
     popup.style.display = 'block';
     const message = document.getElementById('popup-notif-content');
-    message.innerText = `You have a friend request from ${data.sender}`;
+    message.innerText = `Vous avez une demande d'ami de ${data.sender}`;
 });
 
 let notificationsButton = document.getElementById('notifications-button');
