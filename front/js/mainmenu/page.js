@@ -24,7 +24,7 @@ document.getElementById('button-options').addEventListener('click', function() {
     //window.location.href = 'http://localhost:8000/options.html';
 });
 document.getElementById('button-disconnect').addEventListener('click', function () {
-    window.location.href = 'http://localhost:8000/login.html';
+    window.location.href = baseUrl +'/login.html';
 });
 document.getElementById('searchFriends').addEventListener('click', function () {
     window.location.href = baseUrl +'/searchFriends.html';
