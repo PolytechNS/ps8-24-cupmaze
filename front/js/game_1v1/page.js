@@ -111,16 +111,18 @@ function main() {
         document.getElementById("button-validate-action").addEventListener("click",validateRound);
         document.getElementById("button-undo-action").addEventListener("click",undoAction);
         initializeTable();
-
+        console.log(gameInformation)
         if (firstPlayer) {
             player1_name = decodeJWTPayload(getCookie("jwt")).username;
             player2_name = gameInformation.opponentName;
+            //console.log(gameInformation)
             const elo_player1 = gameInformation.player1_elo;
             setVisionForPlayer(1, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
         } else {
             player2_name = decodeJWTPayload(getCookie("jwt")).username;
             player1_name = gameInformation.opponentName;
+            //console.log(gameInformation)
             const elo_player2 = gameInformation.player2_elo;
             setVisionForPlayer(2, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
@@ -600,9 +602,21 @@ function undoWall(action) {
      document.getElementById("display-player-2").innerHTML = player2_name;
      document.getElementById("display-player-2-walls").style.display = "none";
      document.getElementById("display-player-2-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer2;
-     document.getElementById("display-player-1-number-actions").innerHTML = "ELO : " + gameInformation.player1_elo;
+     let elo1;
+     if (firstPlayer) {
+         elo1 = gameInformation.player1_elo;
+     } else {
+         elo1 = gameInformation.player2_elo;
+     }
+     document.getElementById("display-player-1-number-actions").innerHTML = "ELO : " + elo1;
      document.getElementById("display-player-1-number-actions").style.display = "none";
-     document.getElementById("display-player-2-number-actions").innerHTML = "ELO : " + gameInformation.player2_elo;
+     let elo2;
+        if (firstPlayer) {
+            elo2 = gameInformation.player2_elo;
+        } else {
+            elo2 = gameInformation.player1_elo;
+        }
+     document.getElementById("display-player-2-number-actions").innerHTML = "ELO : " + elo2;
      document.getElementById("display-player-2-number-actions").style.display = "none";
      document.getElementById("display-number-tour").innerHTML = "Tour numéro : "+numberTour;
      let currentName;
