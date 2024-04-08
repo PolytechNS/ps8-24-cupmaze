@@ -1,6 +1,5 @@
  import {removePlayerCircle, addPlayerCircle} from "../game_1vbot/movePlayerUtils.js";
 import {updateNumberWallsDisplay} from "../game_local_1v1/wallLayingUtils.js"
-import {/*startNewRound, setUpNewRound*/} from "../game_local_1v1/roundUtils.js";
 import {setVisionForPlayer} from "../game_1vbot/fog_of_war.js";
 import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 
@@ -111,13 +110,20 @@ function main() {
         console.log("gameInformation", gameInformation.roomName);
         // on affiche pas la popup
         document.getElementById("popup").style.display = 'none';
+
+        board = document.getElementById("grid");
+        document.getElementById("popup-button").addEventListener("click",startNewRound);
+        document.getElementById("button-validate-action").addEventListener("click",validateRound);
+        document.getElementById("button-undo-action").addEventListener("click",undoAction);
+        initializeTable();
+
         if (firstPlayer) {
             player1_name = decodeJWTPayload(getCookie("jwt")).username;
             player2_name = gameInformation.opponentName;
             const elo_player1 = gameInformation.player1_elo;
             console.log("elo_player1", elo_player1);
             console.log("player1_name", player1_name, "player2_name", player2_name);
-            //setVisionForPlayer(1, {player1: null, player2: null})
+            setVisionForPlayer(1, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
         } else {
             player2_name = decodeJWTPayload(getCookie("jwt")).username;
@@ -125,16 +131,9 @@ function main() {
             const elo_player2 = gameInformation.player2_elo;
             console.log("elo_player2", elo_player2);
             console.log("player1_name", player1_name, "player2_name", player2_name);
-            //setVisionForPlayer(2, {player1: null, player2: null})
+            setVisionForPlayer(2, {player1: null, player2: null})
             setUpNewRound(1,10,10,1)
         }
-
-        board = document.getElementById("grid");
-        document.getElementById("popup-button").addEventListener("click",startNewRound);
-        document.getElementById("button-validate-action").addEventListener("click",validateRound);
-        document.getElementById("button-undo-action").addEventListener("click",undoAction);
-        initializeTable();
-        //setVisionForPlayer(player_number, {player1: null, player2: null});
         //setUpNewRound(player1_name,10,10,1);
         socket.on("actionResult", (action) => updateUI(action));
         socket.off("game");
@@ -365,7 +364,13 @@ function updateUI(action) {
 function positionBegin(action) {
     if (action.valid) {
         document.getElementById(action.cellId).classList.add("occupied");
-        addPlayerCircle(document.getElementById(action.cellId), action.current);
+        //addPlayerCircle(document.getElementById(action.cellId), action.current);
+        if(firstPlayer){
+            if(action.current===1) addPlayerCircle(document.getElementById(action.cellId), 1);
+        }else {
+            if(action.current===2) addPlayerCircle(document.getElementById(action.cellId), 2);
+        }
+
         lastActionType = "position";
         if (action.playerPositions === null) {
             //showButtonVisible();
@@ -391,6 +396,32 @@ function positionBegin(action) {
 
 function validate(action) {
     if (action.valid) {
+        if(firstPlayer){
+            setVisionForPlayer(1, action.playerPosition);
+            if(action.playerPosition.player2!==null) {
+                let opp_circle = document.getElementById(action.playerPosition.player2[0] + "-" + action.playerPosition.player2[1] + "~cell");
+                if (parseInt(opp_circle.visibility) > 0) {
+                    console.log("hide player 2");
+                    removePlayerCircle(action.playerPosition.player2[0] + "-" + action.playerPosition.player2[1] + "~cell", 2);
+                } else if (document.getElementsByClassName("player2-circle").length === 0){
+                    console.log("show player 2")
+                    addPlayerCircle(opp_circle, 2);
+                }
+            }
+        }else {
+            setVisionForPlayer(2, action.playerPosition);
+            if (action.playerPosition.player1 !== null) {
+                let opp_circle = document.getElementById(action.playerPosition.player1[0] + "-" + action.playerPosition.player1[1] + "~cell");
+                if (parseInt(opp_circle.visibility) < 0) {
+                    console.log("hide player 1")
+                    removePlayerCircle(action.playerPosition.player1[0] + "-" + action.playerPosition.player1[1] + "~cell", 1);
+                } else if( document.getElementsByClassName("player1-circle").length === 0){
+                    console.log("show player 1")
+                    addPlayerCircle(opp_circle, 1);
+                }
+            }
+        }
+
         setUpNewRound(action.currentPlayer, action.nbWallsPlayer1, action.nbWallsPlayer2, action.numberTour);
     } else {
         switch (action.case) {
@@ -421,7 +452,13 @@ function showButtonVisible(){
 function move(action) {
     if (action.valid) {
         if (action.oldPosition !== null) removePlayerCircle(action.oldPosition, action.currentPlayer);
-        addPlayerCircle(document.getElementById(action.cellId), action.currentPlayer);
+        if(firstPlayer){
+            if(action.currentPlayer===1) addPlayerCircle(document.getElementById(action.cellId), 1);
+            if(action.currentPlayer===2 && document.getElementById(action.cellId).visibility<=0) addPlayerCircle(document.getElementById(action.cellId), 2);
+        }else {
+            if(action.currentPlayer===2) addPlayerCircle(document.getElementById(action.cellId), 2);
+            if(action.currentPlayer===1 && document.getElementById(action.cellId).visibility>=0) addPlayerCircle(document.getElementById(action.cellId), 1);
+        }
         lastActionType = "position";
         //showButtonVisible();
     } else {
