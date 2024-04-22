@@ -25,6 +25,7 @@ document.getElementById("signup-form").addEventListener("submit", async function
     })
         .then(response => {
             if (!response.ok) {
+                alert('Erreur:', response.status)
                 if (response.status === 409) {
                     //alert('Cet email est déjà utilisé');
                     window.location.href = 'welcome.html';
@@ -42,7 +43,7 @@ document.getElementById("signup-form").addEventListener("submit", async function
             // Vous pouvez ajouter ici un traitement pour la réponse du serveur
         })
         .catch(error => {
-            console.error('Erreur:', error);
+            alert('Erreur:', window.location);
         });
 });
 
