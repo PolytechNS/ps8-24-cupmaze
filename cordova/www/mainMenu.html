@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu principal :</title>
+    <link rel="stylesheet" href="./css/mainMenu.css">
+    <link rel="preload" href="./img/logOut.png" as="image">
+    <link rel="preload" href="./img/cupheadMenu.png" as="image">
+</head>
+<body>
+    <div class="left-band">
+            <img src="./img/logOut.png" alt="log_out" id="button-disconnect">
+            <div id="logOutMsg">Déconnexion</div>
+    </div>
+    <div class="center">
+        <p id="welcomeMsg">Bienvenue </p>
+        <p>
+            <button id="button-play" class="button">Jouer</button>
+        </p>
+        <p>
+            <button id="button-leaderboard" class="button">Leaderboard</button>
+        </p>
+        <p>
+            <button id="button-prizes" class="button">Récompenses</button>
+        </p>
+        <p>
+            <button id="searchFriends" class="button">Gestion des amis</button>
+        </p>
+        <p>
+            <button id="button-globalChat" class="button">Chat global</button>
+        </p>
+    </div>
+
+    <div class="right-band">
+        <button id="notifications-button">Notifications</button>
+        <div id="popup" class="popup">
+            <div class="popup-content">
+                <span class="close" id="closePopup">&times;</span>
+                <ul id="notifications-list">Notifications :
+                    <p id="element1"></p>
+                    <p id="element2"></p>
+                    <p id="element3"></p>
+                </ul>
+            </div>
+        </div>
+
+        <div id="popup-notif" class="popup-notif">
+            <div class="popup-notif-content">
+                <span class="close" id="closePopup-notif">&times;</span>
+                <p id="popup-notif-content"></p>
+            </div>
+        </div>
+
+    </div>
+    <script src="./js/socket.io.js"></script>
+    <script src="./js/mainmenu/page.js" type="module"></script>
+</body>
+</html>
+

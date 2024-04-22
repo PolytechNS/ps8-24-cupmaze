@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat global de CupMaze : </title>
+    <link rel="stylesheet" href="./css/globalChat.css">
+</head>
+<body>
+<div id="main-container">
+    <h1 class="main_tile">Chat global de CupMaze : </h1>
+
+    <div id="chat-container">
+        <div id="messages-container">
+            <!-- Vos messages seront affichés ici -->
+        </div>
+        <div id="chat-controls">
+            <input type="text" id="messageInput" placeholder="Envoyer un message...">
+            <button id="sendButton">Envoyer</button>
+            <button id="back">Retour en arrière</button>
+        </div>
+    </div>
+</div>
+
+<script src="./js/socket.io.js"></script>
+<script src="./js/globalChat/page.js"></script>
+</body>
+</html>

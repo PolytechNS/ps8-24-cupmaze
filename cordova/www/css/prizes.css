@@ -1,0 +1,107 @@
+@import "buttons.css";
+
+.progress-bar
+{
+    width: 310px;
+    height: 70px;
+    border-radius: 15px;
+    background-color: #f4f4f4;
+    margin-left: 20%;
+}
+
+.progress-friends, .progress-gamesPlayed, .progress-gamesWin
+{
+    width: 50%; /* Changez cette valeur pour ajuster la progression */
+    height: 100%;
+    border-radius: 15px;
+    background: linear-gradient(to right, #4CAF50, #FF8C00);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url("../img/wall_paper_prizes.jpg");
+
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.container
+{
+    display: flex;
+    height: 80%;
+    font-size: xx-large;
+    font-weight: bold;
+}
+
+.column
+{
+    flex: 1;
+    border: 1px solid #000;
+    height: 50%; /* RÃ©glez la hauteur de chaque colonne ici */
+    box-sizing: border-box;
+    background-color: white;
+    border-radius: 15px; /* Ajoutez cette ligne pour des bords arrondis */
+}
+
+#main_tile_prize
+{
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    color: rgba(255, 255, 255);
+    font-weight: bolder;
+    text-shadow: -1px 1px 0 darkgreen,
+    1px 1px 0 darkgreen,
+    1px -1px 0 darkgreen,
+    -1px -1px 0 darkgreen;
+    font-size: xxx-large;
+}
+
+.title_conteneur
+{
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    color: #006400FF;
+    font-weight: bold;
+    font-size: xx-large;
+}
+
+.level-phrase
+{
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    color: black;
+    font-weight: bold;
+    font-size: x-large;
+    font-family: Verdana, sans-serif;
+}
+
+#elo-medal
+{
+    margin-left: 35%;
+}
+
+.medal-defi
+{
+    margin-left: 42%;
+}
+
+.button{
+    color: rgba(255, 255, 255);
+    margin-top: 15%;
+    margin-left: 45%;
+    font-size: xx-large;
+    font-weight: bold;
+    background: rgba(55, 84, 76, 0.7);
+    border: none;
+    text-align: center;
+    padding: 20px;
+}

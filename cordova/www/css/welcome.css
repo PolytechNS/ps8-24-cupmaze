@@ -1,0 +1,46 @@
+@import "buttons.css";
+
+body {
+    background-image: url("../img/cupheadWelcome.jpeg");
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    background-color: #cccccc;
+}
+
+button{
+    margin: 2%;
+    padding: 1%;
+    font-size: xxx-large;
+    min-width: fit-content;
+    background-color: rgb(211,211,211);
+    width: 60%;
+    color: white;
+    text-shadow: -1px 1px 0 black,
+    1px 1px 0 black,
+    1px -1px 0 black,
+    -1px -1px 0 black;
+    border: rgba(0,0,0,0);
+    font-family: "Times New Roman", Times, serif;
+}
+
+h1{
+    font-size: xxx-large;
+    color: white;
+    text-shadow: -1px 1px 0 black,
+    1px 1px 0 black,
+    1px -1px 0 black,
+    -1px -1px 0 black;
+    margin-bottom: 8%;
+}
+
+h1, div{
+    text-align: center;
+}
+
+div{
+    margin-right: 20%;
+    margin-left: 20%;
+    padding: 5%;
+    background-color: rgba(50,50,50,0.5);
+}

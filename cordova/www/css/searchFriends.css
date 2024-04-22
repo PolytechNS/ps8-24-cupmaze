@@ -1,0 +1,139 @@
+@import "buttons.css";
+
+.main_tile{
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    color: rgba(255, 255, 255);
+    font-weight: bolder;
+    text-shadow: -1px 1px 0 darkgreen,
+    1px 1px 0 darkgreen,
+    1px -1px 0 darkgreen,
+    -1px -1px 0 darkgreen;
+    font-size: xxx-large;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh; /* Hauteur de la fenêtre visible */
+    width: 100vw; /* Largeur de la fenêtre visible */
+    background-size: cover; /* Cover the entire body */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat;
+    background-image: url("../img/searchFriends.jpg");
+    background-color: rgba(255, 255, 255, 0.7); /* Couleur de fond avec opacité */
+    box-shadow: 0 0 5000px rgba(0, 0, 0, 0.2); /* Ajoute une ombre box */
+}
+
+.buttonDiv{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+button{
+    cursor: pointer;
+}
+
+.button{
+    cursor: pointer;
+    color: rgba(255, 255, 255);
+    margin-top: 10%;
+    margin-left: 42%;
+    font-size: xx-large;
+    font-weight: bold;
+    background: rgba(55, 84, 76, 0.7);
+    border: none;
+    text-align: center;
+    padding: 20px;
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px; /* Ajoute un espacement sous le conteneur */
+}
+
+#searchResult, #friendsList, #friendsRequests {
+    text-align: center;
+    color: black;
+    font-weight: bold;
+    background-color: white;
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 40%;
+    border: 2px solid black;
+    border-radius: 10px;
+}
+
+
+
+#button-6 {
+     align-items: center;
+     background-color: #FFFFFF;
+     border: 1px solid rgba(0, 0, 0, 0.1);
+     border-radius: .25rem;
+     box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+     box-sizing: border-box;
+     color: rgba(0, 0, 0, 0.85);
+     cursor: pointer;
+     display: inline-flex;
+     font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+     font-size: 16px;
+     font-weight: 600;
+     justify-content: center;
+     line-height: 1.25;
+     margin: 0;
+     min-height: 3rem;
+     padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+     position: relative;
+     text-decoration: none;
+     transition: all 250ms;
+     user-select: none;
+     -webkit-user-select: none;
+     touch-action: manipulation;
+     vertical-align: baseline;
+     width: auto;
+}
+
+#button-6:hover,
+#button-6:focus {
+    border-color: rgba(0, 0, 0, 0.15);
+    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+    color: rgba(0, 0, 0, 0.65);
+}
+
+#button-6:hover {
+    transform: translateY(-1px);
+}
+
+#button-6:active {
+    background-color: #F0F0F1;
+    border-color: rgba(0, 0, 0, 0.15);
+    box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
+    color: rgba(0, 0, 0, 0.65);
+    transform: translateY(0);
+}
+
+.popup-notif {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+}
+.popup-notif-content {
+    text-align: center;
+}
+
+#back.button {
+    position: absolute;
+    left: 9%;
+    transform: translateX(-50%);
+}

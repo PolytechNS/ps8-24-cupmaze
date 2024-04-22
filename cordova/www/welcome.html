@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Page d'accueil</title>
+    <link rel="stylesheet" href="./css/welcome.css">
+</head>
+<body>
+    <h1>Bienvenue sur CupMaze !</h1>
+    <div>
+        <button id="button-connection">Connexion</button>
+        <br/>
+        <button id="button-inscription">Inscription</button>
+    </div>
+    <script>
+
+        var baseUrl = 'http://cupmaze.ps8.academy';
+
+        document.getElementById('button-connection').addEventListener('click', function() {
+            window.location.href = 'login.html';
+        });
+        document.getElementById('button-inscription').addEventListener('click', function() {
+            window.location.href = 'signup.html';
+        });
+    </script>
+</body>
+</html>
