@@ -1,4 +1,5 @@
 @import "buttons.css";
+@import "inGameChat.css";
 
 body {
     background-image: url('../img/cupheadInGame2.jpg');
@@ -275,4 +276,14 @@ table{
     text-align: center;
     width: 7%;
     border-radius: 10px;
+}
+
+@media (min-aspect-ratio: 3/4) and (max-aspect-ratio: 1/1){
+
+}
+
+@media (max-aspect-ratio: 5/8){
+    img{
+        display: none;
+    }
 }
