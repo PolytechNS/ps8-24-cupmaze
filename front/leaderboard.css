@@ -31,14 +31,13 @@
     1px 1px 0 darkgreen,
     1px -1px 0 darkgreen,
     -1px -1px 0 darkgreen;
-    font-size: xxx-large;
+    font-size: 4vw;
 }
-
 
 body {
     margin: 0;
     padding: 0;
-    height: 100vh; /* Hauteur de la fenêtre visible */
+    min-height: 100vh; /* Hauteur minimale de la fenêtre visible */
     width: 100vw; /* Largeur de la fenêtre visible */
     background-size: cover; /* Cover the entire body */
     background-position: center; /* Center the background image */
@@ -47,12 +46,13 @@ body {
     background-color: rgba(255, 255, 255, 0.9); /* Couleur de fond avec transparence */
 }
 
+
 table {
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
     border: 2px solid black; /* Ajout d'un contour noir au tableau */
-    margin: 0;
+    margin: 0 auto;
     padding: 0;
     table-layout: fixed;
     background-color: white;
@@ -69,11 +69,11 @@ th, td {
 
 th {
     font-weight: bold;
-    font-size: x-large;
+    font-size: large;
 }
 
 td {
-    font-size: x-large;
+    font-size: large;
 }
 
 /* Ajout d'une couleur de fond pour chaque ligne impaire */
@@ -99,3 +99,63 @@ tbody tr:nth-child(odd) {
     margin: 0 auto; /* Pour centrer le tableau horizontalement */
 }
 
+
+#searchInput {
+    width: 80%; /* Largeur de 80% de la table */
+    padding: 2%; /* Ajustement du padding en utilisant un pourcentage */
+    font-size: large; /* Taille de police relative à la largeur de la fenêtre */
+    margin: 0 auto 2% auto; /* Centrage horizontal et ajout d'un espace en bas en utilisant un pourcentage */
+}
+
+#searchAccount {
+    width: 80%; /* Largeur de 80% de la table */
+    padding: 1.5%; /* Ajustement du padding en utilisant un pourcentage */
+    font-size: large; /* Taille de police relative à la largeur de la fenêtre */
+    background-color: rgba(55, 84, 76, 0.7); /* Couleur de fond */
+    border: none; /* Suppression de la bordure */
+    text-align: center; /* Centrage du texte */
+    margin: 0 auto 4% auto; /* Centrage horizontal et ajout d'un espace en bas en utilisant un pourcentage */
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+    color: rgba(255, 255, 255);
+}
+
+/* TABLETTES */
+@media(max-aspect-ratio: 3/4) {
+    #searchInput {
+        font-size: 1.5vw;
+    }
+
+    #searchAccount {
+        font-size: 2vw;
+    }
+
+    #main_tile_prize {
+        font-size: 6vw;
+    }
+    th{
+        font-size: 3vw;
+    }
+    td {
+        font-size: 3vw;
+    }
+}
+
+/* TELEPHONES */
+@media(max-aspect-ratio: 1/2) {
+    #searchInput {
+        font-size: 3vw;
+    }
+    #searchAccount {
+        font-size: 3vw;
+    }
+    #main_tile_prize {
+        font-size: 7vw;
+    }
+    td{
+        font-size: 4vw;
+    }
+    th {
+        font-size: 4vw;
+    }
+}
