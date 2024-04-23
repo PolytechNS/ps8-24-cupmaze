@@ -32,7 +32,6 @@ document.getElementById("signup-form").addEventListener("submit", async function
                     return;
                 }
             }
-            //alert('Inscription réussie !');
             let buttonSignIn = document.getElementById("submit");
             buttonSignIn.addEventListener("click", function () {
                 window.location.href = 'mainMenu.html';
@@ -43,7 +42,7 @@ document.getElementById("signup-form").addEventListener("submit", async function
             // Vous pouvez ajouter ici un traitement pour la réponse du serveur
         })
         .catch(error => {
-            alert('Erreur:', window.location);
+            console.error('Erreur lors de la requête:', error);
         });
 });
 

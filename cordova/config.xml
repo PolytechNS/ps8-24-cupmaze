@@ -1,17 +1,22 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.CupMaze.cordova" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<widget id="com.CupMaze.cordova" version="1.0.0"
+        xmlns="http://www.w3.org/ns/widgets"
+        xmlns:cdv="http://cordova.apache.org/ns/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android">
     <name>CupMaze</name>
     <description>Sample Apache Cordova App</description>
     <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
         Apache Cordova Team
     </author>
+
     <content src="welcome.html" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
-    <allow-intent href="*" />
-    <access origin="*" />
-    <allow-navigation href="*"/>
 
+    <preference name="hostname" value="cupmaze.ps8.academy"/>
+    <preference name="scheme" value="http"/>
+    <access origin="http://cupmaze.ps8.academy" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <edit-config
             xmlns:android="http://schemas.android.com/apk/res/android"
             file="app/src/main/AndroidManifest.xml"
@@ -19,10 +24,4 @@
             target="/manifest/application">
         <application android:usesCleartextTraffic="true" />
     </edit-config>
-
-    <preference name="AndroidPersistentFileLocation" value="Compatibility" />
-
-    <platform name="android">
-        <icon src="www/img/logo.png"></icon>
-    </platform>
 </widget>
