@@ -37,3 +37,14 @@ body {
     1px -1px 0 #000,
     -1px -1px 0 #000;
 }
+
+/*MODE PORTRAIT */
+@media(orientation: portrait){
+    .center{
+        width: 80vw; /* 80% de la largeur de la vue */
+        height: 40vh;
+    }
+    p {
+        margin-bottom: 5vh;
+    }
+}
