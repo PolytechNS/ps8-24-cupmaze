@@ -32,10 +32,7 @@ document.getElementById("signup-form").addEventListener("submit", async function
                     return;
                 }
             }
-            let buttonSignIn = document.getElementById("submit");
-            buttonSignIn.addEventListener("click", function () {
-                window.location.href = 'mainMenu.html';
-            });
+            window.location.href = 'welcome.html';
         })
         .then(data => {
             console.log(data); // Affichage de la réponse du serveur

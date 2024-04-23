@@ -38,14 +38,11 @@ document.getElementById("login-form").addEventListener("submit", async function 
 
                     // on retire les guillemets
                     token = token.replace(/['"]+/g, '');
-                    //alert("Connexion réussie !");
+                    alert("Connexion réussie !");
                     //console.log('token', token);
                     setCookie('jwt', token, 2);
                     setCookie('Nameaccount', response.headers.get('Nameaccount'), 2);
-                    let buttonSignIn = document.getElementById("submit");
-                    buttonSignIn.addEventListener("click", function () {
-                        window.location.href = 'mainMenu.html';
-                    });
+                    window.location.href = 'mainMenu.html';
                 });
                 /*
                 const token = response.headers.get('Set-Cookie');
