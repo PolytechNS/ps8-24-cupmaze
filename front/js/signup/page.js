@@ -36,7 +36,7 @@ document.getElementById("signup-form").addEventListener("submit", async function
                 }
             }
             alert('Inscription réussie !');
-            window.location.href = baseUrl;
+            window.location.href = '/';
         })
         .then(data => {
             console.log(data); // Affichage de la réponse du serveur
@@ -73,5 +73,5 @@ function hashPassword(password) {
 
 let buttonBack = document.getElementById("back");
 buttonBack.addEventListener("click", function () {
-    window.location.href = baseUrl;
+    window.location.href = '/';
 });

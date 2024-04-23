@@ -47,7 +47,7 @@ document.getElementById("login-form").addEventListener("submit", async function 
                     console.log('token', token);
                     setCookie('jwt', token, 2);
                     setCookie('Nameaccount', response.headers.get('Nameaccount'), 2);
-                    window.location.href = baseUrl+"/mainMenu.html";
+                    window.location.href = "/mainMenu.html";
                 });
                 /*
                 const token = response.headers.get('Set-Cookie');
