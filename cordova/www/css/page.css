@@ -283,7 +283,7 @@ table{
 }
 
 @media (max-aspect-ratio: 5/8){
-    img{
+    #player2Image, #player1Image{
         display: none;
     }
 }
