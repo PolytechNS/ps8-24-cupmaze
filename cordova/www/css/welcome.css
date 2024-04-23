@@ -6,41 +6,65 @@ body {
     background-position: center;
     height: 100vh;
     background-color: #cccccc;
+    text-align: center;
+    background-repeat: no-repeat;
+    margin: 0;
 }
 
 button{
     margin: 2%;
     padding: 1%;
-    font-size: xxx-large;
+    font-size: 7vh;
     min-width: fit-content;
-    background-color: rgb(211,211,211);
+    background-color: seagreen;
     width: 60%;
     color: white;
-    text-shadow: -1px 1px 0 black,
-    1px 1px 0 black,
-    1px -1px 0 black,
-    -1px -1px 0 black;
-    border: rgba(0,0,0,0);
+    border-width: 0.3vh;
     font-family: "Times New Roman", Times, serif;
 }
 
 h1{
-    font-size: xxx-large;
     color: white;
-    text-shadow: -1px 1px 0 black,
-    1px 1px 0 black,
-    1px -1px 0 black,
-    -1px -1px 0 black;
-    margin-bottom: 8%;
+    font-size: 8vh;
+    font-family: "Times New Roman", Times, serif;
+    text-shadow: -0.2vh 0.2vh 0 darkolivegreen, 0.2vh 0.2vh 0 darkolivegreen, 0.2vh -0.2vh 0 darkolivegreen, -0.2vh -0.2vh 0 darkolivegreen;
 }
 
 h1, div{
     text-align: center;
 }
+#container{
+    padding-top: 5%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+}
 
-div{
-    margin-right: 20%;
-    margin-left: 20%;
-    padding: 5%;
-    background-color: rgba(50,50,50,0.5);
+@media (min-aspect-ratio: 3/4) and (max-aspect-ratio: 1/1){
+    #container{
+        padding-top: 10%;
+    }
+    body {
+        background-position: -82vw center;
+    }
+    h1{
+        font-size: 6vh;
+    }
+    button{
+        font-size: 5vh;
+    }
+}
+
+@media (max-aspect-ratio: 5/8){
+    #container{
+        padding-top: 10%;
+    }
+    body {
+        background-position: -150vw center;;
+    }
+    h1{
+        font-size: 5vh;
+    }
+    button{
+        font-size: 4vh;
+    }
 }
