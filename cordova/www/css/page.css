@@ -1,7 +1,7 @@
 @import "buttons.css";
 @import "inGameChat.css";
 
-body{
+body {
     background-image: url('../img/cupheadInGame2.jpg');
     background-size: cover;
     background-position: center;
