@@ -28,14 +28,4 @@
     <preference name="android-permission" value="true" />
     <preference name="cordova-plugin-network-information" value="true" />
     <plugin name="cordova-plugin-network-information" source="npm" />
-
-
-    <config-file after="uses-permission" parent="/manifest" target="AndroidManifest.xml">
-        <uses-permission android:name="android.permission.POST_NOTIFICATION" />
-        <uses-permission android:name="android.permission.VIBRATE" />
-        <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
-        <uses-permission android:name="android.permission.CAMERA" />
-        <uses-permission android:name="android.permission.BLUETOOTH" />
-        <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    </config-file>
 </widget>
