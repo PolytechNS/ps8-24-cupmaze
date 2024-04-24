@@ -56,7 +56,7 @@ const params = {
 let socketNotifications = io("/notifications");
 socketNotifications.emit('joinRoom', username);
 socketNotifications.on('friendRequestNotification', (data) => {
-    navigator.notification.alert("hello world",null,"Test",["OK"]);
+    navigator.notification.beep(1);
     const popup = document.getElementById('popup-notif');
     popup.style.display = 'block';
     const message = document.getElementById('popup-notif-content');
@@ -89,6 +89,5 @@ window.addEventListener('beforeunload', () => {
 
 let globalChatButton = document.getElementById('button-globalChat');
 globalChatButton.addEventListener('click', () => {
-    navigator.vibrate([3000, 1000, 3000]);
     window.location.href = baseUrl +'/globalChat.html';
 });
