@@ -336,7 +336,7 @@ table{
     }
 }
 
-@media (max-aspect-ratio: 5/2) and (min-aspect-ratio: 4/2){
+@media (max-aspect-ratio: 5/2) and (min-aspect-ratio: 2/1){
     #grid{
         position: absolute;
         top: 15%;
