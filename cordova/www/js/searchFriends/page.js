@@ -340,7 +340,9 @@ function init() {
 
 function onReceiveChallenge(receiveChallenge) {
     // on affiche une popup pour accepter ou refuser le challenge
-    navigator.notification.beep(1);
+    if (window.cordova) {
+        navigator.notification.beep(1);
+    }
     const popup = document.getElementById('popup-notif');
     popup.style.display = 'block';
     popup.style.backgroundColor = 'red';

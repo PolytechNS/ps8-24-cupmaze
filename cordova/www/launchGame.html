@@ -23,6 +23,7 @@
             Retour
         </p>
     </div>
+    <script src="./cordova.js"></script>
     <script src="./js/socket.io.js"></script>
     <script>
 
@@ -56,12 +57,14 @@
             window.location.href = baseUrl+'/mainMenu.html';
         })
         document.getElementById('button-launch-onlineGame').addEventListener('click', function() {
-            var connect = navigator.connection.type;
-            if (connect.toString() === "cellular") {
-                alert('Attention, vous êtes en 3G/4G, la partie peut être instable');
-            } else if (connect.toString() === "none") {
-                alert('Vous n\'êtes pas connecté à internet');
-                return;
+            if (window.cordova) {
+                var connect = navigator.connection.type;
+                if (connect.toString() === "cellular") {
+                    alert('Attention, vous êtes en 3G/4G, la partie peut être instable');
+                } else if (connect.toString() === "none") {
+                    alert('Vous n\'êtes pas connecté à internet');
+                    return;
+                }
             }
             localStorage.setItem('gameType', 'ranked');
             window.location.href = baseUrl+'/waiting_room.html';

@@ -56,7 +56,9 @@ const params = {
 let socketNotifications = io("/notifications");
 socketNotifications.emit('joinRoom', username);
 socketNotifications.on('friendRequestNotification', (data) => {
-    navigator.notification.beep(1);
+    if (window.cordova) {
+        navigator.notification.beep(1);
+    }
     const popup = document.getElementById('popup-notif');
     popup.style.display = 'block';
     const message = document.getElementById('popup-notif-content');
