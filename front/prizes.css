@@ -38,8 +38,7 @@ body {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    height: 75%;
-    font-size: xx-large;
+    height: 40vh;
     font-weight: bold;
 }
 
@@ -47,7 +46,7 @@ body {
 {
     flex: 1;
     border: 1px solid #000;
-    height: 60%; /* RÃ©glez la hauteur de chaque colonne ici */
+    height: 100%; /* RÃ©glez la hauteur de chaque colonne ici */
     box-sizing: border-box;
     background-color: white;
     border-radius: 15px; /* Ajoutez cette ligne pour des bords arrondis */
@@ -60,7 +59,6 @@ body {
 #main_tile_prize
 {
     text-align: center;
-    padding: 20px;
     margin: 0;
     color: rgba(255, 255, 255);
     font-weight: bolder;
@@ -68,27 +66,26 @@ body {
     1px 1px 0 darkgreen,
     1px -1px 0 darkgreen,
     -1px -1px 0 darkgreen;
-    font-size: xxx-large;
+    font-size: 6.5vh;
+    padding-bottom: 10%;
 }
 
 .title_conteneur
 {
     text-align: center;
-    padding: 20px;
     margin: 0;
     color: #006400FF;
     font-weight: bold;
-    font-size: xx-large;
+    font-size: 3vh;
 }
 
 .level-phrase
 {
     text-align: center;
-    padding: 20px;
     margin: 0;
     color: black;
     font-weight: bold;
-    font-size: x-large;
+    font-size: 3vh;
     font-family: Verdana, sans-serif;
 }
 
@@ -123,22 +120,23 @@ body {
 /* Styles par défaut */
 
 
-@media screen and (max-width: 1180px) {
+@media (max-aspect-ratio: 3/4) {
     .container {
         flex-direction: column;
         height: auto;
     }
     .column {
         height: auto;
-        width: 60%;
+        width: 80%;
         flex-direction: row;
+        padding: 2%;
     }
     #main_tile_prize {
-        font-size: 5vw; /* Taille de police relative */
+        font-size: 5vh; /* Taille de police relative */
     }
 
     .title_conteneur {
-        font-size: 2vw; /* Taille de police relative */
+        font-size: 2vh; /* Taille de police relative */
     }
 
     .level-phrase {

@@ -16,15 +16,17 @@
 body {
     margin: 0;
     padding: 0;
-    height: 100vh; /* Hauteur de la fenêtre visible */
-    width: 100vw; /* Largeur de la fenêtre visible */
-    background-size: cover; /* Cover the entire body */
-    background-position: center; /* Center the background image */
+    min-height: 150vh; /* Assure que le corps fait au moins la hauteur de l'écran */
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
     background-image: url("imageResources/searchFriends.jpg");
-    background-color: rgba(255, 255, 255, 0.7); /* Couleur de fond avec opacité */
-    box-shadow: 0 0 5000px rgba(0, 0, 0, 0.2); /* Ajoute une ombre box */
+    background-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 5000px rgba(0, 0, 0, 0.2);
 }
+
+/* Autres styles CSS... */
+
 
 .buttonDiv{
     display: flex;
@@ -136,4 +138,37 @@ button{
     position: absolute;
     left: 9%;
     transform: translateX(-50%);
+}
+
+/*MODE PAYSAGE TELEPHONE*/
+@media(max-aspect-ratio: 745/360) and (orientation: landscape){
+    body{
+        min-height: 220vh;
+    }
+}
+
+/*MODE PORTRAIT TELEPHONE*/
+@media(orientation: portrait) and (max-aspect-ratio: 1/2){
+    .main_tile {
+        font-size: 6vw;
+    }
+    p{
+        font-size: large;
+    }
+    body{
+        min-height: 100vh;
+    }
+    button{
+        font-size: 3vw;
+    }
+    input{
+        font-size: 3vw;
+    }
+}
+
+/*MODE PORTRAIT TABLETTE*/
+@media(max-aspect-ratio: 555/730) and (orientation: portrait){
+    body{
+        min-height: 100vh;
+    }
 }
