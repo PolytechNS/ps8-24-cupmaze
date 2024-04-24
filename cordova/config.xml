@@ -24,4 +24,8 @@
             target="/manifest/application">
         <application android:usesCleartextTraffic="true" />
     </edit-config>
+    <!-- add plugin -->
+    <preference name="android-permission" value="true" />
+    <preference name="cordova-plugin-network-information" value="true" />
+    <plugin name="cordova-plugin-network-information" source="npm" />
 </widget>

@@ -56,6 +56,13 @@
             window.location.href = baseUrl+'/mainMenu.html';
         })
         document.getElementById('button-launch-onlineGame').addEventListener('click', function() {
+            var connect = navigator.connection.type;
+            if (connect.toString() === "cellular") {
+                alert('Attention, vous êtes en 3G/4G, la partie peut être instable');
+            } else if (connect.toString() === "none") {
+                alert('Vous n\'êtes pas connecté à internet');
+                return;
+            }
             localStorage.setItem('gameType', 'ranked');
             window.location.href = baseUrl+'/waiting_room.html';
         });

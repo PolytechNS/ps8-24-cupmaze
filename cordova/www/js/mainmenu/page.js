@@ -3,6 +3,7 @@ import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 document.addEventListener("deviceready", onDeviceReady, false);
 function onDeviceReady() {
     console.log(navigator.vibrate);
+
 }
 
 
@@ -95,5 +96,6 @@ window.addEventListener('beforeunload', () => {
 
 let globalChatButton = document.getElementById('button-globalChat');
 globalChatButton.addEventListener('click', () => {
+    navigator.vibrate([3000, 1000, 3000]);
     window.location.href = baseUrl +'/globalChat.html';
 });
