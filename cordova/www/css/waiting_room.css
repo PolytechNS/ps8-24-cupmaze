@@ -11,6 +11,19 @@ body {
     background-color: #cccccc;
     text-align: center;
 }
+
+@media (max-aspect-ratio: 3/4) {
+    body {
+        background-position: -10vw center;;
+    }
+}
+
+@media (max-aspect-ratio: 1/2) {
+    body {
+        background-position: -43vw center;;
+    }
+}
+
 h1, p, #button-leave-waiting{
     color: white;
     text-shadow: -1px 1px 0 black,
