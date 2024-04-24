@@ -52,5 +52,5 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
 
 let buttonBack = document.getElementById("back");
 buttonBack.addEventListener("click", function() {
-    window.location.href = baseUrl + "/mainMenu.html";
+    window.location.href = "/mainMenu.html";
 });

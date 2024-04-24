@@ -1,7 +1,7 @@
 @import "buttons.css";
 
 body {
-    background-image: url("../img/cupheadWaiting.gif");
+    background-image: url("./../img/cupheadWaiting.gif");
     margin: 0; /* Remove default margin */
     padding: 0; /* Remove default padding */
     background-size: cover; /* Cover the entire body */

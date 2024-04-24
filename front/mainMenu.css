@@ -163,18 +163,30 @@ body {
     border: none;
 }
 
-#logOutMsg{
-    cursor: pointer;
-    color: rgba(255, 255, 255);
-    margin: 2%;
-    font-size: xx-large;
-    font-weight: bold;
-    padding: 2%;
+/* Pour les petits écrans */
+@media screen and (max-width: 800px) {
+    #logOutMsg {
+        font-size: medium; /* Taille de la police adaptée */
+        margin: 1%; /* Marge réduite */
+    }
+
+    #button-disconnect {
+        width: 8vh; /* Taille réduite du bouton */
+        height: 8vh;
+        margin-top: 1%; /* Marge réduite */
+    }
 }
 
-#button-disconnect{
-    margin-top: 2%;
-    width: 10vh;
-    height: 10vh;
-    cursor: pointer;
+/* Pour les écrans moyens à grands */
+@media screen and (min-width: 801px) {
+    #logOutMsg {
+        font-size: xx-large; /* Taille de la police adaptée */
+        margin: 2%; /* Marge normale */
+    }
+
+    #button-disconnect {
+        width: 10vh; /* Taille normale du bouton */
+        height: 10vh;
+        margin-top: 2%; /* Marge normale */
+    }
 }

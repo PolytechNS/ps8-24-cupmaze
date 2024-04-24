@@ -2,11 +2,12 @@
 
 .progress-bar
 {
-    width: 310px;
+    display: flex;
+    font-family: Verdana, sans-serif;
+    width: 100%;
     height: 70px;
     border-radius: 15px;
     background-color: #f4f4f4;
-    margin-left: 20%;
 }
 
 .progress-friends, .progress-gamesPlayed, .progress-gamesWin
@@ -20,7 +21,7 @@
 body {
     margin: 0;
     padding: 0;
-    height: 100%;
+    height: 100vh;
 
     background-size: cover;
     background-position: center;
@@ -34,8 +35,10 @@ body {
 .container
 {
     display: flex;
-    height: 80%;
-    font-size: xx-large;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 40vh;
     font-weight: bold;
 }
 
@@ -43,16 +46,19 @@ body {
 {
     flex: 1;
     border: 1px solid #000;
-    height: 50%; /* RÃ©glez la hauteur de chaque colonne ici */
+    height: 100%; /* RÃ©glez la hauteur de chaque colonne ici */
     box-sizing: border-box;
     background-color: white;
     border-radius: 15px; /* Ajoutez cette ligne pour des bords arrondis */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 #main_tile_prize
 {
     text-align: center;
-    padding: 20px;
     margin: 0;
     color: rgba(255, 255, 255);
     font-weight: bolder;
@@ -60,48 +66,92 @@ body {
     1px 1px 0 darkgreen,
     1px -1px 0 darkgreen,
     -1px -1px 0 darkgreen;
-    font-size: xxx-large;
+    font-size: 6.5vh;
+    padding-bottom: 10%;
 }
 
 .title_conteneur
 {
     text-align: center;
-    padding: 20px;
     margin: 0;
     color: #006400FF;
     font-weight: bold;
-    font-size: xx-large;
+    font-size: 3vh;
 }
 
 .level-phrase
 {
     text-align: center;
-    padding: 20px;
     margin: 0;
     color: black;
     font-weight: bold;
-    font-size: x-large;
+    font-size: 3vh;
     font-family: Verdana, sans-serif;
 }
 
 #elo-medal
 {
-    margin-left: 35%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .medal-defi
 {
-    margin-left: 42%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.button{
+#back{
     color: rgba(255, 255, 255);
-    margin-top: 15%;
-    margin-left: 45%;
     font-size: xx-large;
     font-weight: bold;
     background: rgba(55, 84, 76, 0.7);
     border: none;
     text-align: center;
     padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+/* Styles par défaut */
+
+
+@media (max-aspect-ratio: 3/4) {
+    .container {
+        flex-direction: column;
+        height: auto;
+    }
+    .column {
+        height: auto;
+        width: 80%;
+        flex-direction: row;
+        padding: 2%;
+    }
+    #main_tile_prize {
+        font-size: 5vh; /* Taille de police relative */
+    }
+
+    .title_conteneur {
+        font-size: 2vh; /* Taille de police relative */
+    }
+
+    .level-phrase {
+        font-size: 1.5vh; /* Taille de police relative */
+    }
+
+    .medal-defi {
+        width: 20%;
+    }
+
+    .progress-bar {
+        font-size: 1.5vh; /* Taille de police relative */
+    }
+
+    .elo-medal {
+        width: 50%;
+    }
 }
