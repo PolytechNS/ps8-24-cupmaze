@@ -1,5 +1,11 @@
 import {decodeJWTPayload, getCookie} from "../tokenUtils.js";
 
+document.addEventListener("deviceready", onDeviceReady, false);
+function onDeviceReady() {
+    console.log(navigator.vibrate);
+}
+
+
 let username = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
 let socket=io("/api/game");
 
@@ -49,7 +55,14 @@ const params = {
 let socketNotifications = io("/notifications");
 socketNotifications.emit('joinRoom', username);
 socketNotifications.on('friendRequestNotification', (data) => {
-    //alert(`You have a friend request from ${data.sender}`);
+    if(window.hasOwnProperty("cordova")){
+        var notification = cordova.plugins.notification.local;
+        notification.schedule({
+            title: "cupMaze",
+            text: "caca",
+            foreground: true,
+        });
+    }
     const popup = document.getElementById('popup-notif');
     popup.style.display = 'block';
     const message = document.getElementById('popup-notif-content');
