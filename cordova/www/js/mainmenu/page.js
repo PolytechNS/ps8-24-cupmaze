@@ -4,6 +4,11 @@ document.addEventListener("deviceready", onDeviceReady, false);
 function onDeviceReady() {
     console.log(navigator.vibrate);
 
+    cordova.plugin.permissions.requestPermission("android.permission.POST_NOTIFICATION", function (status) {
+        console.log(status);
+    }, function (error) {
+        console.error(error);
+    });
 }
 
 
