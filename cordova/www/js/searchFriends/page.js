@@ -178,7 +178,7 @@ function retrieveFriends(params){
 
                     const challengeButton = document.createElement("button");
                     const challengeIcone = document.createElement("img");
-                    challengeIcone.src = "imageResources/icone_defi.png";
+                    challengeIcone.src = "img/icone_defi.png";
                     challengeIcone.style.width = "25px"; // Réduire la largeur de l'image
                     challengeIcone.style.height = "25px"; // Réduire la hauteur de l'image
                     challengeButton.appendChild(challengeIcone);

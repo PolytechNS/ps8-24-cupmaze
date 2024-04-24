@@ -74,33 +74,33 @@ buttonBack.onclick = function() {
 
 function findLeague(elo){
     if(elo < 400){
-        return ["Bronze", "imageResources/rank_bronze.png"];
+        return ["Bronze", "img/rank_bronze.png"];
     }else if(elo < 600){
-        return ["Silver", "imageResources/rank_silver.png"];
+        return ["Silver", "img/rank_silver.png"];
     }else if(elo < 800){
-        return ["Gold", "imageResources/rank_gold.png"];
+        return ["Gold", "img/rank_gold.png"];
     }else if(elo < 1000){
-        return ["Platinum", "imageResources/rank_platinum.png"];
+        return ["Platinum", "img/rank_platinum.png"];
     }else if(elo < 1200){
-        return ["Diamond", "imageResources/rank_diamond.png"];
+        return ["Diamond", "img/rank_diamond.png"];
     }else if(elo < 1400){
-        return ["Master", "imageResources/rank_master.png"];
+        return ["Master", "img/rank_master.png"];
     }else{
-        return ["Challenger", "imageResources/rank_challenger.png"];
+        return ["Challenger", "img/rank_challenger.png"];
     }
 }
 
 
 function getMedal(lvl_rank){
     if(lvl_rank ===0){
-        return "imageResources/rank0_logo.png";
+        return "img/rank0_logo.png";
     } else if (lvl_rank === 1){
-        return "imageResources/rank1_logo.png";
+        return "img/rank1_logo.png";
     } else if (lvl_rank === 2){
-        return "imageResources/rank2_logo.png";
+        return "img/rank2_logo.png";
     } else if (lvl_rank === 3){
-        return "imageResources/rank3_logo.png";
+        return "img/rank3_logo.png";
     } else if (lvl_rank === 4 || lvl_rank > 4){
-        return "imageResources/rank4_logo.png";
+        return "img/rank4_logo.png";
     }
 }

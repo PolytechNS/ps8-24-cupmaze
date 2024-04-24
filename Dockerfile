@@ -7,7 +7,7 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY front ./front
+COPY cordova/www ./front
 COPY back ./back
 
 EXPOSE 8000

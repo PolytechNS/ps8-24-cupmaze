@@ -125,7 +125,7 @@ function applyFogOfWar(cell){
     if(!document.getElementById("fog~"+cell.id.split("~")[0])){
         let fogImage = document.createElement("img");
         fogImage.id = "fog~" + cell.id.split("~")[0];
-        fogImage.src = "imageResources/fog.png";
+        fogImage.src = "img/fog.png";
         fogImage.alt = "brouillard de guerre";
         fogImage.classList.add("fog");
         cell.appendChild(fogImage);
