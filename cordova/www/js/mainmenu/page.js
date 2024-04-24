@@ -56,14 +56,7 @@ const params = {
 let socketNotifications = io("/notifications");
 socketNotifications.emit('joinRoom', username);
 socketNotifications.on('friendRequestNotification', (data) => {
-    if(window.hasOwnProperty("cordova")){
-        var notification = cordova.plugins.notification.local;
-        notification.schedule({
-            title: "cupMaze",
-            text: "caca",
-            foreground: true,
-        });
-    }
+    navigator.notification.alert("hello world",null,"Test",["OK"]);
     const popup = document.getElementById('popup-notif');
     popup.style.display = 'block';
     const message = document.getElementById('popup-notif-content');
