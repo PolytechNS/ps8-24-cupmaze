@@ -38,7 +38,7 @@ function main() {
     });
 
 
-    for(let i = 1; i < 5; i++) {
+    for(let i = 1; i < 13; i++) {
         let nameEmoji = "reaction" + i;
         console.log(nameEmoji);
         let reactionEmoji = document.getElementById(nameEmoji);
@@ -608,11 +608,11 @@ function undoWall(action) {
      document.getElementById("display-player-1").style.display = "none";
      document.getElementById("display-player-1").innerHTML = player1_name;
      document.getElementById("display-player-1-walls").style.display = "none";
-     document.getElementById("display-player-1-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer1;
+     document.getElementById("display-player-1-walls").innerHTML = nbWallsPlayer1 + " murs restants";
      document.getElementById("display-player-2").style.display = "none";
      document.getElementById("display-player-2").innerHTML = player2_name;
      document.getElementById("display-player-2-walls").style.display = "none";
-     document.getElementById("display-player-2-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer2;
+     document.getElementById("display-player-2-walls").innerHTML = nbWallsPlayer2 + " murs restants";
      let elo1;
      if (firstPlayer) {
          elo1 = gameInformation.player1_elo;
@@ -629,14 +629,14 @@ function undoWall(action) {
         }
      document.getElementById("display-player-2-number-actions").innerHTML = "ELO : " + elo2;
      document.getElementById("display-player-2-number-actions").style.display = "none";
-     document.getElementById("display-number-tour").innerHTML = "Tour numéro : "+numberTour;
+     document.getElementById("display-number-tour").innerHTML = "Tour numéro : "+numberTour + " - " + (currentPlayer=== 1 ? player1_name : player2_name);
      let currentName;
      if (currentPlayer === 1) {
          currentName = player1_name;
      } else {
          currentName = player2_name;
      }
-     document.getElementById("display-player-turn").innerHTML = "C'est au tour de : "+ currentName;
+     //document.getElementById("display-player-turn").innerHTML = "C'est au tour de : "+ currentName;
      document.getElementById("display-number-tour").style.display = "none";
      document.getElementById("player1Image").style.display = "none";
      document.getElementById("player2Image").style.display = "none";

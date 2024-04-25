@@ -9,7 +9,6 @@
 </head>
 <body>
 <h1 id="display-number-tour"></h1>
-<h2 id="display-player-turn"></h2>
 
 <button id="button-leave-game">Abandonner & Quitter</button>
 <table>
@@ -19,6 +18,11 @@
             <h2 id="display-player-1-walls"></h2>
             <h2 id="display-player-1-number-actions"></h2>
         </td>
+        <!--
+        <td id="player-turn">
+            <h1 id="display-player-turn"></h1>
+        </td>
+        -->
         <td id="player2-info">
             <h1 id="display-player-2"></h1>
             <h2 id="display-player-2-walls"></h2>
@@ -31,7 +35,6 @@
 <img id="player2Image" src="./img/CupheadBlue.png" alt="playerBlue"/>
 
 
-<button id="sendReaction" class="reaction-button">Envoyer une réaction</button>
 <div id="popup-reaction" class="popup-reaction">
     <div class="popup-content">
         <span class="close" id="closePopup">&times;</span>
@@ -72,8 +75,8 @@
 </div>
 
 <button id="button-validate-action">Valider son action</button>
+<button id="sendReaction" class="reaction-button">Envoyer une réaction</button>
 <button id="button-undo-action">Revenir en arrière</button>
-<!-- <button id="button-save-game">Sauvegarder et Quitter</button> -->
 
 </body>
 </html>

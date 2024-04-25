@@ -1,4 +1,8 @@
 @import "buttons.css";
+@import url('https://fonts.googleapis.com/css2?family=Sedan:ital@0;1&display=swap');
+* {
+    font-family: "Sedan", serif;;
+}
 
 body {
     background-image: url("./../img/cupheadSignUp.jpg");
@@ -52,7 +56,6 @@ button{
     1px -1px 0 black,
     -1px -1px 0 black;
     border: rgba(0,0,0,0);
-    font-family: "Times New Roman", Times, serif;
 }
 
 @media(orientation: portrait) {
