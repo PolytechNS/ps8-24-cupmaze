@@ -1,4 +1,4 @@
-const { createUser, getUser, getUsersRank,createGame, getGame, removeFriendRequest,getUserByName, addFriendRequest,removeFriend, acceptFriendRequest, clearUsersDb, clearPrivateChatDb} = require('../database/mongo');
+const { createUser, getUser, getUsersRank,createGame, clearGlobalChatDb,getGame, removeFriendRequest,getUserByName, addFriendRequest,removeFriend, acceptFriendRequest, clearUsersDb, clearPrivateChatDb} = require('../database/mongo');
 
 const jwt = require('jsonwebtoken');
 
@@ -104,11 +104,17 @@ function getLeaderboard(request, response) {
     });
 }
 
-function clearPrivateChatDbAPI(request, response) {
-    clearPrivateChatDb().then(() => {
+async function clearPrivateChatDbAPI(request, response) {
+    await clearPrivateChatDb().then(() => {
         console.log("Chats privés supprimés avec succès");
         response.statusCode = 200;
         response.end('Chats privés supprimés');
+    });
+
+    await clearGlobalChatDb().then(() => {
+        console.log("Chats globaux supprimés avec succès");
+        response.statusCode = 200;
+        response.end('Chats globaux supprimés');
     });
 }
 
