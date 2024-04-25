@@ -36,9 +36,17 @@ body {
 
 button{
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#challengeButton {
+    padding: 0 1vh;
 }
 
 .button{
+    display: flex;
     cursor: pointer;
     color: rgba(255, 255, 255);
     margin-top: 10%;
@@ -68,7 +76,6 @@ button{
     border: 2px solid black;
     border-radius: 10px;
 }
-
 
 
 #button-6 {

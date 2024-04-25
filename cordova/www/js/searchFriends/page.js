@@ -181,7 +181,8 @@ function retrieveFriends(params){
                     buttonDiv.classList.add("buttonDiv");
 
                     const challengeButton = document.createElement("button");
-                    const challengeIcone = document.createElement("img");
+                    const challengeIcone = document.createElement("img")
+                    challengeButton.id = "challengeButton";
                     challengeIcone.src = "img/icone_defi.png";
                     challengeIcone.style.width = "25px"; // Réduire la largeur de l'image
                     challengeIcone.style.height = "25px"; // Réduire la hauteur de l'image
@@ -321,6 +322,15 @@ function getCookie(name) {
 
 function sendChallenge(friend) {
     console.log('sendChallenge', friend);
+    if (window.cordova) {
+        var connect = navigator.connection.type;
+        if (connect.toString() === "cellular") {
+            alert('Attention, vous êtes en 3G/4G, la partie peut être instable');
+        } else if (connect.toString() === "none") {
+            alert('Vous n\'êtes pas connecté à internet');
+            return;
+        }
+    }
     let sendChallenge = {
         "senderToken": getCookie('jwt'),
         "friend": friend
