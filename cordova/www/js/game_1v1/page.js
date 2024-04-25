@@ -575,7 +575,13 @@ function undoWall(action) {
 
      const popup = document.getElementById("popup");
      popup.style.display = 'flex';
-     document.getElementById("popup-ready-message").innerHTML = "Victoire de " + winnerText + " !! Félicitations ! ";
+     let endGameSentence;
+     if(winnerText === getCookie("Nameaccount")){
+         endGameSentence = "Vous avez gagné !! Félicitations ! ";
+     }else{
+         endGameSentence = "Vous avez perdu la partie ! :(";
+     }
+     document.getElementById("popup-ready-message").innerHTML = endGameSentence;
      document.getElementById("popup-button").style.display = "none";
      setTimeout(() => {
          window.location.href = `/mainMenu.html`;
