@@ -645,11 +645,11 @@ function setUpNewRound(currentPlayer,nbWallsPlayer1,nbWallsPlayer2,numberTour){
     document.getElementById("display-player-1").style.display = "none";
     document.getElementById("display-player-1").innerHTML = "Joueur 1 : ";
     document.getElementById("display-player-1-walls").style.display = "none";
-    document.getElementById("display-player-1-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer1;
+    document.getElementById("display-player-1-walls").innerHTML = nbWallsPlayer1 + " murs restants";
     document.getElementById("display-player-2").style.display = "none";
     document.getElementById("display-player-2").innerHTML = "Joueur 2 : ";
     document.getElementById("display-player-2-walls").style.display = "none";
-    document.getElementById("display-player-2-walls").innerHTML = "Nombre de murs restants : "+nbWallsPlayer2;
+    document.getElementById("display-player-2-walls").innerHTML = nbWallsPlayer2 + " murs restants";
     document.getElementById("display-player-1-number-actions").innerHTML = "Nombre d'actions restantes : 1";
     document.getElementById("display-player-1-number-actions").style.display = "none";
     document.getElementById("display-player-2-number-actions").innerHTML = "Nombre d'actions restantes : 1";

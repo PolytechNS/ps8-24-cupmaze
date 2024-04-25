@@ -1,4 +1,8 @@
 @import "buttons.css";
+@import url('https://fonts.googleapis.com/css2?family=Sedan:ital@0;1&display=swap');
+* {
+    font-family: "Sedan", serif;;
+}
 
 .popup {
     display: none;
@@ -64,7 +68,6 @@ th, td {
     text-align: left;
     vertical-align: middle;
     color: black;
-    font-family: Verdana, sans-serif
 }
 
 th {
@@ -115,7 +118,6 @@ tbody tr:nth-child(odd) {
     border: none; /* Suppression de la bordure */
     text-align: center; /* Centrage du texte */
     margin: 0 auto 4% auto; /* Centrage horizontal et ajout d'un espace en bas en utilisant un pourcentage */
-    font-family: "Times New Roman", Times, serif;
     font-weight: bold;
     color: rgba(255, 255, 255);
 }

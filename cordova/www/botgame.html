@@ -5,21 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game page</title>
     <link rel="stylesheet" href="./css/page.css">
+    <link rel="stylesheet" href="./css/saveGame.css">
     <script src="./js/game_1vbot/page.js" type="module"></script>
     <script src="./js/socket.io.js"></script>
 </head>
 <body>
-<!--
-    <div id="popup">
-        <div id="popup-content">
-            <p id="popup-ready-message"></p>
-            <button id="popup-button">Jouer le tour</button>
+    <button id="button-leave-or-save" onclick="showPopUp()">&#128682;</button>
+    <div id="popup" onclick="hidePopUp()" style="text-align: center">
+        <div id="popup-content" style="justify-content: center">
+            <button id="button-save-game">Sauvegarder & Quitter</button>
+            <button id="button-leave-game" onclick="leaveGame()">Abandonner & Quitter</button>
         </div>
     </div>
-    -->
-
+    <script>
+        function showPopUp() {
+            document.getElementById('popup').style.display = 'flex';
+        }
+        function hidePopUp() {
+            document.getElementById('popup').style.display = 'none';
+        }
+        function leaveGame() {
+            window.location.href = 'mainMenu.html';
+        }
+    </script>
     <h1 id="display-number-tour"></h1>
-
     <table>
         <tr>
             <td id="player1-info">
@@ -34,16 +43,11 @@
             </td>
         </tr>
     </table>
-
     <img id="player1Image" src="./img/cupheadRED.png" alt="playerRed"/>
     <img id="player2Image" src="./img/CupheadBlue.png" alt="playerBlue"/>
-
     <div id="grid" class="quoridor-board"></div>
-
     <button id="button-validate-action">Valider son action</button>
     <button id="button-undo-action">Revenir en arrière</button>
-    <button id="button-save-game">Sauvegarder et Quitter</button>
-
 </body>
 </html>
 
