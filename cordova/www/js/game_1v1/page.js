@@ -61,12 +61,14 @@ function main() {
     firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
     let leaveGameButtonStyle = document.getElementById("button-leave-game").style;
     let reactButton = document.getElementById("sendReaction");
+    let reactionPopup = document.getElementById("popup-reaction");
     if(firstPlayer) {
         leaveGameButtonStyle.left = "0%";
         leaveGameButtonStyle.removeProperty("float");
         leaveGameButtonStyle.background = "rgba(200, 94, 94, 0.7)";
 
         reactButton.classList.add("reaction-button-player1");
+        reactionPopup.style.right = "unset";
     }
     else {
         leaveGameButtonStyle.background = "rgba(94,174,200, 0.7)";
@@ -74,6 +76,7 @@ function main() {
         leaveGameButtonStyle.float = "right";
 
         reactButton.classList.add("reaction-button-player2");
+        reactionPopup.style.right = "20px";
     }
 
 
@@ -92,7 +95,6 @@ function main() {
             let content = document.getElementById("popup-notif-content");
             content.textContent = "Vous avez envoyé une réaction !";
             let reactionSend = document.getElementById("popup-reaction-send");
-            reactionSend.style.fontSize= "20px";
             reactionSend.textContent = reaction;
         }
     });

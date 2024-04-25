@@ -270,6 +270,10 @@ table{
     text-align: center;
 }
 
+#popup-reaction-send{
+    font-size: 8vh;
+}
+
 #center{
     width: 50%;
 }
