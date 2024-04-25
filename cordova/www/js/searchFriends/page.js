@@ -368,9 +368,9 @@ function onReceiveChallenge(receiveChallenge) {
     // on affiche une popup pour accepter ou refuser le challenge
     const popup = document.getElementById('popup-notif');
     popup.style.display = 'block';
-    popup.style.backgroundColor = 'red';
+    /*popup.style.backgroundColor = 'red';
     popup.style.color = 'white';
-    popup.style.border = '2px solid black';
+    popup.style.border = '2px solid black';*/
     const message = document.getElementById('popup-notif-content');
     message.innerText = `${receiveChallenge.senderName} vous a défié !`;
     const acceptButton = document.createElement('button');
