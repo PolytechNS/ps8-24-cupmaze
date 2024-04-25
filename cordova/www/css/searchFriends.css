@@ -14,13 +14,13 @@
     1px 1px 0 darkgreen,
     1px -1px 0 darkgreen,
     -1px -1px 0 darkgreen;
-    font-size: xxx-large;
+    font-size: 5vh;
 }
 
 body {
     margin: 0;
-    padding: 0;
-    min-height: 150vh; /* Assure que le corps fait au moins la hauteur de l'écran */
+    padding: 5%;
+    height: 100vh;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -55,7 +55,7 @@ button{
     color: rgba(255, 255, 255);
     margin-top: 10%;
     margin-left: 42%;
-    font-size: xx-large;
+    font-size: 4vh;
     font-weight: bold;
     background: rgba(55, 84, 76, 0.7);
     border: none;
@@ -95,7 +95,7 @@ button{
     color: rgba(0, 0, 0, 0.85);
     cursor: pointer;
     display: inline-flex;
-    font-size: 16px;
+    font-size: 2vh;
     font-weight: 600;
     justify-content: center;
     line-height: 1.25;
@@ -153,35 +153,18 @@ button{
     transform: translateX(-50%);
 }
 
-/*MODE PAYSAGE TELEPHONE*/
-@media(max-aspect-ratio: 745/360) and (orientation: landscape){
-    body{
-        min-height: 220vh;
-    }
-}
-
 /*MODE PORTRAIT TELEPHONE*/
 @media(orientation: portrait) and (max-aspect-ratio: 1/2){
     .main_tile {
-        font-size: 6vw;
+        font-size: 3vh;
     }
     p{
-        font-size: large;
-    }
-    body{
-        min-height: 100vh;
+        font-size: 4vh;
     }
     button{
-        font-size: 3vw;
+        font-size: 2vh;
     }
     input{
-        font-size: 3vw;
-    }
-}
-
-/*MODE PORTRAIT TABLETTE*/
-@media(max-aspect-ratio: 555/730) and (orientation: portrait){
-    body{
-        min-height: 100vh;
+        font-size: 2vh;
     }
 }
