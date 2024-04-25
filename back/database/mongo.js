@@ -349,6 +349,23 @@ async function getUsersRank(){
     return users.find().sort({elo: -1}).toArray();
 }
 
+async function removeFriendRequest(usernameRemover, usernameToRemove){
+    const db = await getDb();
+    const users = db.collection('users');
+    await users.updateOne(
+        {username: usernameRemover},
+        {$pull: {friendsRequests: usernameToRemove}},
+        function(err, result) {
+            if (err) {
+                console.error('Erreur lors de la mise à jour des données :', err);
+                return;
+            }
+            console.log('Demande d\'ami retirée avec succès');
+            client.close();
+        }
+    );
+}
+
 
 exports.createUser = createUser;
 exports.getUser = getUser;
@@ -377,3 +394,4 @@ exports.removeFriend = removeFriend;
 exports.getUsersRank = getUsersRank;
 exports.clearGames = clearGames;
 exports.deleteGame = deleteGame;
+exports.removeFriendRequest = removeFriendRequest;

@@ -1,4 +1,8 @@
 @import "buttons.css";
+@import url('https://fonts.googleapis.com/css2?family=Sedan:ital@0;1&display=swap');
+* {
+    font-family: "Sedan", serif;;
+}
 
 body {
     background-image: url("./../img/cupheadWaiting.gif");
@@ -32,14 +36,13 @@ h1, p, #button-leave-waiting{
     -1px -1px 0 black;
 }
 h1{
-    font-size: xxx-large;
+    font-size: 3vh;
 }
 #button-leave-waiting{
     font-size: xx-large;
     padding: 1%;
     border: none;
     background: rgba(255, 255, 255, 0.7);
-    font-family: "Times New Roman", Times, serif;
     position: fixed;
     bottom: 2%;
     left: 45%;
