@@ -19,6 +19,7 @@
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-local-notification": "github:katzer/cordova-plugin-local-notifications",
     "cordova-plugin-network-information": "^3.0.0",
+    "cordova-plugin-splashscreen": "^6.0.1",
     "cordova-plugin-vibration": "^3.1.1"
   },
   "cordova": {
@@ -31,7 +32,8 @@
         "ANDROID_SUPPORT_V4_VERSION": "26.+"
       },
       "cordova-plugin-network-information": {},
-      "cordova-plugin-dialogs": {}
+      "cordova-plugin-dialogs": {},
+      "cordova-plugin-splashscreen": {}
     }
   }
 }
