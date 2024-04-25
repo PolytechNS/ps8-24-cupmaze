@@ -22,11 +22,13 @@ document.getElementById('button-prizes').addEventListener('click', function() {
 });
 
 document.getElementById('button-disconnect').addEventListener('click', function () {
-    localStorage.clear();
+    document.cookie = 'Nameaccount' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'jwt' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     window.location.href = baseUrl +'/login.html';
 });
 document.getElementById('logOutMsg').addEventListener('click', function () {
-    localStorage.clear();
+    document.cookie = 'Nameaccount' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'jwt' + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     window.location.href = baseUrl +'/login.html';
 });
 document.getElementById('searchFriends').addEventListener('click', function () {
