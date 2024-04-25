@@ -31,7 +31,7 @@ fetch(baseUrl+"/api/getStats?$"+queryString, {
             console.log(data);
 
             let elo = data.elo;
-            printElo.innerText = "Vous faites partie de la ligue " + findLeague(elo)[0] + " avec un elo de " + elo;
+            printElo.innerText = "Ligue " + findLeague(elo)[0] + " elo de " + elo;
             document.getElementById("elo-medal").src = findLeague(elo)[1];
             document.getElementById("elo-medal").style.width = "100px";
 
@@ -39,7 +39,8 @@ fetch(baseUrl+"/api/getStats?$"+queryString, {
             let data_to_put = friends % 5;
             barFriends[0].style.width = data_to_put * 20 + "%";
             let lvl = Math.floor(friends / 5); // Calcul du niveau d'amis en divisant le nombre d'amis par 5
-            document.getElementById("level-friends-add").innerText = "Niveau actuel : " + lvl.toString() +"\nVous devez ajouter " + (5 - data_to_put).toString() + " amis pour passer au niveau suivant.";
+            document.getElementById("level-friends-add").innerText = "Niveau actuel " + lvl.toString()
+            //document.getElementById("friend-bar").innerText = (data_to_put).toString() + " / 5";
             document.getElementById("friends-medal").src = getMedal(lvl);
 
 
@@ -47,14 +48,14 @@ fetch(baseUrl+"/api/getStats?$"+queryString, {
             data_to_put = gamesWin % 5;
             lvl = Math.floor(gamesWin / 5); // Calcul du niveau de parties gagnées en divisant le nombre de parties gagnées par 5
             barGamesWon[0].style.width = data_to_put * 20 + "%";
-            document.getElementById("level-games-win").innerText = "Niveau actuel : " + lvl.toString() +"\nVous devez gagner " + (5 - data_to_put).toString() + " parties pour passer au niveau suivant.";
+            document.getElementById("level-games-win").innerText = "Niveau actuel " + lvl.toString();
             document.getElementById("games-win-medal").src = getMedal(lvl);
 
             let gamesPlayed = data.gamesWin + data.gamesLoose;
             data_to_put = gamesPlayed % 5;
             lvl = Math.floor(gamesPlayed / 5); // Calcul du niveau de parties jouées en divisant le nombre de parties jouées par 5
             barGamesPlayed[0].style.width = data_to_put * 20 + "%";
-            document.getElementById("level-games-played").innerText = "Niveau actuel : " + lvl.toString() +"\nVous devez jouer " + (5 - data_to_put).toString() + " parties pour passer au niveau suivant.";
+            document.getElementById("level-games-played").innerText = "Niveau actuel " + lvl.toString();
             document.getElementById("games-played-medal").src = getMedal(lvl);
 
 

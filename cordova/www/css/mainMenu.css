@@ -1,0 +1,214 @@
+@import "buttons.css";
+
+#friend-list {
+    display: block;
+    margin: 0;
+    padding: 0;
+    width: 300px;
+    height: 100%;
+    background: #EEE;
+    list-style-type: none;
+}
+
+.friend {
+    width: 300px;
+    height: 60px;
+    background: #EEE;
+    border-bottom: 1px solid #DDD;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.friend img {
+    width: 45px;
+    height: 45px;
+    border-radius: 30px;
+    border: 2px solid #AAA;
+    object-fit: cover;
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+.friend .name {
+    font-size: 18px;
+}
+
+.friend.selected {
+    background: #43A047;
+    color: white;
+}
+
+.friend:not(.selected):hover {
+    background: #DDD;
+}
+
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Transparence du fond */
+}
+
+.popup-content {
+    background-color: #fefefe;
+    margin: 20% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.right-band{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#notifications-button {
+    position: fixed;
+    top: 5vh;
+    background-color: #007bff;
+    color: white;
+    padding: 1vh 2vh;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    max-width: 90%;
+    font-size: 3vh;
+}
+
+.popup-notif {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+}
+.popup-notif-content {
+    text-align: center;
+}
+
+
+
+body {
+    background-image: url("./../img/cupheadMenu.png");
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    background-size: cover; /* Cover the entire body */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Do not repeat the background image */
+    height: 100vh; /* Make the body take up the entire viewport height */
+    display: flex;
+    background-color: #cccccc;
+}
+
+.left-band, .right-band {
+    width: 20%;
+    background: rgba(55, 84, 76, 0.7);
+}
+
+.left-band{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#logOutMsg{
+    color: rgb(255, 255, 255);
+    font-weight: bolder;
+    font-size: xx-large;
+    cursor: pointer;
+}
+
+.center{
+    width: 60%;
+    text-align: center;
+}
+
+#welcomeMsg{
+    color: rgb(11, 77, 4);
+    font-weight: bolder;
+    margin-top: 8vh;
+    margin-bottom: 2vh;
+    font-size: 8vh;
+    font-family: "Sedan", serif;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.button{
+    cursor: pointer;
+    color: rgba(255, 255, 255);
+    margin: 1%;
+    font-weight: bold;
+    padding: 1%;
+    font-size: 4vh;
+    min-width: fit-content;
+    background-color: seagreen;
+    width: 40%;
+    color: white;
+    border-width: 0.3vh;
+}
+
+/* Pour les petits écrans */
+@media screen and (max-width: 800px) {
+    #logOutMsg {
+        font-size: 3vw; /* Taille de la police adaptée */
+        margin: 1%; /* Marge réduite */
+    }
+
+    #button-disconnect {
+        width: 6vh; /* Taille réduite du bouton */
+        height: 6vh;
+        margin-top: 1%; /* Marge réduite */
+    }
+
+    .button{
+        font-size: 4vw;
+        width: 40vw;
+    }
+
+    #welcomeMsg{
+        font-size: 6vw;
+    }
+    #notifications-button {
+        font-size: 2.5vw;
+        padding: 1vh 1vh;
+    }
+}
+
+/* Pour les écrans moyens à grands */
+@media screen and (min-width: 801px) {
+    #logOutMsg {
+        font-size: 4vh; /* Taille de la police adaptée */
+        margin: 2%; /* Marge normale */
+    }
+
+    #button-disconnect {
+        width: 10vh; /* Taille normale du bouton */
+        height: 10vh;
+        margin-top: 2%; /* Marge normale */
+    }
+}

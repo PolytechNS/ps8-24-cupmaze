@@ -1,11 +1,47 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.CupMaze.cordova" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.CupMaze.cordova" version="1.0.0"
+        xmlns="http://www.w3.org/ns/widgets"
+        xmlns:cdv="http://cordova.apache.org/ns/1.0"
+        xmlns:android="http://schemas.android.com/apk/res/android">
     <name>CupMaze</name>
     <description>Sample Apache Cordova App</description>
     <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
         Apache Cordova Team
     </author>
-    <content src="index.html" />
+
+    <content src="welcome.html" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
+
+    <preference name="hostname" value="cupmaze.ps8.academy"/>
+    <preference name="scheme" value="http"/>
+    <access origin="http://cupmaze.ps8.academy" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <edit-config
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            file="app/src/main/AndroidManifest.xml"
+            mode="merge"
+            target="/manifest/application">
+        <application android:usesCleartextTraffic="true" />
+    </edit-config>
+    <!-- add plugin -->
+    <preference name="android-permission" value="true" />
+    <preference name="cordova-plugin-network-information" value="true" />
+    <plugin name="cordova-plugin-network-information" source="npm" />
+
+    <preference name="android-targetSdkVersion" value="33" />
+
+    <!-- Préférences pour le splash screen -->
+    <preference name="SplashScreen" value="screen" />
+    <preference name="SplashScreenDelay" value="2000" /> <!-- Durée d'affichage en millisecondes -->
+
+    <platform name="android">
+
+        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/img/splash_screen.png" />
+        <preference name="AndroidWindowSplashScreenBackground" value="#FFFFFF" />
+
+        <icon src="www/img/icone.jpg" />
+
+    </platform>
+
 </widget>

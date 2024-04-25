@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recherche d'amis</title>
+    <link rel="stylesheet" href="./css/searchFriends.css">
+</head>
+<body>
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="Rechercher des amis...">
+    <button class="searchFriendsButton" id="button-6" onclick=searchAccountOnDB()>Rechercher</button>
+</div>
+<h1 class="main_tile">Résultat de la recherche :</h1>
+<div id="searchResult"></div>
+
+
+<h1 class="main_tile">Voici votre liste d'amis :</h1>
+<ul id="friendsList">
+</ul>
+
+<h1 class="main_tile">Ils souhaitent devenir votre ami :</h1>
+<ul id="friendsRequests">
+</ul>
+
+<div id="popup-notif" class="popup-notif">
+    <div class="popup-notif-content">
+        <span class="close" id="closePopup-notif">&times;</span>
+        <p id="popup-notif-content"></p>
+    </div>
+</div>
+
+<button id="back" class="button">Retour en arrière</button>
+<script src="./js/searchFriends/page.js"></script>
+<script src="./js/socket.io.js"></script>
+<script src="cordova.js"></script>
+</body>
+</html>

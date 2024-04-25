@@ -1,0 +1,47 @@
+@import "buttons.css";
+@import url('https://fonts.googleapis.com/css2?family=Sedan:ital@0;1&display=swap');
+* {
+    font-family: "Sedan", serif;;
+}
+
+body {
+    background-image: url("./../img/cupheadWaiting.gif");
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    background-size: cover; /* Cover the entire body */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Do not repeat the background image */
+    height: 100vh; /* Make the body take up the entire viewport height */
+    background-color: #cccccc;
+    text-align: center;
+}
+
+@media (max-aspect-ratio: 3/4) {
+    body {
+        background-position: -10vw center;;
+    }
+}
+
+@media (max-aspect-ratio: 1/2) {
+    body {
+        background-position: -43vw center;;
+    }
+}
+
+h1, p, #button-leave-waiting{
+    color: white;
+    text-shadow: -1px 1px 0 black,
+    1px 1px 0 black,
+    1px -1px 0 black,
+    -1px -1px 0 black;
+}
+h1{
+    font-size: 3vh;
+}
+#button-leave-waiting{
+    font-size: 4vh;
+    padding: 1%;
+    border: none;
+    background: rgba(255, 255, 255, 0.7);
+    margin-top: 84vh;
+}

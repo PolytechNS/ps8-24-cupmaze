@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1v1-Game page</title>
+    <link rel="stylesheet" href="./css/page.css">
+    <script src="./js/game_1v1/page.js" type="module"></script>
+    <script src="./js/socket.io.js"></script>
+</head>
+<body>
+<h1 id="display-number-tour"></h1>
+
+<button id="button-leave-game">Abandonner & Quitter</button>
+<table>
+    <tr>
+        <td id="player1-info">
+            <h1 id="display-player-1"></h1>
+            <h2 id="display-player-1-walls"></h2>
+            <h2 id="display-player-1-number-actions"></h2>
+        </td>
+        <td id="center"></td>
+        <td id="player2-info">
+            <h1 id="display-player-2"></h1>
+            <h2 id="display-player-2-walls"></h2>
+            <h2 id="display-player-2-number-actions"></h2>
+        </td>
+    </tr>
+</table>
+
+<img id="player1Image" src="./img/cupheadRED.png" alt="playerRed"/>
+<img id="player2Image" src="./img/CupheadBlue.png" alt="playerBlue"/>
+
+
+<div id="popup-reaction" class="popup-reaction">
+    <div class="popup-content">
+        <span class="close" id="closePopup">&times;</span>
+        <ul id="reaction-list">
+            <li id="reaction1">&#128512;</li>
+            <li id="reaction2">&#128520;</li>
+            <li id="reaction3">&#128531;</li>
+            <li id="reaction4">&#128564;</li>
+            <br>
+            <li id="reaction5">&#129315;</li>
+            <li id="reaction6">&#128526;</li>
+            <li id="reaction7">&#128536;</li>
+            <li id="reaction8">&#128557;</li>
+            <br>
+            <li id="reaction9">&#129313;</li>
+            <li id="reaction10">&#128169;</li>
+            <li id="reaction11">&#128584;</li>
+            <li id="reaction12">&#128170;</li>
+        </ul>
+    </div>
+</div>
+
+<div id="popup-notif" class="popup-notif">
+    <div class="popup-notif-content">
+        <span class="close" id="closePopup-notif">&times;</span>
+        <div id="popup-notif-content"></div>
+        <br>
+        <div id="popup-reaction-send"></div>
+    </div>
+</div>
+
+<div id="grid" class="quoridor-board"></div>
+
+<div id="popup">
+    <div id="popup-content">
+        <p id="popup-ready-message"></p>
+        <button id="popup-button">Jouer le tour</button>
+    </div>
+</div>
+
+<button id="button-validate-action">Valider son action</button>
+<button id="sendReaction" class="reaction-button">Envoyer une réaction</button>
+<button id="button-undo-action">Revenir en arrière</button>
+
+</body>
+</html>

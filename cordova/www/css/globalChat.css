@@ -1,0 +1,102 @@
+@import "buttons.css";
+@import url('https://fonts.googleapis.com/css2?family=Sedan:ital@0;1&display=swap');
+* {
+    font-family: "Sedan", serif;;
+}
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url("../img/chat_illustration.jpg");
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.main_tile {
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    color: rgba(255, 255, 255);
+    font-weight: bolder;
+    text-shadow: -1px 1px 0 darkgreen,
+    1px 1px 0 darkgreen,
+    1px -1px 0 darkgreen,
+    -1px -1px 0 darkgreen;
+    font-size: xxx-large;
+}
+
+#main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#chat-container {
+    max-width: 600px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+#messages-container {
+    overflow-y: auto;
+    max-height: 70vh;
+    width: 100%;
+    padding: 20px;
+    background-color: white;
+}
+
+#chat-controls {
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.message {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 5px;
+    color: black;
+    font-family: Arial, sans-serif;
+}
+
+
+
+/* TABLETTES */
+@media(max-aspect-ratio: 3/4) {
+    #main-container {
+        margin-top: 40px;
+    }
+}
+
+/* TELEPHONES */
+@media(max-aspect-ratio: 1/2) {
+    #main-container {
+        margin-top: 40px;
+    }
+    #messageInput {
+        font-size: 2.5vw;
+    }
+    button{
+        font-size: 3vw;
+    }
+    .main_tile {
+        font-size: 7vw;
+    }
+}
+
+@media(orientation: portrait) {
+    #messageInput {
+        font-size: 2vw;
+    }
+
+    button {
+        font-size: 3vw;
+    }
+
+    .message {
+        font-size: 3vw;
+    }
+}

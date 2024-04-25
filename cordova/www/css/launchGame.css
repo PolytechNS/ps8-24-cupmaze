@@ -1,0 +1,54 @@
+@import "buttons.css";
+@import url('https://fonts.googleapis.com/css2?family=Sedan:ital@0;1&display=swap');
+* {
+    font-family: "Sedan", serif;;
+}
+
+body {
+    background-image: url("./../img/cupheadPlay.jpg");
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+    background-size: cover; /* Cover the entire body */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Do not repeat the background image */
+    height: 100vh; /* Make the body take up the entire viewport height */
+    display: flex;
+    background-color: #cccccc;
+    text-align: center;
+}
+
+.center{
+    margin: auto;
+    background: rgba(61, 117, 168, 0.7);
+    width: 60%;
+}
+
+.button{
+    margin: 1%;
+    padding: 1.5%;
+    width: 80%;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+}
+
+#back, .button{
+    cursor: pointer;
+    font-size: 4vh;
+    font-weight: bold;
+    color: rgba(255, 255, 255);
+    text-shadow: -1px 1px 0 #000,
+    1px 1px 0 #000,
+    1px -1px 0 #000,
+    -1px -1px 0 #000;
+}
+
+/*MODE PORTRAIT */
+@media(orientation: portrait){
+    .center{
+        width: 80vw; /* 80% de la largeur de la vue */
+        height: fit-content;
+    }
+    p {
+        margin-bottom: 5vh;
+    }
+}

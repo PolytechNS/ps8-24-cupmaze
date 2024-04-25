@@ -44,7 +44,7 @@ fetch(baseUrl+"/api/getLeaderboard?$",{
 
 let buttonBack = document.getElementById("button-back");
 buttonBack.onclick = function() {
-    window.location.href = baseUrl+'/mainMenu.html';
+    window.location.href = '/mainMenu.html';
 }
 
 

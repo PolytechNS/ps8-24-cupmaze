@@ -1,0 +1,90 @@
+@import "buttons.css";
+@import url('https://fonts.googleapis.com/css2?family=Sedan:ital@0;1&display=swap');
+* {
+    font-family: "Sedan", serif;;
+}
+
+body {
+    background-image: url("./../img/cupheadSignUp.jpg");
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    background-color: #cccccc;
+    text-align: center;
+}
+
+h1{
+    font-size: xxx-large;
+    color: white;
+    text-shadow: -1px 1px 0 black,
+    1px 1px 0 black,
+    1px -1px 0 black,
+    -1px -1px 0 black;
+    margin-bottom: 8%;
+}
+
+label{
+    font-size: xx-large;
+    color: white;
+    text-shadow: -1px 1px 0 black,
+    1px 1px 0 black,
+    1px -1px 0 black,
+    -1px -1px 0 black;
+    margin-bottom: 8%;
+}
+
+div{
+    padding: 1%;
+    width: 20%;
+    min-width: fit-content;
+    background: rgba(200,200,255,0.7);
+    border: none;
+    margin: 1% auto;
+    text-align: left;
+}
+
+button{
+    margin: 2%;
+    padding: 1%;
+    font-size: xx-large;
+    min-width: fit-content;
+    background-color: rgb(200,200,255);
+    width: fit-content;
+    color: white;
+    text-shadow: -1px 1px 0 black,
+    1px 1px 0 black,
+    1px -1px 0 black,
+    -1px -1px 0 black;
+    border: rgba(0,0,0,0);
+}
+
+@media(orientation: portrait) {
+    button{
+        font-size: 5vw;
+    }
+    h1{
+        font-size: 7vw;
+    }
+    input{
+        font-size: 3vw;
+    }
+    label{
+        font-size: 7vw;
+    }
+    div{
+        margin: 10% auto;
+    }
+}
+
+@media(max-aspect-ratio: 1/2) {
+    div{
+        margin: 25% auto;
+    }
+}
+
+@media (max-aspect-ratio: 1/2) and (orientation: portrait) {
+    h1 {
+        font-size: 7vw;
+    }
+}
+
