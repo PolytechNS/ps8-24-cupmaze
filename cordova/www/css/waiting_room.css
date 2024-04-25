@@ -39,12 +39,9 @@ h1{
     font-size: 3vh;
 }
 #button-leave-waiting{
-    font-size: xx-large;
+    font-size: 4vh;
     padding: 1%;
     border: none;
     background: rgba(255, 255, 255, 0.7);
-    position: fixed;
-    bottom: 2%;
-    left: 45%;
-    right: 45%;
+    margin-top: 84vh;
 }
