@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>1v1-Game page</title>
     <link rel="stylesheet" href="./css/page.css">
     <script src="./js/game_1v1/page.js" type="module"></script>
@@ -9,7 +10,6 @@
 </head>
 <body>
 <h1 id="display-number-tour"></h1>
-<h2 id="display-player-turn"></h2>
 
 <button id="button-leave-game">Abandonner & Quitter</button>
 <table>
@@ -19,6 +19,7 @@
             <h2 id="display-player-1-walls"></h2>
             <h2 id="display-player-1-number-actions"></h2>
         </td>
+        <td id="center"></td>
         <td id="player2-info">
             <h1 id="display-player-2"></h1>
             <h2 id="display-player-2-walls"></h2>
@@ -31,7 +32,6 @@
 <img id="player2Image" src="./img/CupheadBlue.png" alt="playerBlue"/>
 
 
-<button id="sendReaction" class="reaction-button">Envoyer une réaction</button>
 <div id="popup-reaction" class="popup-reaction">
     <div class="popup-content">
         <span class="close" id="closePopup">&times;</span>
@@ -57,8 +57,9 @@
 <div id="popup-notif" class="popup-notif">
     <div class="popup-notif-content">
         <span class="close" id="closePopup-notif">&times;</span>
-        <p id="popup-notif-content"></p>
-        <p id="popup-reaction-send"></p>
+        <div id="popup-notif-content"></div>
+        <br>
+        <div id="popup-reaction-send"></div>
     </div>
 </div>
 
@@ -72,8 +73,8 @@
 </div>
 
 <button id="button-validate-action">Valider son action</button>
+<button id="sendReaction" class="reaction-button">Envoyer une réaction</button>
 <button id="button-undo-action">Revenir en arrière</button>
-<!-- <button id="button-save-game">Sauvegarder et Quitter</button> -->
 
 </body>
 </html>
