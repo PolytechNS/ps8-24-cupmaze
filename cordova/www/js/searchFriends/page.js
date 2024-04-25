@@ -117,6 +117,30 @@ function acceptFriendRequest(usernameAdder) {
         });
 }
 
+function removeFriendRequest(usernameAdder) {
+    let myUsername = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
+    const params = {
+        usernameAdder: myUsername,
+        usernameToAdd: usernameAdder
+    };
+    const queryString = new URLSearchParams(params).toString();
+    fetch(baseUrl+"/api/removeFriendRequest?$"+queryString, {
+        method: "GET",
+    })
+        .then(async response => {
+            if (!response.ok) {
+                alert("ERROR"+response.status);
+            }else{
+                alert("Refus de l'ami validé");
+                console.log("Refus de l'ami bon");
+                retrieveWaitingFriendsRequests(null);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+        });
+}
+
 
 function deleteFriend(usernameToDelete) {
     let myUsername = document.cookie.split('; ').find(row => row.startsWith('Nameaccount')).split('=')[1].toString();
@@ -259,7 +283,13 @@ function retrieveWaitingFriendsRequests(params){
                         acceptFriendRequest(friendsRequest.split('&')[0]);
                         //alert(`L'utilisateur ${friendsRequest.split('&')[0]} a été ajouté à votre liste d'amis.`);
                     });
+                    const removeButton = document.createElement("button");
+                    removeButton.textContent = "Refuser la demande";
+                    removeButton.addEventListener("click", () => {
+                        removeFriendRequest(friendsRequest.split('&')[0]);
+                    });
                     resultDiv.appendChild(addButton);
+                    resultDiv.appendChild(removeButton);
                 }
             }
         })
