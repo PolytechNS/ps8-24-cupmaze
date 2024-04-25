@@ -1,4 +1,8 @@
+document.addEventListener("deviceready", onDeviceReady, false);
+function onDeviceReady() {
+    console.log(navigator.vibrate);
 
+}
 let socketNotifications;
 
 let friendsOfUser;
@@ -336,6 +340,9 @@ function init() {
 
 function onReceiveChallenge(receiveChallenge) {
     // on affiche une popup pour accepter ou refuser le challenge
+    if (window.cordova) {
+        navigator.notification.beep(1);
+    }
     const popup = document.getElementById('popup-notif');
     popup.style.display = 'block';
     popup.style.backgroundColor = 'red';
