@@ -60,15 +60,20 @@ function main() {
 
     firstPlayer = gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id;
     let leaveGameButtonStyle = document.getElementById("button-leave-game").style;
+    let reactButton = document.getElementById("sendReaction");
     if(firstPlayer) {
         leaveGameButtonStyle.left = "0%";
         leaveGameButtonStyle.removeProperty("float");
         leaveGameButtonStyle.background = "rgba(200, 94, 94, 0.7)";
+
+        reactButton.classList.add("reaction-button-player1");
     }
     else {
         leaveGameButtonStyle.background = "rgba(94,174,200, 0.7)";
         leaveGameButtonStyle.removeProperty("left");
         leaveGameButtonStyle.float = "right";
+
+        reactButton.classList.add("reaction-button-player2");
     }
 
 
@@ -591,7 +596,6 @@ function undoWall(action) {
      document.getElementById("display-player-1-number-actions").style.display = "flex";
      document.getElementById("display-player-2-number-actions").style.display = "flex";
      document.getElementById("display-number-tour").style.display = "flex";
-     document.getElementById("display-player-turn").style.display = "flex";
      document.getElementById("player1Image").style.display = "flex";
      document.getElementById("player2Image").style.display = "flex";
  }
