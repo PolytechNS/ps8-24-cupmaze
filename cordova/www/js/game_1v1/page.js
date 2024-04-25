@@ -76,7 +76,6 @@ function main() {
         leaveGameButtonStyle.float = "right";
 
         reactButton.classList.add("reaction-button-player2");
-        reactionPopup.style.right = "20px";
     }
 
 
@@ -87,7 +86,6 @@ function main() {
             let content = document.getElementById("popup-notif-content");
             content.textContent = usernameSender + " a envoyé une réaction !";
             let reactionSend = document.getElementById("popup-reaction-send");
-            reactionSend.style.fontSize= "20px";
             reactionSend.textContent = reaction;
         } else {
             let popupNotif = document.getElementById("popup-notif");

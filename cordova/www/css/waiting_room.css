@@ -16,6 +16,24 @@ body {
     text-align: center;
 }
 
+h1, p, #button-leave-waiting{
+    color: white;
+    text-shadow: -1px 1px 0 black,
+    1px 1px 0 black,
+    1px -1px 0 black,
+    -1px -1px 0 black;
+}
+h1{
+    font-size: 5vh;
+}
+#button-leave-waiting{
+    font-size: 4vh;
+    padding: 1%;
+    border: none;
+    background: rgba(255, 255, 255, 0.7);
+    margin-top: 75vh;
+}
+
 @media (max-aspect-ratio: 3/4) {
     body {
         background-position: -10vw center;;
@@ -26,22 +44,7 @@ body {
     body {
         background-position: -43vw center;;
     }
-}
-
-h1, p, #button-leave-waiting{
-    color: white;
-    text-shadow: -1px 1px 0 black,
-    1px 1px 0 black,
-    1px -1px 0 black,
-    -1px -1px 0 black;
-}
-h1{
-    font-size: 3vh;
-}
-#button-leave-waiting{
-    font-size: 4vh;
-    padding: 1%;
-    border: none;
-    background: rgba(255, 255, 255, 0.7);
-    margin-top: 84vh;
+    h1{
+        font-size: 4vh;
+    }
 }
