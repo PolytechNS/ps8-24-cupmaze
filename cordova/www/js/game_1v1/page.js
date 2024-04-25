@@ -647,26 +647,22 @@ function undoWall(action) {
         if (action.valid) {
             let popup = document.getElementById("popup");
             popup.style.display = 'flex';
-            let winnerText;
-            let leaverText;
+            let text;
             if (gameInformation.roomName === decodeJWTPayload(getCookie("jwt")).id) {
                 if (action.winner === 1) {
-                    winnerText = player1_name;
-                    leaverText = player2_name;
+                    text = "L'adversaire " + player2_name +" a abandonné";
                 } else {
-                    winnerText = player2_name;
-                    leaverText = player1_name;
+                    text = "Vous avez abandonné";
                 }
             } else {
                 if (action.winner === 1) {
-                    winnerText = player1_name;
-                    leaverText = player2_name;
+                    text = "Vous avez abandonné";
                 } else {
-                    winnerText = player2_name;
-                    leaverText = player1_name;
+                    text = "L'adversaire " + player1_name +" a abandonné";
                 }
             }
-            document.getElementById("popup-ready-message").innerHTML = "Le joueur " + leaverText + " a quitté la partie.<br> Victoire de " + winnerText + " !! Félicitations ! ";
+            document.getElementById("popup-ready-message").innerHTML = text;
+            //document.getElementById("popup-ready-message").innerHTML = "Le joueur " + leaverText + " a quitté la partie.<br> Victoire de " + winnerText + " !! Félicitations ! ";
             document.getElementById("popup-button").style.display = "none";
             setTimeout(() => {
                 window.location.href = `/mainMenu.html`;

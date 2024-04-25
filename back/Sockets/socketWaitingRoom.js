@@ -585,8 +585,13 @@ function createSocket(io) {
             // c'est le joueur qui a abandonné
             let user = decodeJWTPayload(token);
             if (!gameState || !roomId) { return; }
-
-                let winner = gameState.game.currentPlayer === 1 ? 2 : 1;
+                let current;
+                if (user.id === roomId) {
+                    current = 1;
+                } else {
+                    current = 2;
+                }
+                let winner = current === 1 ? 2 : 1;
                 if (playersWithRooms[roomId].gameMode === "ranked") {
                     const eloGame = updateElo(roomId, winner);
                 }
