@@ -28,13 +28,14 @@ document.getElementById("signup-form").addEventListener("submit", async function
     })
         .then(response => {
             if (!response.ok) {
-                alert('Erreur:', response.status)
+                //alert('Erreur:', response.status)
                 if (response.status === 409) {
-                    //alert('Cet email est déjà utilisé');
-                    window.location.href = 'welcome.html';
+                    alert('Cet email est déjà utilisé');
+                    //window.location.href = 'welcome.html';
                     return;
                 }
             }
+            alert('Inscription réussie');
             window.location.href = 'welcome.html';
         })
         .then(data => {
